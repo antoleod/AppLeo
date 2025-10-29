@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>App bebé — Léo</title>
+<link rel="stylesheet" href="css/styles.css" />
+
+<!-- Configuración PWA y tema -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a84ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="App Léo">
+<!-- Ícono de la aplicación (Favicon) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a84ff'/><text x='50' y='70' font-family='-apple-system, sans-serif' font-weight='bold' font-size='80' fill='white' text-anchor='middle'>L</text></svg>">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png"> <!-- Ícono para iOS -->
+
+</head>
+<body>
+  <input type="file" id="bg-picker" accept="image/*" style="display:none" />
+  <div class="wrap stack" id="app-container">
+    <div id="save-indicator" class="save-indicator" data-state="idle" aria-live="polite">
+      <span class="save-icon"></span>
+      <span id="save-label" class="save-label">Prêt</span>
+    </div>
+
+    <h1>Bonjour, maman ✨</h1>
+
+    <!-- Avatar Léo -->
+    <div class="card row row-center" id="leo-card">
+      <button class="avatar avatar-btn" id="avatar-btn" type="button">🍼</button>
+      <div class="col">
+        <button class="info-btn" id="info-btn" type="button">
+          <div class="leo-name">Léo</div>
+          <div class="muted" id="leo-summary-info">Touchez pour voir les informations</div>
+        </button>
+      </div>
+      <button class="chevron-btn" id="info-chevron" type="button" aria-label="Infos Léo">›</button>
+    </div>
+
+    <!-- Botones principales -->
+    <div class="primary-actions">
+      <button class="btn btn-primary" id="btn-leche" aria-label="Enregistrer une tétée ou un biberon">
+        <span class="btn-icon">🍼</span> Lait
+      </button>
+      <button class="btn btn-success" id="btn-elim" aria-label="Enregistrer un changement de couche ou un vomi">
+        <span class="btn-icon">🚼</span> Couche
+      </button>
+      <button class="btn btn-warning" id="btn-med" aria-label="Enregistrer un médicament">
+        <span class="btn-icon">💊</span> Meds
+      </button>
+      <button class="btn btn-info" id="btn-mesures" aria-label="Enregistrer la température, le poids ou la taille">
+        <span class="btn-icon">🌡️</span> Mesures
+      </button>
+    </div>
+
+    <div class="report-line" id="dashboard-elim"></div>
+
+    <!-- Historial -->
+    <div class="stack">
+      <div class="section-head">
+        <div class="view-switcher">
+          <button class="icon-btn" id="history-range-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Changer la période du rapport">
+            <span class="icon-calendar" aria-hidden="true"></span>
+            <span class="label" id="history-range-label">Aujourd'hui</span>
+            <span class="caret" aria-hidden="true">▾</span>
+          </button>
+          <span class="pill" id="count-pill">0</span>
+          <button class="icon-btn icon-btn-secondary icon-only" id="export-pdf" type="button" aria-label="Exporter le rapport en PDF" style="margin-left: auto;">
+            <span class="icon-export" aria-hidden="true"></span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+          <div class="range-menu" id="history-range-menu" role="menu" aria-labelledby="history-range-btn">
+            <button class="range-option active" type="button" data-range="day" role="menuitemradio" aria-checked="true">
+              <span class="icon-calendar" aria-hidden="true"></span>
+              <span>Jour actuel</span>
+            </button>
+            <button class="range-option" type="button" data-range="week" role="menuitemradio" aria-checked="false">
+              <span class="icon-calendar" aria-hidden="true"></span>
+              <span>7 derniers jours</span>
+            </button>
+            <button class="range-option" type="button" data-range="month" role="menuitemradio" aria-checked="false">
+              <span class="icon-calendar" aria-hidden="true"></span>
+              <span>30 derniers jours</span>
+            </button>
+            <div class="range-option range-option-custom" data-range="custom" role="menuitemradio" aria-checked="false" tabindex="-1">
+              <button class="range-option-custom-trigger" type="button">
+                <span class="icon-calendar" aria-hidden="true"></span>
+                <span>Choisir une date</span>
+              </button>
+              <input class="range-date-input" id="history-range-date" type="date" aria-label="Sélectionner une date spécifique" />
+            </div>
+          </div>
+        </div>
+        <div class="history-actions">
+          <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuel</button>
+          <button class="btn btn-ghost btn-compact" id="btn-stats" type="button"><span class="btn-icon">📈</span> Statistiques</button>
+        </div>
+        <div class="selection-actions is-hidden" id="selection-actions">
+          <button class="btn btn-ghost" id="cancel-select-btn" type="button">Annuler</button>
+          <button class="btn btn-danger" id="delete-selected-btn" type="button" disabled>Supprimer la sélection (0)</button>
+        </div>
+      </div>
+      <div class="list" id="history"></div>
+    </div>
+  </div>
+
+  <!-- Modal LAIT -->
+  <div class="modal" id="modal-leche" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="modal-header">
+        <h2>Lait</h2>
+        <button class="btn btn-ghost btn-compact" id="close-leche">Fermer</button>
+      </div>
+
+      <div class="seg">
+        <button id="seg-pecho" class="active">Sein</button>
+        <button id="seg-biberon">Biberon</button>
+      </div>
+
+      <div class="stack" id="feed-content">
+        <!-- Pecho -->
+        <div id="pane-pecho" class="stack pane-content">
+          <div class="seg seg-sides">
+            <button id="side-left" class="active">Gauche</button>
+            <button id="side-right">Droite</button>
+            <button id="side-both">Les deux</button>
+          </div>
+          <div class="text-center">
+            <div class="time" id="chrono">00:00:00</div>
+            <div id="start-time-display" class="muted"></div>
+            <button class="btn btn-primary" id="startStop">Démarrer</button>
+          </div>
+        </div>
+
+        <!-- Biberón -->
+        <div id="pane-biberon" class="stack is-hidden">
+          <div class="field field-padded">
+            <label for="ml">Quantité (ml)</label>
+            <input id="ml" class="input" type="number" inputmode="numeric" placeholder="ej. 120" />
+          </div>
+          <button class="btn btn-primary" id="save-biberon">Enregistrer</button>
+        </div>
+
+        <div class="report-line" id="summary-feed"></div>
+
+        <div class="stack" id="feed-history-section">
+          <strong>Aujourd'hui</strong>
+          <div class="list" id="feed-history"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ELIMINACIONES -->
+  <div class="modal" id="modal-elim" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="modal-header">
+        <h2>Pipi / Caca / Vomi</h2>
+        <button class="btn btn-ghost btn-compact" id="close-elim">Fermer</button>
+      </div>
+
+      <div class="stack">
+        <div class="field">
+          <label>Pipi</label>
+          <div class="scale" data-scale="pee"></div>
+        </div>
+        <div class="field">
+          <label>Caca</label>
+          <div class="scale" data-scale="poop"></div>
+        </div>
+        <div class="field">
+          <label>Vomi</label>
+          <div class="scale" data-scale="vomit"></div>
+        </div>
+      </div>
+
+      <div class="report-line" id="summary-elim"></div>
+
+      <div class="footer">
+        <button class="btn btn-ghost" id="cancel-elim">Annuler</button>
+        <button class="btn btn-primary" id="save-elim">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MEDICAMENTS -->
+  <div class="modal" id="modal-med" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="modal-header">
+        <h2>Medicaments</h2>
+        <button class="btn btn-ghost btn-compact" id="close-med" type="button">Fermer</button>
+      </div>
+
+      <div class="stack">
+        <div class="field">
+          <label for="medication-select">Choisir un medicament</label>
+          <select id="medication-select" class="input">
+            <option value="ibufrone">Ibufrone</option>
+            <option value="dalfalgan">Dalfalgan</option>
+            <option value="other">Autres...</option>
+          </select>
+        </div>
+        <div class="field is-hidden" id="medication-other-field">
+          <label for="medication-other">Nom du medicament</label>
+          <input id="medication-other" class="input" type="text" placeholder="Nom du medicament" />
+        </div>
+        <div class="report-line" id="summary-med"></div>
+      </div>
+
+      <div class="footer">
+        <button class="btn btn-ghost" id="cancel-med" type="button">Annuler</button>
+        <button class="btn btn-primary" id="save-med" type="button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MESURES -->
+  <div class="modal" id="modal-mesures" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="modal-header">
+        <h2>Mesures</h2>
+        <button class="btn btn-ghost btn-compact" id="close-mesures" type="button">Fermer</button>
+      </div>
+
+      <div class="stack form-grid">
+        <div class="field">
+          <label for="mesure-temp">Température (°C)</label>
+          <input id="mesure-temp" class="input" type="number" inputmode="numeric" step="0.1" placeholder="ex. 37.5" />
+        </div>
+        <div class="field">
+          <label for="mesure-poids">Poids (kg)</label>
+          <input id="mesure-poids" class="input" type="number" inputmode="numeric" step="0.01" placeholder="ex. 4.25" />
+        </div>
+        <div class="field">
+          <label for="mesure-taille">Taille (cm)</label>
+          <input id="mesure-taille" class="input" type="number" inputmode="numeric" step="0.1" placeholder="ex. 55.5" />
+        </div>
+      </div>
+
+      <div class="footer">
+        <button class="btn btn-ghost" id="cancel-mesures" type="button">Annuler</button>
+        <button class="btn btn-primary" id="save-mesures" type="button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MANUAL -->
+  <div class="modal" id="modal-manual" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="row modal-header">
+        <h2>Nouvel enregistrement</h2>
+        <button class="btn btn-ghost btn-compact" id="close-manual" type="button">Fermer</button>
+      </div>
+
+      <div class="seg" id="manual-type">
+        <button data-type="feed" class="active" type="button"><span class="btn-icon">🍼</span> Lait</button>
+        <button data-type="elim" type="button"><span class="btn-icon">🚼</span> Couche</button>
+        <button data-type="med" type="button"><span class="btn-icon">💊</span> Meds</button>
+        <button data-type="measurement" type="button"><span class="btn-icon">🌡️</span> Mesures</button>
+      </div>
+
+      <div class="stack form-grid" id="manual-feed-fields">
+        <div class="field span-2">
+          <label for="manual-source">Source</label>
+          <select id="manual-source" class="input">
+            <option value="breast">Sein</option>
+            <option value="bottle">Biberon</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="manual-breast">Côté</label>
+          <select id="manual-breast" class="input">
+            <option value="Gauche">Gauche</option>
+            <option value="Droite">Droite</option>
+            <option value="Les deux">Les deux</option>
+          </select>
+        </div>
+        <div class="field" id="manual-duration-field">
+          <label for="manual-duration">Durée (minutes)</label>
+          <input id="manual-duration" class="input" type="number" inputmode="numeric" min="0" step="1" placeholder="ex. 12" />
+        </div>
+        <div class="field is-hidden" id="manual-amount-field">
+          <label for="manual-amount">Quantité (ml)</label>
+          <input id="manual-amount" class="input" type="number" inputmode="numeric" min="0" step="10" placeholder="ex. 120" />
+        </div>
+        <div class="field span-2">
+          <label for="manual-notes">Notes</label>
+          <textarea id="manual-notes" class="input textarea" rows="2" placeholder="Observations rapides..."></textarea>
+        </div>
+      </div>
+
+      <div class="stack form-grid is-hidden" id="manual-elim-fields">
+        <div class="field">
+          <label for="manual-pee">Pipi</label>
+          <input id="manual-pee" class="input" type="number" inputmode="numeric" min="0" max="3" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label for="manual-poop">Caca</label>
+          <input id="manual-poop" class="input" type="number" inputmode="numeric" min="0" max="3" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label for="manual-vomit">Vomi</label>
+          <input id="manual-vomit" class="input" type="number" inputmode="numeric" min="0" max="3" step="1" value="0" />
+        </div>
+        <div class="field span-2">
+          <label for="manual-elim-notes">Notes</label>
+          <textarea id="manual-elim-notes" class="input textarea" rows="2" placeholder="Textures, couleurs, etc."></textarea>
+        </div>
+      </div>
+
+      <div class="stack form-grid is-hidden" id="manual-med-fields">
+        <div class="field">
+          <label for="manual-med-select">Médicament</label>
+          <select id="manual-med-select" class="input">
+            <option value="ibufrone">Ibufrone</option>
+            <option value="dalfalgan">Dalfalgan</option>
+            <option value="other">Autres...</option>
+          </select>
+        </div>
+        <div class="field is-hidden" id="manual-med-other-field">
+          <label for="manual-med-other">Nom</label>
+          <input id="manual-med-other" class="input" type="text" placeholder="Nom du medicament" />
+        </div>
+        <div class="field">
+          <label for="manual-med-dose">Dose</label>
+          <input id="manual-med-dose" class="input" type="text" placeholder="ex. 5 ml" />
+        </div>
+        <div class="field span-2">
+          <label for="manual-med-notes">Notes</label>
+          <textarea id="manual-med-notes" class="input textarea" rows="2" placeholder="Réactions, rappel..."></textarea>
+        </div>
+      </div>
+
+      <div class="stack form-grid is-hidden" id="manual-mesures-fields">
+        <div class="field">
+          <label for="manual-mesure-temp">Température (°C)</label>
+          <input id="manual-mesure-temp" class="input" type="number" inputmode="numeric" step="0.1" placeholder="ex. 37.5" />
+        </div>
+        <div class="field">
+          <label for="manual-mesure-poids">Poids (kg)</label>
+          <input id="manual-mesure-poids" class="input" type="number" inputmode="numeric" step="0.01" placeholder="ex. 4.25" />
+        </div>
+        <div class="field">
+          <label for="manual-mesure-taille">Taille (cm)</label>
+          <input id="manual-mesure-taille" class="input" type="number" inputmode="numeric" step="0.1" placeholder="ex. 55.5" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="manual-datetime">Date &amp; heure</label>
+        <input id="manual-datetime" class="input" type="datetime-local" />
+      </div>
+
+      <div class="footer">
+        <button class="btn btn-ghost" id="cancel-manual" type="button">Annuler</button>
+        <button class="btn btn-primary" id="save-manual" type="button">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal STATS -->
+  <div class="modal" id="modal-stats" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="row modal-header">
+        <h2>Statistiques</h2>
+        <button class="btn btn-ghost btn-compact" id="close-stats" type="button">Fermer</button>
+      </div>
+
+      <div class="stack stats-content">
+        <div class="stats-summary" id="stats-summary" aria-live="polite">
+          <div class="stat-placeholder">Choisissez une periode pour voir les totaux d'allaitement et de biberon.</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="stats-chart"></canvas>
+        </div>
+        <div class="stats-breakdown">
+          <div class="stats-breakdown-head">
+            <h3>Répartition quotidienne</h3>
+            <span class="muted" id="stats-breakdown-label"></span>
+          </div>
+          <div class="stats-day-list" id="stats-day-list">
+            <div class="stat-placeholder">Sélectionnez une période pour voir le détail quotidien.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template para los elementos del historial -->
+  <template id="history-item-template">
+    <div class="item history-item" role="listitem">
+      <input type="checkbox" class="history-item-checkbox" aria-label="Sélectionner cet élément">
+      <div class="item-content">
+        <strong class="item-title"></strong>
+        <div class="item-meta"></div>
+      </div>
+      <div class="item-actions">
+        <button class="item-action item-edit" type="button" aria-label="Modifier l'élément">
+          <span>✏️</span>
+        </button>
+        <button class="item-action item-delete" type="button" aria-label="Supprimer l'élément">
+          <span>🗑️</span>
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

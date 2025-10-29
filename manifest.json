@@ -1,0 +1,21 @@
+{
+  "name": "App Léo - Suivi de bébé",
+  "short_name": "App Léo",
+  "description": "Une application simple pour suivre les repas, les couches et la croissance de Léo.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7fafd",
+  "theme_color": "#0a84ff",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
