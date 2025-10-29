@@ -213,6 +213,8 @@ const historyRangeLabel = $('#history-range-label');
 const historyRangeMenu = $('#history-range-menu');
 const historyRangeDateInput = $('#history-range-date');
 const historyRangeOptions = $$('#history-range-menu .range-option[data-range]');
+const rangePickerModal = $('#modal-range-picker');
+const closeRangePickerBtn = $('#close-range-picker');
 const statsBtn = $('#btn-stats');
 const statsModal = $('#modal-stats');
 const closeStatsBtn = $('#close-stats');
@@ -484,6 +486,23 @@ function setHistoryRange(mode, extra = {}){
   syncHistoryRangeUI();
   renderHistory();
 }
+
+function syncRangePickerModal() {
+  if (!rangePickerModal) return;
+  const options = $$('.range-option-item', rangePickerModal);
+  options.forEach(option => {
+    const isActive = option.dataset.range === historyRange.mode;
+    option.classList.toggle('active', isActive);
+    option.setAttribute('aria-checked', String(isActive));
+  });
+  const customInput = $('#custom-range-date-modal', rangePickerModal);
+  if (customInput) {
+    const isCustom = historyRange.mode === 'custom';
+    customInput.closest('.range-option-item-custom')?.classList.toggle('active', isCustom);
+    customInput.value = isCustom && historyRange.date ? historyRange.date : '';
+  }
+}
+
 
 function closeHistoryRangeMenu(){
   if(!historyRangeMenu) return;
@@ -901,22 +920,28 @@ function updateStatsChart(force = false){
             type: 'linear',
             position: 'left',
             beginAtZero: true,
-            title: {display:true, text:'Minutes sein'},
-            ticks: {precision:0},
-            grid: {color:'rgba(148, 163, 184, 0.25)'}
+            title: {display:true, text:'Minutes sein', color: '#f5f7ff'},
+            ticks: {
+              precision:0,
+              color: '#f5f7ff'
+            },
+            grid: {color:'rgba(255, 255, 255, 0.15)'}
           },
           y1: {
             type: 'linear',
             position: 'right',
             beginAtZero: true,
-            title: {display:true, text:'Millilitres biberon'},
-            ticks: {precision:0},
+            title: {display:true, text:'Millilitres biberon', color: '#f5f7ff'},
+            ticks: {
+              precision:0,
+              color: '#f5f7ff'
+            },
             grid: {drawOnChartArea:false}
           },
           x: {
             grid: {display:false},
             ticks: {
-              color: '#1f2937',
+              color: '#f5f7ff',
               font: {weight:'600'}
             }
           }
@@ -924,9 +949,17 @@ function updateStatsChart(force = false){
         plugins: {
           legend: {
             display: true,
-            labels: {usePointStyle:true}
+            labels: {
+              usePointStyle:true,
+              color: '#f5f7ff'
+            }
           },
           tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: 'rgba(255,255,255,0.2)',
+            borderWidth: 1,
             callbacks: {
               label(context){
                 const value = context.parsed.y ?? 0;
@@ -940,7 +973,7 @@ function updateStatsChart(force = false){
           title: {
             display: true,
             text: `Periode : ${summary.rangeLabel}`,
-            color: '#0f172a',
+            color: '#f5f7ff',
             font: {
               size: 14,
               weight: '600'
@@ -1069,7 +1102,8 @@ renderHistory();
 
 historyRangeBtn?.addEventListener('click', (event) => {
   event.preventDefault();
-  toggleHistoryRangeMenu();
+  syncRangePickerModal();
+  openModal('#modal-range-picker');
 });
 
 historyRangeMenu?.addEventListener('click', (event) => {
@@ -1084,6 +1118,21 @@ historyRangeDateInput?.addEventListener('change', () => {
   setHistoryRange('custom', { date: value });
   closeHistoryRangeMenu();
   historyRangeBtn?.focus();
+});
+
+rangePickerModal?.addEventListener('click', (e) => {
+  const target = e.target.closest('.range-option-item');
+  if (target) {
+    const range = target.dataset.range;
+    if (range) {
+      setHistoryRange(range);
+      closeModal('#modal-range-picker');
+    }
+  }
+});
+
+closeRangePickerBtn?.addEventListener('click', () => {
+  closeModal('#modal-range-picker');
 });
 
 statsBtn?.addEventListener('click', () => {

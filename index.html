@@ -12,9 +12,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="App Léo">
-<!-- Ícono de la aplicación (Favicon) -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%230a84ff'/><text x='50' y='70' font-family='-apple-system, sans-serif' font-weight='bold' font-size='80' fill='white' text-anchor='middle'>L</text></svg>">
-<link rel="apple-touch-icon" href="img/apple-touch-icon.png"> <!-- Ícono para iOS -->
+
+<!-- Íconos de la aplicación -->
+<link rel="icon" href="img/icon/icon-square-180.png" type="image/png"> <!-- Ícono principal -->
+<link rel="apple-touch-icon" href="img/icon/icon-square-180.png"> <!-- Ícono para iOS -->
 
 </head>
 <body>
@@ -403,6 +404,30 @@
       <div class="footer">
         <button class="btn btn-ghost" id="cancel-confirm-delete" type="button">Annuler</button>
         <button class="btn btn-danger" id="confirm-delete-btn" type="button">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal DATE RANGE PICKER -->
+  <div class="modal" id="modal-range-picker" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="modal-header">
+        <h2>Choisir une période</h2>
+        <button class="btn btn-ghost btn-compact" id="close-range-picker" type="button">Fermer</button>
+      </div>
+      <div class="list" id="range-picker-options">
+        <button class="range-option-item" data-range="day">
+          <span class="icon-calendar"></span>
+          <span>Jour actuel</span>
+        </button>
+        <button class="range-option-item" data-range="week">
+          <span class="icon-calendar"></span>
+          <span>7 derniers jours</span>
+        </button>
+        <button class="range-option-item" data-range="month">
+          <span class="icon-calendar"></span>
+          <span>30 derniers jours</span>
+        </button>
       </div>
     </div>
   </div>
