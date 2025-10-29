@@ -1476,7 +1476,7 @@ function closeModal(id){
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden','true');
   modal.setAttribute('inert','');
-  if(!document.querySelector('.modal.open')){
+  if ($$('.modal.open').length === 0) {
     document.body.classList.remove('modal-open');
   }
   const prev = modal.__prevFocus;
