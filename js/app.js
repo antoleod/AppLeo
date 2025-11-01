@@ -1671,6 +1671,50 @@ historyList?.addEventListener('click', (e) => {
   }
 }); 
 
+let undoState = {
+  timer: null,
+  items: [],
+};
+
+function showUndoToast(items) {
+  const toast = $('#undo-toast');
+  const messageEl = $('#undo-message');
+  const undoBtn = $('#undo-btn');
+
+  if (undoState.timer) {
+    clearTimeout(undoState.timer);
+    commitDeletion(); // Commit la eliminación anterior antes de mostrar una nueva
+  }
+
+  undoState.items = items;
+  messageEl.textContent = `${items.length} elemento(s) eliminado(s)`;
+  toast.classList.add('show');
+
+  undoBtn.onclick = () => executeUndo();
+
+  undoState.timer = setTimeout(() => {
+    commitDeletion();
+  }, 7000); // 7 segundos para deshacer
+}
+
+function executeUndo() {
+  if (undoState.timer) clearTimeout(undoState.timer);
+  $('#undo-toast').classList.remove('show');
+  
+  // Simplemente renderiza de nuevo el historial para restaurar los elementos
+  renderHistory();
+
+  undoState.items = [];
+  undoState.timer = null;
+}
+
+function commitDeletion() {
+  if (!undoState.items.length) return;
+  const api = getPersistenceApi();
+  api?.deleteEntries(undoState.items);
+  executeUndo(); // Limpia el estado de deshacer
+}
+
 function confirmAndDelete(itemsToDelete) {
   if (!itemsToDelete || itemsToDelete.length === 0) return;
 
@@ -1693,39 +1737,31 @@ function confirmAndDelete(itemsToDelete) {
       pinInput.focus();
       return;
     }
-    triggerVibration(100); // Vibration for deletion
+    triggerVibration(100);
 
-    let changed = false;
-    const idsByType = itemsToDelete.reduce((acc, item) => {
-      if (!acc[item.type]) acc[item.type] = new Set();
-      acc[item.type].add(String(item.id));
-      return acc;
-    }, {});
-
-    updateState(currentData => {
-      for (const type in idsByType) {
-        const ids = idsByType[type];
-        if (currentData[type + 's']) {
-          const initialCount = currentData[type + 's'].length;
-          currentData[type + 's'] = currentData[type + 's'].filter(item => !ids.has(String(item.id)));
-          if (currentData[type + 's'].length < initialCount) changed = true;
-        }
+    // Optimistic UI: remove from view immediately
+    const idsToDeleteSet = new Set(itemsToDelete.map(item => item.id));
+    $$('.history-item').forEach(el => {
+      const checkbox = el.querySelector('.history-item-checkbox');
+      if (checkbox && idsToDeleteSet.has(checkbox.dataset.id)) {
+        el.classList.add('is-deleting');
       }
+    });
+
+    // Update state but keep items in undo buffer
+    updateState(currentData => {
+      itemsToDelete.forEach(({ type, id }) => {
+        const key = type + 's';
+        if (currentData[key]) {
+          currentData[key] = currentData[key].filter(item => String(item.id) !== String(id));
+        }
+      });
       return currentData;
     });
 
-    if (changed) {
-      for (const type in idsByType) {
-        const idsToDelete = Array.from(idsByType[type]);
-        const api = getPersistenceApi();
-        api?.deleteEntries?.(type, idsToDelete, `Delete ${idsToDelete.length} ${type}(s)`);
-      }
-    }
+    showUndoToast(itemsToDelete);
     toggleDeleteMode(false);
     closeConfirmModal();
-
-    // Recargar la vista principal para asegurar que volvemos a index.html después de borrar.
-    window.location.href = './index.html';
   }
 
   confirmBtn.onclick = onConfirm;
@@ -2956,7 +2992,6 @@ function handleSwipeStart(e) {
   }
 
   swipeState.target = foreground;
-  swipeState.startX = e.pointerId ? e.clientX : e.touches[0].clientX;
   swipeState.startX = e.clientX;
   swipeState.isSwiping = false;
   historyList.addEventListener('pointermove', handleSwipeMove, { passive: false });
@@ -2967,7 +3002,6 @@ function handleSwipeStart(e) {
 function handleSwipeMove(e) {
   if (!swipeState.target) return;
 
-  swipeState.currentX = e.pointerId ? e.clientX : e.touches[0].clientX;
   swipeState.currentX = e.clientX;
   const deltaX = swipeState.currentX - swipeState.startX;
 
