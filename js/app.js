@@ -10,6 +10,18 @@ const store = {
   remove(key){ localStorage.removeItem(key); }
 };
 
+// ===== Haptic Feedback =====
+function triggerVibration(duration = 50) {
+  if (navigator.vibrate) {
+    try {
+      // Using a short, distinct vibration pattern for confirmation
+      navigator.vibrate(duration);
+    } catch (e) {
+      console.warn("Vibration failed", e);
+    }
+  }
+}
+
 // ===== Theme handling =====
 const themeToggleBtn = $('#theme-toggle');
 const themeToggleLabel = themeToggleBtn ? themeToggleBtn.querySelector('.theme-toggle-label') : null;
@@ -269,7 +281,8 @@ function saveHeroMeta(meta){
 function syncHeroRotation({advance=false, force=false} = {}){
   const sources = getHeroSources();
   if(!sources.length) return;
-  let meta = getHeroMeta();
+  let meta = getHeroMeta();  
+  triggerVibration();
   const now = Date.now();
   let index = meta.index % sources.length;
   if(index < 0) index = (index + sources.length) % sources.length;
@@ -1476,8 +1489,8 @@ function renderHistory(){
 
       const entriesForDay = groupedByDay[dayKey];
       for (const row of entriesForDay) {
-        const clone = itemTemplate.content.cloneNode(true);
-        const div = clone.querySelector('.history-item');
+        const templateClone = itemTemplate.content.cloneNode(true);
+        const itemContainer = templateClone.querySelector('.history-item');
         const dateString = new Date(row.item.dateISO).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
         let title = '';
 
@@ -1511,20 +1524,20 @@ function renderHistory(){
           metaHtml.push(`<span class="item-note">${escapeHtml(row.item.notes)}</span>`);
         }
 
-        div.querySelector('.item-title').textContent = title;
-        div.querySelector('.item-meta').innerHTML = metaHtml.join('');
+        itemContainer.querySelector('.item-title').textContent = title;
+        itemContainer.querySelector('.item-meta').innerHTML = metaHtml.join('');
 
-        const checkbox = div.querySelector('.history-item-checkbox');
+        const checkbox = itemContainer.querySelector('.history-item-checkbox');
         checkbox.dataset.id = row.item.id;
         checkbox.dataset.type = row.type;
 
-        div.querySelector('.item-edit').dataset.id = row.item.id;
-        div.querySelector('.item-edit').dataset.type = row.type;
-        div.querySelector('.item-delete').dataset.id = row.item.id;
-        div.querySelector('.item-delete').dataset.type = row.type;
+        itemContainer.querySelector('.item-edit').dataset.id = row.item.id;
+        itemContainer.querySelector('.item-edit').dataset.type = row.type;
+        itemContainer.querySelector('.swipe-delete-btn').dataset.id = row.item.id;
+        itemContainer.querySelector('.swipe-delete-btn').dataset.type = row.type;
 
-        fragment.appendChild(div);
-        newItems.push(div);
+        fragment.appendChild(itemContainer);
+        newItems.push(itemContainer);
       }
     }
     historyList.appendChild(fragment);
@@ -1593,7 +1606,7 @@ const LONG_PRESS_DURATION = 500;
 
 historyList?.addEventListener('pointerdown', (e) => {
   if (isDeleteMode) return;
-  const item = e.target.closest('.history-item');
+  const item = e.target.closest('.history-item-foreground');
   if (!item) return;
 
   longPressTarget = item;
@@ -1624,16 +1637,16 @@ historyList?.addEventListener('pointerleave', cancelLongPress);
 historyList?.addEventListener('contextmenu', (e) => e.preventDefault()); // Evita el menú contextual
 
 historyList?.addEventListener('click', (e) => {
+  const itemContainer = e.target.closest('.history-item');
   if (longPressTimer) {
     cancelLongPress();
   }
   
   if (isDeleteMode) {
-    const item = e.target.closest('.history-item');
-    const checkbox = item?.querySelector('.history-item-checkbox');
-    if (item && checkbox && e.target !== checkbox) {
+    const checkbox = itemContainer?.querySelector('.history-item-checkbox');
+    if (itemContainer && checkbox && e.target !== checkbox) {
       checkbox.checked = !checkbox.checked;
-      item.classList.toggle('is-selected', checkbox.checked);
+      itemContainer.classList.toggle('is-selected', checkbox.checked);
       updateSelectionCount();
     } else if (e.target.classList.contains('history-item-checkbox')) {
       e.target.closest('.item')?.classList.toggle('is-selected', e.target.checked);
@@ -1651,12 +1664,12 @@ historyList?.addEventListener('click', (e) => {
     return;
   }
 
-  const deleteBtn = e.target.closest('.item-delete');
+  const deleteBtn = e.target.closest('.swipe-delete-btn');
   if (deleteBtn) {
     const { type, id } = deleteBtn.dataset;
     confirmAndDelete([{ type, id }]);
   }
-});
+}); 
 
 function confirmAndDelete(itemsToDelete) {
   if (!itemsToDelete || itemsToDelete.length === 0) return;
@@ -1680,6 +1693,7 @@ function confirmAndDelete(itemsToDelete) {
       pinInput.focus();
       return;
     }
+    triggerVibration(100); // Vibration for deletion
 
     let changed = false;
     const idsByType = itemsToDelete.reduce((acc, item) => {
@@ -1710,10 +1724,8 @@ function confirmAndDelete(itemsToDelete) {
     toggleDeleteMode(false);
     closeConfirmModal();
 
-    // Reload the main view to ensure we land back on index.html after deleting.
-    if (window?.location) {
-      window.location.href = './index.html';
-    }
+    // Recargar la vista principal para asegurar que volvemos a index.html después de borrar.
+    window.location.href = './index.html';
   }
 
   confirmBtn.onclick = onConfirm;
@@ -2020,7 +2032,7 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
   bottleTimerStart = startTimestamp;
   bottleTimerInterval && clearInterval(bottleTimerInterval);
   bottleTimerInterval = setInterval(tickBottleTimer, 1000);
-  tickBottleTimer();
+    if(bottleTimerInterval) return; triggerVibration();
   const label = new Date(bottleTimerStart).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = `Commencé à ${label}`);
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Stop');
@@ -2033,6 +2045,7 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
 
 function stopBottleTimerWithoutSaving(){
   if(bottleTimerInterval){
+    triggerVibration();
     clearInterval(bottleTimerInterval);
     bottleTimerInterval = null;
   }
@@ -2085,7 +2098,8 @@ function beginTimer(startTimestamp = Date.now(), persist = true){
 
 function stopTimerWithoutSaving(){
   if(timerInterval){
-    clearInterval(timerInterval);
+    triggerVibration();
+  clearInterval(timerInterval);
     timerInterval = null;
   }
   timerStart = null;
@@ -2155,7 +2169,8 @@ startStopBottleBtn?.addEventListener('click', () => {
 });
 
 $('#save-biberon')?.addEventListener('click', () => {
-  const ml = Number(bottleAmountInput?.value || 0);
+    triggerVibration();
+    const amount = parseFloat(bottleAmountInput.value);
   if(ml > 0){
     const entry = {
       id: Date.now()+'',
@@ -2214,6 +2229,7 @@ function renderScale(root){
 $$('.scale').forEach(renderScale);
 
 $('#save-elim')?.addEventListener('click', ()=>{
+  triggerVibration();
   updateState(currentData => {
     currentData.elims.push({
       id: Date.now()+'',
@@ -2260,7 +2276,7 @@ function setupMedicationModal(){
 
   const closeMedModal = () => closeModal('#modal-med');
 
-  const saveMedication = () => {
+  const saveMedication = () => { triggerVibration();
     if(!medSelect) return;
     const selection = medSelect.value || 'ibufrone';
     const labels = {
@@ -2330,6 +2346,7 @@ function resetMesuresForm() {
 }
 
 function saveMesures() {
+    triggerVibration();
   const temp = tempInput.value ? parseFloat(tempInput.value) : null;
   const weight = poidsInput.value ? parseFloat(poidsInput.value) : null;
   const height = tailleInput.value ? parseFloat(tailleInput.value) : null;
@@ -2640,7 +2657,12 @@ function beginEditEntry(type, id){
 
 
 
-function saveManualEntry(){
+function saveManualEntry() {
+
+
+
+    triggerVibration();
+  triggerVibration();
   const isEdit = Boolean(editingEntry);
   const targetType = isEdit && editingEntry ? editingEntry.type : manualType;
   let date = manualDatetime && manualDatetime.value ? new Date(manualDatetime.value) : new Date();
@@ -2904,6 +2926,89 @@ window.addEventListener('offline', () => {
   updateOfflineIndicator();
 });
 
+// --- Lógica de Deslizamiento para Eliminar ---
+let swipeState = {
+  startX: 0,
+  currentX: 0,
+  isSwiping: false,
+  target: null,
+  swipedItem: null,
+  threshold: 80, // Ancho del área de borrado en px
+};
+
+function handleSwipeStart(e) {
+  if (isDeleteMode || e.target.closest('.item-action, .history-item-checkbox, .swipe-delete-btn')) return;
+  const foreground = e.target.closest('.history-item-foreground');
+  if (!foreground) return;
+
+  // Cerrar cualquier otro item abierto
+  if (swipeState.swipedItem && swipeState.swipedItem !== foreground.parentElement) {
+    closeSwipedItem(swipeState.swipedItem);
+  }
+
+  swipeState.target = foreground;
+  swipeState.startX = e.pointerId ? e.clientX : e.touches[0].clientX;
+  swipeState.isSwiping = false;
+  historyList.addEventListener('pointermove', handleSwipeMove, { passive: false });
+  historyList.addEventListener('pointerup', handleSwipeEnd);
+  historyList.addEventListener('pointercancel', handleSwipeEnd);
+}
+
+function handleSwipeMove(e) {
+  if (!swipeState.target) return;
+
+  swipeState.currentX = e.pointerId ? e.clientX : e.touches[0].clientX;
+  const deltaX = swipeState.currentX - swipeState.startX;
+
+  if (!swipeState.isSwiping && Math.abs(deltaX) > 10) {
+    swipeState.isSwiping = true;
+  }
+
+  if (swipeState.isSwiping) {
+    e.preventDefault(); // Prevenir scroll vertical
+    const newX = Math.min(0, Math.max(-swipeState.threshold, deltaX));
+    swipeState.target.style.transform = `translateX(${newX}px)`;
+    swipeState.target.style.transition = 'none';
+  }
+}
+
+function handleSwipeEnd() {
+  if (!swipeState.target) return;
+
+  const deltaX = swipeState.currentX - swipeState.startX;
+  const itemContainer = swipeState.target.parentElement;
+
+  if (swipeState.isSwiping && deltaX < -(swipeState.threshold / 2)) {
+    // Abrir
+    swipeState.target.style.transform = `translateX(-${swipeState.threshold}px)`;
+    swipeState.target.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    itemContainer.classList.add('is-swiped');
+    swipeState.swipedItem = itemContainer;
+  } else {
+    // Cerrar
+    closeSwipedItem(itemContainer);
+  }
+
+  // Limpiar estado
+  swipeState.target = null;
+  swipeState.isSwiping = false;
+  swipeState.startX = 0;
+  swipeState.currentX = 0;
+  historyList.removeEventListener('pointermove', handleSwipeMove);
+  historyList.removeEventListener('pointerup', handleSwipeEnd);
+  historyList.removeEventListener('pointercancel', handleSwipeEnd);
+}
+
+function closeSwipedItem(itemContainer) {
+  if (!itemContainer) return;
+  const foreground = itemContainer.querySelector('.history-item-foreground');
+  if (foreground) {
+    foreground.style.transform = 'translateX(0)';
+    foreground.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+  }
+  itemContainer.classList.remove('is-swiped');
+  if (swipeState.swipedItem === itemContainer) swipeState.swipedItem = null;
+}
 // Temporarily disable service worker registration to avoid caching stale bundles.
 // if ('serviceWorker' in navigator) {
 //   window.addEventListener('load', () => {
@@ -2913,7 +3018,12 @@ window.addEventListener('offline', () => {
 //   });
 // }
 
+historyList?.addEventListener('pointerdown', handleSwipeStart);
+document.addEventListener('click', (e) => {
+  // Cerrar el item deslizado si se hace clic fuera de él
+  if (swipeState.swipedItem && !swipeState.swipedItem.contains(e.target)) {
+    closeSwipedItem(swipeState.swipedItem);
+  }
+});
+
 bootstrap();
-
-
-  updateMa

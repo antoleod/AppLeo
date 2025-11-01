@@ -10,6 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a84ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="App Léo">
 
@@ -458,19 +459,21 @@
 
   <!-- Template para los elementos del historial -->
   <template id="history-item-template">
-    <div class="item history-item" role="listitem">
-      <input type="checkbox" class="history-item-checkbox" aria-label="Sélectionner cet élément">
-      <div class="item-content">
-        <strong class="item-title"></strong>
-        <div class="item-meta"></div>
-      </div>
-      <div class="item-actions">
-        <button class="item-action item-edit" type="button" aria-label="Modifier l'élément">
-          <span>✏️</span>
-        </button>
-        <button class="item-action item-delete" type="button" aria-label="Supprimer l'élément">
+    <div class="history-item" role="listitem">
+      <div class="history-item-background">
+        <button class="swipe-delete-btn" type="button" aria-label="Supprimer">
           <span>🗑️</span>
         </button>
+      </div>
+      <div class="history-item-foreground">
+        <input type="checkbox" class="history-item-checkbox" aria-label="Sélectionner cet élément">
+        <div class="item-content">
+          <strong class="item-title"></strong>
+          <div class="item-meta"></div>
+        </div>
+        <div class="item-actions">
+          <button class="item-action item-edit" type="button" aria-label="Modifier l'élément"><span>✏️</span></button>
+        </div>
       </div>
     </div>
   </template>
