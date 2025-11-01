@@ -26,7 +26,15 @@
       <span id="save-label" class="save-label">Prêt</span>
     </div>
 
-    <h1>Bonjour, maman ✨</h1>
+    <div class="title-bar">
+      <h1>Bonjour, maman ✨</h1>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb"></span>
+        </span>
+        <span class="theme-toggle-label">Mode nuit</span>
+      </button>
+    </div>
 
     <!-- Avatar Léo -->
     <div class="card row row-center" id="leo-card">
@@ -96,7 +104,7 @@
         </div>
         <div class="history-actions">
           <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuel</button>
-          <button class="btn btn-ghost btn-compact" id="btn-stats" type="button"><span class="btn-icon">📈</span> Statistiques</button>
+          <button class="btn btn-ghost btn-compact btn-stats" id="btn-stats" type="button"><span class="btn-icon">📈</span> Statistiques</button>
         </div>
         <div class="selection-actions is-hidden" id="selection-actions">
           <button class="btn btn-ghost" id="cancel-select-btn" type="button">Annuler</button>
@@ -376,18 +384,29 @@
 
       <div class="stack stats-content">
         <div class="stats-summary" id="stats-summary" aria-live="polite">
-          <div class="stat-placeholder">Choisissez une periode pour voir les totaux d'allaitement et de biberon.</div>
+          <div class="stat-placeholder">Explora los totales y promedios de hoy, 7 días y 30 días.</div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-container">
+            <canvas id="chart-breast-by-hour"></canvas>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-bottle-by-day"></canvas>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-diaper-pie"></canvas>
+          </div>
         </div>
         <div class="chart-container">
-          <canvas id="stats-chart"></canvas>
+          <canvas id="chart-growth"></canvas>
         </div>
         <div class="stats-breakdown">
           <div class="stats-breakdown-head">
-            <h3>Répartition quotidienne</h3>
+            <h3>Detalle diario</h3>
             <span class="muted" id="stats-breakdown-label"></span>
           </div>
           <div class="stats-day-list" id="stats-day-list">
-            <div class="stat-placeholder">Sélectionnez une période pour voir le détail quotidien.</div>
+            <div class="stat-placeholder">Selecciona un rango para ver el detalle diario.</div>
           </div>
         </div>
       </div>

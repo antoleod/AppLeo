@@ -10,6 +10,119 @@ const store = {
   remove(key){ localStorage.removeItem(key); }
 };
 
+// ===== Theme handling =====
+const themeToggleBtn = $('#theme-toggle');
+const themeToggleLabel = themeToggleBtn ? themeToggleBtn.querySelector('.theme-toggle-label') : null;
+const THEME_STORAGE_KEY = 'appThemePreference';
+const THEME_AUTO_NIGHT_START = 21;
+const THEME_AUTO_NIGHT_END = 6;
+const THEME_META_LIGHT = '#0a84ff';
+const THEME_META_DARK = '#0b1424';
+
+let themeState = { mode: 'light', source: 'auto' };
+let themeAutoTimer = null;
+
+function isWithinNightSchedule(now = new Date()){
+  const hours = now.getHours();
+  return hours >= THEME_AUTO_NIGHT_START || hours < THEME_AUTO_NIGHT_END;
+}
+
+function getMsUntilNextThemeBoundary(now = new Date()){
+  const next = new Date(now);
+  const currentTime = now.getTime();
+
+  if(isWithinNightSchedule(now)){
+    if(now.getHours() >= THEME_AUTO_NIGHT_START){
+      next.setDate(now.getDate() + 1);
+    }
+    next.setHours(THEME_AUTO_NIGHT_END, 0, 0, 0);
+  } else {
+    next.setHours(THEME_AUTO_NIGHT_START, 0, 0, 0);
+  }
+
+  const delta = next.getTime() - currentTime;
+  return Math.max(delta, 60 * 1000); // fallback to at least 1 minute
+}
+
+function updateThemeMetaColor(mode){
+  const targetColor = mode === 'dark' ? THEME_META_DARK : THEME_META_LIGHT;
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if(themeMeta){
+    themeMeta.setAttribute('content', targetColor);
+  }
+  const statusBarMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if(statusBarMeta){
+    statusBarMeta.setAttribute('content', mode === 'dark' ? 'black' : 'black-translucent');
+  }
+}
+
+function syncThemeToggleUi(){
+  if(!themeToggleBtn) return;
+  const isDark = themeState.mode === 'dark';
+  themeToggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+  themeToggleBtn.dataset.source = themeState.source;
+  if(themeToggleLabel){
+    themeToggleLabel.textContent = isDark ? 'Mode jour' : 'Mode nuit';
+  }
+  const titleSuffix = themeState.source === 'manual'
+    ? ' (préférence manuelle)'
+    : ' (automatique 21h-06h)';
+  themeToggleBtn.title = `${isDark ? 'Basculer vers le mode jour' : 'Basculer vers le mode nuit'}${titleSuffix}`;
+}
+
+function applyAppTheme(mode, source){
+  const normalizedMode = mode === 'dark' ? 'dark' : 'light';
+  const root = document.documentElement;
+  const body = document.body;
+
+  themeState = { mode: normalizedMode, source };
+
+  root.classList.toggle('dark-mode', normalizedMode === 'dark');
+  if(body){
+    body.classList.toggle('dark-mode', normalizedMode === 'dark');
+  }
+
+  updateThemeMetaColor(normalizedMode);
+  syncThemeToggleUi();
+
+  if(source === 'manual'){
+    store.set(THEME_STORAGE_KEY, normalizedMode);
+  } else if(source === 'auto'){
+    store.remove(THEME_STORAGE_KEY);
+  }
+}
+
+function scheduleAutomaticTheme(){
+  window.clearTimeout(themeAutoTimer);
+  const delay = getMsUntilNextThemeBoundary();
+  themeAutoTimer = window.setTimeout(() => {
+    if(themeState.source !== 'manual'){
+      const nextMode = isWithinNightSchedule() ? 'dark' : 'light';
+      applyAppTheme(nextMode, 'auto');
+    }
+    scheduleAutomaticTheme();
+  }, delay);
+}
+
+function initThemeManager(){
+  const storedPreference = store.get(THEME_STORAGE_KEY, null);
+  const hasManualPreference = storedPreference === 'dark' || storedPreference === 'light';
+  const initialMode = hasManualPreference ? storedPreference : (isWithinNightSchedule() ? 'dark' : 'light');
+  const source = hasManualPreference ? 'manual' : 'auto';
+
+  applyAppTheme(initialMode, source);
+  scheduleAutomaticTheme();
+
+  if(themeToggleBtn){
+    themeToggleBtn.addEventListener('click', () => {
+      const nextMode = themeState.mode === 'dark' ? 'light' : 'dark';
+      applyAppTheme(nextMode, 'manual');
+    });
+  }
+}
+
+initThemeManager();
+
 const FOCUSABLE_SELECTOR = [
   'a[href]',
   'button:not([disabled])',
@@ -44,6 +157,16 @@ function formatNumber(value, minimumFractionDigits=0, maximumFractionDigits){
     minimumFractionDigits,
     maximumFractionDigits: maxDigits
   }).format(safe);
+}
+
+function formatMinutes(totalMinutes){
+  const safe = Math.max(0, Math.round(Number(totalMinutes) || 0));
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  if(hours > 0){
+    return `${hours}:${String(minutes).padStart(2, '0')}`;
+  }
+  return String(minutes);
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -218,7 +341,10 @@ const closeRangePickerBtn = $('#close-range-picker');
 const statsBtn = $('#btn-stats');
 const statsModal = $('#modal-stats');
 const closeStatsBtn = $('#close-stats');
-const statsCanvas = $('#stats-chart');
+const statsBreastHourCanvas = $('#chart-breast-by-hour');
+const statsBottleDayCanvas = $('#chart-bottle-by-day');
+const statsDiaperCanvas = $('#chart-diaper-pie');
+const statsGrowthCanvas = $('#chart-growth');
 const statsSummaryEl = $('#stats-summary');
 const statsDailyList = $('#stats-day-list');
 const statsBreakdownLabel = $('#stats-breakdown-label');
@@ -316,7 +442,10 @@ let editingEntry = null;
 
 
 let historyRange = normalizeHistoryRange(store.get(HISTORY_RANGE_KEY, {mode:'day'}));
-let statsChart = null;
+let statsBreastHourChart = null;
+let statsBottleDayChart = null;
+let statsDiaperChart = null;
+let statsGrowthChart = null;
 const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
 const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
@@ -603,78 +732,6 @@ function getHistoryEntriesForRange(range = historyRange){
     .sort((a,b)=> a.item.dateISO < b.item.dateISO ? 1 : -1);
 }
 
-function getFeedStats(range = historyRange){
-  const bounds = getHistoryRangeBounds(range);
-  const base = {
-    label: formatHistoryRangeLabel(range),
-    perDay: [],
-    totals: {
-      feedCount: 0,
-      breastMinutes: 0,
-      bottleMl: 0,
-      breastSessions: 0,
-      bottleSessions: 0
-    },
-    dayCount: 0
-  };
-  if(!bounds || bounds.start == null || bounds.end == null){
-    return base;
-  }
-
-  const buckets = new Map();
-  for(let ts = bounds.start; ts <= bounds.end; ts += DAY_MS){
-    const day = new Date(ts);
-    day.setHours(0, 0, 0, 0);
-    const key = toDateInputValue(day);
-    const entry = {
-      dateISO: key,
-      feedCount: 0,
-      breastMinutes: 0,
-      bottleMl: 0,
-      breastSessions: 0,
-      bottleSessions: 0
-    };
-    base.perDay.push(entry);
-    buckets.set(key, entry);
-  }
-
-  const feedEntries = getHistoryEntriesForRange(range).filter(entry => entry.type === 'feed');
-  for(const entry of feedEntries){
-    const parsed = parseDateInput(entry.item.dateISO);
-    if(!parsed) continue;
-    const key = toDateInputValue(parsed);
-    const bucket = buckets.get(key);
-    if(!bucket) continue;
-
-    bucket.feedCount += 1;
-    base.totals.feedCount += 1;
-
-    if(entry.item.source === 'breast'){
-      const minutes = (entry.item.durationSec || 0) / 60;
-      bucket.breastMinutes += minutes;
-      bucket.breastSessions += 1;
-      base.totals.breastMinutes += minutes;
-      base.totals.breastSessions += 1;
-    }else if(entry.item.source === 'bottle'){
-      const ml = Number(entry.item.amountMl || 0);
-      if(Number.isFinite(ml)){
-        bucket.bottleMl += ml;
-        bucket.bottleSessions += 1;
-        base.totals.bottleMl += ml;
-        base.totals.bottleSessions += 1;
-      }
-    }
-  }
-
-  base.perDay.forEach(day => {
-    day.breastMinutes = Number(day.breastMinutes.toFixed(1));
-    day.bottleMl = Number(day.bottleMl.toFixed(0));
-  });
-  base.totals.breastMinutes = Number(base.totals.breastMinutes.toFixed(1));
-  base.totals.bottleMl = Number(base.totals.bottleMl.toFixed(0));
-  base.dayCount = base.perDay.length;
-  return base;
-}
 
 function formatStatsDayLabel(dateISO, options = {weekday:'short', day:'numeric'}){
   const parsed = parseDateInput(dateISO);
@@ -684,10 +741,144 @@ function formatStatsDayLabel(dateISO, options = {weekday:'short', day:'numeric'}
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
+function buildRangeStats(range = historyRange){
+  const bounds = getHistoryRangeBounds(range);
+  const base = {
+    label: formatHistoryRangeLabel(range),
+    range,
+    bounds,
+    dayCount: 0,
+    perDay: [],
+    perHour: Array.from({length:24}, () => 0),
+    feedTotals: {
+      feedCount: 0,
+      breastMinutes: 0,
+      bottleMl: 0,
+      breastSessions: 0,
+      bottleSessions: 0
+    },
+    diapers: {
+      wet: 0,
+      dirty: 0,
+      both: 0,
+      total: 0
+    },
+    meds: {
+      count: 0
+    },
+    measurements: {
+      entries: [],
+      latest: null
+    }
+  };
+
+  if(!bounds || bounds.start == null || bounds.end == null){
+    return base;
+  }
+
+  const perDayMap = new Map();
+  const orderedKeys = [];
+  for(let ts = bounds.start; ts <= bounds.end; ts += DAY_MS){
+    const day = new Date(ts);
+    day.setHours(0, 0, 0, 0);
+    const key = toDateInputValue(day);
+    orderedKeys.push(key);
+    perDayMap.set(key, {
+      dateISO: key,
+      feedCount: 0,
+      breastMinutes: 0,
+      bottleMl: 0,
+      breastSessions: 0,
+      bottleSessions: 0
+    });
+  }
+
+  const feeds = Array.isArray(state.feeds) ? state.feeds : [];
+  for(const feed of feeds){
+    const ts = Date.parse(feed.dateISO);
+    if(!Number.isFinite(ts) || ts < bounds.start || ts > bounds.end) continue;
+    const dayKey = toDateInputValue(new Date(ts));
+    const bucket = perDayMap.get(dayKey);
+    if(!bucket) continue;
+
+    bucket.feedCount += 1;
+    base.feedTotals.feedCount += 1;
+
+    if(feed.source === 'breast'){
+      const minutes = (Number(feed.durationSec) || 0) / 60;
+      bucket.breastMinutes += minutes;
+      bucket.breastSessions += 1;
+      base.feedTotals.breastMinutes += minutes;
+      base.feedTotals.breastSessions += 1;
+      const hour = new Date(ts).getHours();
+      base.perHour[hour] = (base.perHour[hour] || 0) + minutes;
+    }else if(feed.source === 'bottle'){
+      const ml = Number(feed.amountMl || 0);
+      if(Number.isFinite(ml)){
+        bucket.bottleMl += ml;
+        bucket.bottleSessions += 1;
+        base.feedTotals.bottleMl += ml;
+        base.feedTotals.bottleSessions += 1;
+      }
+    }
+  }
+
+  const elims = Array.isArray(state.elims) ? state.elims : [];
+  for(const elim of elims){
+    const ts = Date.parse(elim.dateISO);
+    if(!Number.isFinite(ts) || ts < bounds.start || ts > bounds.end) continue;
+    const pee = Number(elim.pee || 0);
+    const poop = Number(elim.poop || 0);
+    if(pee > 0 && poop > 0){
+      base.diapers.both += 1;
+    }else if(pee > 0){
+      base.diapers.wet += 1;
+    }else if(poop > 0){
+      base.diapers.dirty += 1;
+    }
+  }
+  base.diapers.total = base.diapers.wet + base.diapers.dirty + base.diapers.both;
+
+  const meds = Array.isArray(state.meds) ? state.meds : [];
+  base.meds.count = meds.reduce((count, med) => {
+    const ts = Date.parse(med.dateISO);
+    if(!Number.isFinite(ts) || ts < bounds.start || ts > bounds.end) return count;
+    return count + 1;
+  }, 0);
+
+  const measurements = Array.isArray(state.measurements) ? state.measurements : [];
+  const measurementEntries = measurements
+    .filter(entry => {
+      const ts = Date.parse(entry.dateISO);
+      return Number.isFinite(ts) && ts >= bounds.start && ts <= bounds.end;
+    })
+    .sort((a, b) => Date.parse(a.dateISO) - Date.parse(b.dateISO));
+  base.measurements.entries = measurementEntries;
+  base.measurements.latest = measurementEntries.length ? measurementEntries[measurementEntries.length - 1] : null;
+
+  base.perDay = orderedKeys.map(key => {
+    const bucket = perDayMap.get(key) || {feedCount:0, breastMinutes:0, bottleMl:0, breastSessions:0, bottleSessions:0};
+    return {
+      dateISO: key,
+      feedCount: bucket.feedCount,
+      breastMinutes: Number(bucket.breastMinutes.toFixed(2)),
+      bottleMl: Math.round(bucket.bottleMl),
+      breastSessions: bucket.breastSessions,
+      bottleSessions: bucket.bottleSessions
+    };
+  });
+
+  base.perHour = base.perHour.map(value => Number(value.toFixed(2)));
+  base.feedTotals.breastMinutes = Number(base.feedTotals.breastMinutes.toFixed(2));
+  base.feedTotals.bottleMl = Math.round(base.feedTotals.bottleMl);
+  base.dayCount = base.perDay.length;
+  return base;
+}
+
 function getStatsChartData(range = historyRange){
-  const stats = getFeedStats(range);
+  const stats = buildRangeStats(range);
   const labels = stats.perDay.map(day => formatStatsDayLabel(day.dateISO, {weekday:'short', day:'numeric'}));
-  const breastMinutes = stats.perDay.map(day => day.breastMinutes);
+  const breastMinutes = stats.perDay.map(day => Number(day.breastMinutes.toFixed(2)));
   const bottleMl = stats.perDay.map(day => day.bottleMl);
   return {
     labels,
@@ -698,137 +889,181 @@ function getStatsChartData(range = historyRange){
   };
 }
 
-function updateStatsSummary(stats = null){
+function updateStatsSummary(currentStats = null){
   if(!statsSummaryEl) return;
-  const data = stats || getFeedStats();
-  const totals = data?.totals || {feedCount:0, breastMinutes:0, bottleMl:0, breastSessions:0, bottleSessions:0};
-  const perDay = Array.isArray(data?.perDay) ? data.perDay : [];
-  const dayCountRaw = data?.dayCount ?? perDay.length ?? 0;
-  const dayCount = Math.max(dayCountRaw, 1);
+  const rangeConfigs = [
+    { key: 'today', label: 'Hoy', range: {mode:'day'} },
+    { key: 'week', label: '7 días', range: {mode:'week'} },
+    { key: 'month', label: '30 días', range: {mode:'month'} }
+  ];
+
+  const cardsHtml = rangeConfigs.map(cfg => {
+    const data = buildRangeStats(cfg.range);
+    const dayCount = Math.max(data.dayCount, 1);
+    const totalFeeds = data.feedTotals.feedCount;
+    const avgFeeds = totalFeeds / dayCount;
+    const totalBreastMinutes = data.feedTotals.breastMinutes;
+    const avgBreastMinutes = totalBreastMinutes / dayCount;
+    const totalBottleMl = data.feedTotals.bottleMl;
+    const avgBottleMl = totalBottleMl / dayCount;
+    const diapers = data.diapers;
+    const meds = data.meds.count;
+    const latest = data.measurements.latest;
+    const measurementParts = [];
+    if(latest){
+      if(Number.isFinite(latest.weight)){
+        measurementParts.push(`${formatNumber(latest.weight, 2, 2)} kg`);
+      }
+      if(Number.isFinite(latest.height)){
+        measurementParts.push(`${formatNumber(latest.height, 1, 1)} cm`);
+      }
+      if(Number.isFinite(latest.temp)){
+        measurementParts.push(`${formatNumber(latest.temp, 1, 1)} °C`);
+      }
+    }
+    const measurementLabel = measurementParts.length ? measurementParts.join(' · ') : 'Sin registros';
+    const dayLabel = dayCount === 1 ? '1 día' : `${dayCount} días`;
+    return `
+      <article class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-title">${cfg.label}</span>
+          <span class="stat-sub">${escapeHtml(dayLabel)}</span>
+        </div>
+        <div class="stat-metric">
+          <span class="metric-label">Tomas</span>
+          <span class="metric-value">${formatNumber(totalFeeds)}</span>
+          <span class="metric-sub">Prom: ${formatNumber(avgFeeds, 1, 1)} / día</span>
+        </div>
+        <div class="stat-metric">
+          <span class="metric-label">Sein (hh:mm)</span>
+          <span class="metric-value">${formatMinutes(totalBreastMinutes)}</span>
+          <span class="metric-sub">Prom: ${formatMinutes(avgBreastMinutes)} / día</span>
+        </div>
+        <div class="stat-metric">
+          <span class="metric-label">Biberón (ml)</span>
+          <span class="metric-value">${formatNumber(totalBottleMl)}</span>
+          <span class="metric-sub">Prom: ${formatNumber(avgBottleMl, 1, 1)} ml / día</span>
+        </div>
+        <div class="stat-metric">
+          <span class="metric-label">Pañales</span>
+          <span class="metric-value">${formatNumber(diapers.total)}</span>
+          <span class="metric-sub">Húmedos ${formatNumber(diapers.wet)} · Sucios ${formatNumber(diapers.dirty)} · Ambos ${formatNumber(diapers.both)}</span>
+        </div>
+        <div class="stat-metric">
+          <span class="metric-label">Medicación</span>
+          <span class="metric-value">${formatNumber(meds)}</span>
+          <span class="metric-sub">Prom: ${formatNumber(meds / dayCount, 1, 1)} dosis / día</span>
+        </div>
+        <div class="stat-metric">
+          <span class="metric-label">Últimas medidas</span>
+          <span class="metric-value">${escapeHtml(measurementLabel)}</span>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  const statsData = currentStats || buildRangeStats(historyRange);
+  const perDay = Array.isArray(statsData.perDay) ? statsData.perDay : [];
+  const dayCount = Math.max(statsData.dayCount || perDay.length || 0, 1);
+  const totals = statsData.feedTotals || {feedCount:0, breastMinutes:0, bottleMl:0};
   const hasData = totals.feedCount > 0 || totals.breastMinutes > 0 || totals.bottleMl > 0;
-  if(!hasData){
-    statsSummaryEl.innerHTML = '<div class="stat-placeholder">Aucune donnee pour cette periode.</div>';
-    if(statsBreakdownLabel) statsBreakdownLabel.textContent = data?.label || '';
-    renderStatsDailyList(data);
-    return;
-  }
 
-  const dayLabel = dayCount === 1 ? '1 jour' : `${dayCount} jours`;
-  const avgFeeds = totals.feedCount / dayCount;
-  const avgBreastMinutes = totals.breastMinutes / dayCount;
-  const avgBottleMl = totals.bottleMl / dayCount;
+  let insightsHtml = '';
+  if(hasData){
+    const busiestDay = perDay.reduce((best, day) => {
+      if(!day) return best;
+      if(!best) return day;
+      const dayFeeds = day.feedCount || 0;
+      const bestFeeds = best.feedCount || 0;
+      if(dayFeeds > bestFeeds) return day;
+      if(dayFeeds === bestFeeds){
+        const dayVolume = (day.breastMinutes || 0) + (day.bottleMl || 0) / 60;
+        const bestVolume = (best.breastMinutes || 0) + (best.bottleMl || 0) / 60;
+        return dayVolume > bestVolume ? day : best;
+      }
+      return best;
+    }, null);
 
-  const busiestDay = perDay.reduce((best, day) => {
-    if(!day) return best;
-    if(!best) return day;
-    const dayFeeds = day.feedCount || 0;
-    const bestFeeds = best.feedCount || 0;
-    if(dayFeeds > bestFeeds) return day;
-    if(dayFeeds === bestFeeds){
-      const dayVolume = (day.breastMinutes || 0) + (day.bottleMl || 0) / 60;
-      const bestVolume = (best.breastMinutes || 0) + (best.bottleMl || 0) / 60;
-      return dayVolume > bestVolume ? day : best;
-    }
-    return best;
-  }, null);
-
-  const insightItems = [];
-  if(busiestDay && (busiestDay.feedCount > 0 || busiestDay.breastMinutes > 0 || busiestDay.bottleMl > 0)){
-    const busyLabel = formatStatsDayLabel(busiestDay.dateISO, {weekday:'long', day:'numeric', month:'short'});
-    const sessionsLabel = busiestDay.feedCount === 1 ? '1 session' : `${formatNumber(busiestDay.feedCount)} sessions`;
-    const detailParts = [];
-    if(busiestDay.breastMinutes > 0){
-      detailParts.push(`${formatNumber(busiestDay.breastMinutes, 1, 1)} min sein`);
-    }
-    if(busiestDay.bottleMl > 0){
-      detailParts.push(`${formatNumber(busiestDay.bottleMl)} ml biberon`);
-    }
-    const sub = detailParts.length ? `${sessionsLabel} | ${detailParts.join(' | ')}` : sessionsLabel;
-    insightItems.push({
-      label: 'Jour le plus actif',
-      value: busyLabel,
-      sub
-    });
-  }
-
-  const totalSessions = (totals.breastSessions || 0) + (totals.bottleSessions || 0);
-  if(totalSessions > 0){
-    const ratioBreast = Math.round((totals.breastSessions / totalSessions) * 100);
-    const ratioBottle = Math.max(0, 100 - ratioBreast);
-    insightItems.push({
-      label: 'Répartition sessions',
-      value: `${ratioBreast}% sein | ${ratioBottle}% biberon`,
-      sub: `${formatNumber(totals.breastSessions)} sein | ${formatNumber(totals.bottleSessions)} biberon`
-    });
-  }
-
-  if(totals.feedCount > 0){
-    const sessionDetails = [];
-    if(totals.breastSessions > 0){
-      const avgPerSessionBreast = totals.breastMinutes / totals.breastSessions;
-      sessionDetails.push(`${formatNumber(avgPerSessionBreast, 1, 1)} min sein`);
-    }
-    if(totals.bottleSessions > 0){
-      const avgPerSessionBottle = totals.bottleMl / totals.bottleSessions;
-      sessionDetails.push(`${formatNumber(avgPerSessionBottle)} ml biberon`);
-    }
-    if(sessionDetails.length){
+    const insightItems = [];
+    if(busiestDay && (busiestDay.feedCount > 0 || busiestDay.breastMinutes > 0 || busiestDay.bottleMl > 0)){
+      const busyLabel = formatStatsDayLabel(busiestDay.dateISO, {weekday:'long', day:'numeric', month:'short'});
+      const sessionsLabel = busiestDay.feedCount === 1 ? '1 sesión' : `${formatNumber(busiestDay.feedCount)} sesiones`;
+      const detailParts = [];
+      if(busiestDay.breastMinutes > 0){
+        detailParts.push(`${formatMinutes(busiestDay.breastMinutes)} sein`);
+      }
+      if(busiestDay.bottleMl > 0){
+        detailParts.push(`${formatNumber(busiestDay.bottleMl)} ml biberón`);
+      }
+      const sub = detailParts.length ? `${sessionsLabel} · ${detailParts.join(' · ')}` : sessionsLabel;
       insightItems.push({
-        label: 'Moyenne par session',
-        value: sessionDetails.join(' | '),
-        sub: `${formatNumber(avgFeeds, 1, 1)} sessions / jour`
+        label: 'Día más activo',
+        value: busyLabel,
+        sub
       });
     }
+
+    const totalSessions = (totals.breastSessions || 0) + (totals.bottleSessions || 0);
+    if(totalSessions > 0){
+      const ratioBreast = Math.round((totals.breastSessions / totalSessions) * 100);
+      const ratioBottle = Math.max(0, 100 - ratioBreast);
+      insightItems.push({
+        label: 'Reparto sesiones',
+        value: `${ratioBreast}% sein | ${ratioBottle}% biberón`,
+        sub: `${formatNumber(totals.breastSessions)} sein · ${formatNumber(totals.bottleSessions)} biberón`
+      });
+    }
+
+    if(totals.feedCount > 0){
+      const sessionDetails = [];
+      if(totals.breastSessions > 0){
+        const avgPerSessionBreast = totals.breastMinutes / Math.max(totals.breastSessions, 1);
+        sessionDetails.push(`${formatMinutes(avgPerSessionBreast)} sein`);
+      }
+      if(totals.bottleSessions > 0){
+        const avgPerSessionBottle = totals.bottleMl / Math.max(totals.bottleSessions, 1);
+        sessionDetails.push(`${formatNumber(avgPerSessionBottle, 1, 1)} ml biberón`);
+      }
+      if(sessionDetails.length){
+        insightItems.push({
+          label: 'Promedio por sesión',
+          value: sessionDetails.join(' · '),
+        sub: `${formatNumber(totals.feedCount / dayCount, 1, 1)} sesiones / día`
+        });
+      }
+    }
+
+    insightsHtml = insightItems.length
+      ? `<div class="stat-insights">${insightItems.map(item => `
+          <div class="stat-insight">
+            <span class="stat-insight-label">${escapeHtml(item.label)}</span>
+            <span class="stat-insight-value">${escapeHtml(item.value)}</span>
+            ${item.sub ? `<span class="stat-insight-sub">${escapeHtml(item.sub)}</span>` : ''}
+          </div>
+        `).join('')}</div>`
+      : '';
   }
 
-  const insightsHtml = insightItems.length
-    ? `<div class="stat-insights">${insightItems.map(item => `
-        <div class="stat-insight">
-          <span class="stat-insight-label">${escapeHtml(item.label)}</span>
-          <span class="stat-insight-value">${escapeHtml(item.value)}</span>
-          ${item.sub ? `<span class="stat-insight-sub">${escapeHtml(item.sub)}</span>` : ''}
-        </div>
-      `).join('')}</div>`
-    : '';
-
   statsSummaryEl.innerHTML = `
-    <div class="stat-period">
-      <strong>${escapeHtml(data.label)}</strong>
-      <span>${escapeHtml(dayLabel)}</span>
+    <div class="stat-overview-grid">
+      ${cardsHtml}
     </div>
-    <article class="stat-card">
-      <span class="stat-title">Sessions</span>
-      <span class="stat-value">${formatNumber(totals.feedCount)}</span>
-      <span class="stat-sub">${formatNumber(avgFeeds, 1, 1)} / jour | Sein ${formatNumber(totals.breastSessions)} | Biberon ${formatNumber(totals.bottleSessions)}</span>
-    </article>
-    <article class="stat-card">
-      <span class="stat-title">Sein</span>
-      <span class="stat-value">${formatNumber(totals.breastMinutes, 1, 1)} min</span>
-      <span class="stat-sub">${formatNumber(avgBreastMinutes, 1, 1)} min / jour</span>
-    </article>
-    <article class="stat-card">
-      <span class="stat-title">Biberon</span>
-      <span class="stat-value">${formatNumber(totals.bottleMl)} ml</span>
-      <span class="stat-sub">${formatNumber(avgBottleMl)} ml / jour</span>
-    </article>
     ${insightsHtml}
   `;
-  if(statsBreakdownLabel) statsBreakdownLabel.textContent = data?.label || '';
-  renderStatsDailyList(data);
 }
 
 function renderStatsDailyList(stats = null){
   if(!statsDailyList) return;
-  const data = stats || getFeedStats();
+  const data = stats || buildRangeStats();
   const perDay = Array.isArray(data?.perDay) ? data.perDay : [];
   if(!perDay.length){
-    statsDailyList.innerHTML = '<div class="stat-placeholder">Aucune activite pour cette periode.</div>';
+    statsDailyList.innerHTML = '<div class="stat-placeholder">No hay actividad registrada en este rango.</div>';
     return;
   }
 
   const hasActivity = perDay.some(day => (day?.feedCount || 0) > 0 || (day?.breastMinutes || 0) > 0 || (day?.bottleMl || 0) > 0);
   if(!hasActivity){
-    statsDailyList.innerHTML = '<div class="stat-placeholder">Aucune activite pour cette periode.</div>';
+    statsDailyList.innerHTML = '<div class="stat-placeholder">No hay actividad registrada en este rango.</div>';
     return;
   }
 
@@ -844,12 +1079,12 @@ function renderStatsDailyList(stats = null){
     const bottleMl = day?.bottleMl || 0;
     const breastPercent = maxBreast > 0 ? Math.round((breastMinutes / maxBreast) * 100) : 0;
     const bottlePercent = maxBottle > 0 ? Math.round((bottleMl / maxBottle) * 100) : 0;
-    const breastValue = `${formatNumber(breastMinutes, 1, 1)} min`;
+    const breastValue = formatMinutes(breastMinutes);
     const bottleValue = `${formatNumber(bottleMl)} ml`;
     const dayHasActivity = feedCount > 0 || breastMinutes > 0 || bottleMl > 0;
     const countText = dayHasActivity
-      ? (feedCount === 1 ? '1 session' : `${formatNumber(feedCount)} sessions`)
-      : 'Aucune session';
+      ? (feedCount === 1 ? '1 sesión' : `${formatNumber(feedCount)} sesiones`)
+      : 'Sin sesiones';
 
     const safeBreastPercent = Math.min(100, Math.max(0, breastPercent));
     const safeBottlePercent = Math.min(100, Math.max(0, bottlePercent));
@@ -868,8 +1103,8 @@ function renderStatsDailyList(stats = null){
           <span class="metric-value">${escapeHtml(breastValue)}</span>
         </div>
         <div class="stats-day-metric">
-          <span class="metric-label"><span class="metric-dot bottle"></span> Biberon</span>
-          <div class="metric-bar" title="Biberon ${escapeHtml(bottleValue)}">
+          <span class="metric-label"><span class="metric-dot bottle"></span> Biberón</span>
+          <div class="metric-bar" title="Biberón ${escapeHtml(bottleValue)}">
             <div class="stats-bar bottle" style="--percent:${safeBottlePercent}%"></div>
           </div>
           <span class="metric-value">${escapeHtml(bottleValue)}</span>
@@ -881,135 +1116,273 @@ function renderStatsDailyList(stats = null){
 
 function updateStatsChart(force = false){
   const summary = getStatsChartData();
-  updateStatsSummary(summary.stats);
+  const stats = summary.stats;
+  updateStatsSummary(stats);
+  if(statsBreakdownLabel) statsBreakdownLabel.textContent = summary.rangeLabel || '';
+  renderStatsDailyList(stats);
 
-  if(!statsCanvas || typeof Chart === 'undefined') return;
-  if(!statsChart && !force) return;
-  const ctx = statsCanvas.getContext('2d');
-  if(!ctx) return;
+  if(typeof Chart === 'undefined') return;
 
-  if(!statsChart){
-    statsChart = new Chart(ctx, {
-      data: {
-        labels: summary.labels,
-        datasets: [
-          {
-            type: 'bar',
-            label: 'Sein (minutes)',
-            data: summary.breastMinutes,
-            backgroundColor: 'rgba(37, 99, 235, 0.55)',
-            borderColor: 'rgba(37, 99, 235, 0.85)',
-            borderWidth: 1,
-            borderRadius: 12,
-            maxBarThickness: 48,
-            yAxisID: 'y',
-            order: 2
-          },
-          {
-            type: 'line',
-            label: 'Biberon (ml)',
-            data: summary.bottleMl,
-            borderColor: 'rgba(249, 115, 22, 0.9)',
-            backgroundColor: 'rgba(249, 115, 22, 0.2)',
+  const hourCtx = statsBreastHourCanvas?.getContext('2d');
+  if(hourCtx){
+    const hourLabels = Array.from({length:24}, (_, hour) => `${String(hour).padStart(2, '0')}h`);
+    const hourData = stats.perHour.map(value => Number(value.toFixed(2)));
+    if(!statsBreastHourChart){
+      statsBreastHourChart = new Chart(hourCtx, {
+        type: 'line',
+        data: {
+          labels: hourLabels,
+          datasets: [{
+            label: 'Minutos de lactancia',
+            data: hourData,
+            borderColor: 'rgba(37, 99, 235, 0.9)',
+            backgroundColor: 'rgba(37, 99, 235, 0.2)',
             borderWidth: 3,
             tension: 0.35,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: false,
-            yAxisID: 'y1',
-            order: 1
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {mode:'index', intersect:false},
-        scales: {
-          y: {
-            type: 'linear',
-            position: 'left',
-            beginAtZero: true,
-            title: {display:true, text:'Minutes sein', color: '#f5f7ff'},
-            ticks: {
-              precision:0,
-              color: '#f5f7ff'
-            },
-            grid: {color:'rgba(255, 255, 255, 0.15)'}
-          },
-          y1: {
-            type: 'linear',
-            position: 'right',
-            beginAtZero: true,
-            title: {display:true, text:'Millilitres biberon', color: '#f5f7ff'},
-            ticks: {
-              precision:0,
-              color: '#f5f7ff'
-            },
-            grid: {drawOnChartArea:false}
-          },
-          x: {
-            grid: {display:false},
-            ticks: {
-              color: '#f5f7ff',
-              font: {weight:'600'}
-            }
-          }
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: true
+          }]
         },
-        plugins: {
-          legend: {
-            display: true,
-            labels: {
-              usePointStyle:true,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Minutos de lactancia por hora',
               color: '#f5f7ff'
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            titleColor: '#ffffff',
-            bodyColor: '#ffffff',
-            borderColor: 'rgba(255,255,255,0.2)',
-            borderWidth: 1,
-            callbacks: {
-              label(context){
-                const value = context.parsed.y ?? 0;
-                if(context.dataset?.yAxisID === 'y1'){
-                  return `${formatNumber(value)} ml`;
+            },
+            tooltip: {
+              callbacks: {
+                label(context){
+                  const val = context.parsed.y ?? 0;
+                  return `Minutos ${formatMinutes(val)}`;
                 }
-                return `${formatNumber(value, 1, 1)} min`;
               }
             }
           },
-          title: {
-            display: true,
-            text: `Periode : ${summary.rangeLabel}`,
-            color: '#f5f7ff',
-            font: {
-              size: 14,
-              weight: '600'
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#f5f7ff' },
+              grid: { color: 'rgba(255,255,255,0.15)' }
             },
-            padding: {
-              top: 6,
-              bottom: 12
+            x: {
+              ticks: { color: '#f5f7ff' },
+              grid: { color: 'rgba(255,255,255,0.1)' }
             }
           }
         }
-      }
+      });
+    }else{
+      statsBreastHourChart.data.labels = hourLabels;
+      statsBreastHourChart.data.datasets[0].data = hourData;
+      statsBreastHourChart.update();
+    }
+  }
+
+  const bottleCtx = statsBottleDayCanvas?.getContext('2d');
+  if(bottleCtx){
+    if(!statsBottleDayChart){
+      statsBottleDayChart = new Chart(bottleCtx, {
+        type: 'bar',
+        data: {
+          labels: summary.labels,
+          datasets: [{
+            label: 'Ml por día',
+            data: summary.bottleMl,
+            backgroundColor: 'rgba(249, 115, 22, 0.6)',
+            borderColor: 'rgba(249, 115, 22, 0.9)',
+            borderWidth: 1,
+            borderRadius: 12,
+            maxBarThickness: 40
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Mililitros por día',
+              color: '#f5f7ff'
+            },
+            tooltip: {
+              callbacks: {
+                label(context){
+                  return ` ${formatNumber(context.parsed.y || 0)} ml`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#f5f7ff' },
+              grid: { color: 'rgba(255,255,255,0.15)' }
+            },
+            x: {
+              ticks: { color: '#f5f7ff' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }else{
+      statsBottleDayChart.data.labels = summary.labels;
+      statsBottleDayChart.data.datasets[0].data = summary.bottleMl;
+      statsBottleDayChart.update();
+    }
+  }
+
+  const diaperCtx = statsDiaperCanvas?.getContext('2d');
+  if(diaperCtx){
+    const diaperData = [stats.diapers.wet, stats.diapers.dirty, stats.diapers.both];
+    if(!statsDiaperChart){
+      statsDiaperChart = new Chart(diaperCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pipi', 'Caca', 'Ambos'],
+          datasets: [{
+            data: diaperData,
+            backgroundColor: [
+              'rgba(14, 165, 233, 0.8)',
+              'rgba(249, 115, 22, 0.8)',
+              'rgba(139, 92, 246, 0.8)'
+            ],
+            borderColor: 'rgba(255,255,255,0.45)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#f5f7ff' }
+            },
+            title: {
+              display: true,
+              text: 'Pañales registrados',
+              color: '#f5f7ff'
+            }
+          }
+        }
+      });
+    }else{
+      statsDiaperChart.data.datasets[0].data = diaperData;
+      statsDiaperChart.update();
+    }
+  }
+
+  const growthCtx = statsGrowthCanvas?.getContext('2d');
+  if(growthCtx){
+    const measurementEntries = stats.measurements.entries;
+    const labels = measurementEntries.map(entry => {
+      const date = parseDateInput(entry.dateISO);
+      return date ? date.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'}) : '';
     });
-  }else{
-    statsChart.data.labels = summary.labels;
-    if(statsChart.data.datasets[0]){
-      statsChart.data.datasets[0].data = summary.breastMinutes;
+    const weightData = measurementEntries.map(entry => Number.isFinite(entry.weight) ? entry.weight : null);
+    const heightData = measurementEntries.map(entry => Number.isFinite(entry.height) ? entry.height : null);
+    const tempData = measurementEntries.map(entry => Number.isFinite(entry.temp) ? entry.temp : null);
+
+    if(!statsGrowthChart){
+      statsGrowthChart = new Chart(growthCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Peso (kg)',
+              data: weightData,
+              borderColor: 'rgba(59, 130, 246, 0.9)',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              spanGaps: true,
+              tension: 0.3,
+              pointRadius: 4,
+              yAxisID: 'yWeight'
+            },
+            {
+              label: 'Talla (cm)',
+              data: heightData,
+              borderColor: 'rgba(16, 185, 129, 0.9)',
+              backgroundColor: 'rgba(16, 185, 129, 0.2)',
+              spanGaps: true,
+              tension: 0.3,
+              pointRadius: 4,
+              yAxisID: 'yHeight'
+            },
+            {
+              label: 'Temperatura (°C)',
+              data: tempData,
+              borderColor: 'rgba(244, 63, 94, 0.9)',
+              backgroundColor: 'rgba(244, 63, 94, 0.2)',
+              spanGaps: true,
+              tension: 0.3,
+              pointRadius: 4,
+              yAxisID: 'yTemp'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode:'index', intersect:false },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Curvas de crecimiento',
+              color: '#f5f7ff'
+            },
+            legend: {
+              position: 'bottom',
+              labels: { color: '#f5f7ff' }
+            }
+          },
+          scales: {
+            yWeight: {
+              type: 'linear',
+              position: 'left',
+              title: { display:true, text:'Peso (kg)', color:'#f5f7ff' },
+              ticks: { color:'#f5f7ff' },
+              grid: { color:'rgba(255,255,255,0.1)' }
+            },
+            yHeight: {
+              type: 'linear',
+              position: 'right',
+              title: { display:true, text:'Talla (cm)', color:'#f5f7ff' },
+              ticks: { color:'#f5f7ff' },
+              grid: { drawOnChartArea:false }
+            },
+            yTemp: {
+              type: 'linear',
+              position: 'right',
+              offset: true,
+              title: { display:true, text:'Temp (°C)', color:'#f5f7ff' },
+              ticks: { color:'#f5f7ff' },
+              grid: { drawOnChartArea:false }
+            },
+            x: {
+              ticks: { color:'#f5f7ff' },
+              grid: { color:'rgba(255,255,255,0.08)' }
+            }
+          }
+        }
+      });
+    }else{
+      statsGrowthChart.data.labels = labels;
+      statsGrowthChart.data.datasets[0].data = weightData;
+      statsGrowthChart.data.datasets[1].data = heightData;
+      statsGrowthChart.data.datasets[2].data = tempData;
+      statsGrowthChart.update();
     }
-    if(statsChart.data.datasets[1]){
-      statsChart.data.datasets[1].data = summary.bottleMl;
-    }
-    if(statsChart.options?.plugins?.title){
-      statsChart.options.plugins.title.text = `Periode : ${summary.rangeLabel}`;
-    }
-    statsChart.update();
   }
 }
+
 function renderHistory(){
   if(!historyList) return;
   const itemTemplate = $('#history-item-template');
@@ -1051,8 +1424,8 @@ function renderHistory(){
 
         if(row.type === 'feed'){
           if(row.item.source === 'breast'){
-            const mins = Math.round((row.item.durationSec || 0) / 60);
-            title = `🍼 Sein (${row.item.breastSide || ''}) · ${mins} min`;
+            const minsLabel = formatMinutes((row.item.durationSec || 0) / 60);
+            title = `🍼 Sein (${row.item.breastSide || ''}) · ${minsLabel}`;
           }else{
             const ml = Number(row.item.amountMl || 0);
             title = `🍼 Biberon · ${ml} ml`;
@@ -1404,12 +1777,13 @@ function updateSummaries(){
     }else{
       const breast = todayFeeds.filter(f => f.source === 'breast');
       const bottle = todayFeeds.filter(f => f.source === 'bottle');
-      const breastMinutes = Math.round(breast.reduce((sum,f)=> sum + (f.durationSec || 0), 0) / 60);
+      const breastMinutesTotal = breast.reduce((sum,f)=> sum + (f.durationSec || 0), 0) / 60;
+      const breastLabel = formatMinutes(breastMinutesTotal);
       const bottleMl = bottle.reduce((sum,f)=> sum + (f.amountMl || 0), 0);
       summaryFeedEl.innerHTML = `
         <strong>Aujourd'hui</strong>
         <span>${todayFeeds.length} séances</span>
-        <span>Sein ${breastMinutes} min</span>
+        <span>Sein ${breastLabel}</span>
         <span>Biberon ${bottleMl} ml</span>
       `;
     }
@@ -1503,8 +1877,8 @@ function renderFeedHistory(){
     const time = new Date(feed.dateISO).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     let line = '';
     if(feed.source === 'breast'){
-      const mins = Math.round((feed.durationSec || 0)/60);
-      line = `🍼 ${escapeHtml(time)} — Sein (${escapeHtml(feed.breastSide || '')}) · ${mins} min`;
+      const minsLabel = formatMinutes((feed.durationSec || 0)/60);
+      line = `🍼 ${escapeHtml(time)} — Sein (${escapeHtml(feed.breastSide || '')}) · ${minsLabel}`;
     }else{
       const ml = Number(feed.amountMl || 0);
       line = `🍼 ${escapeHtml(time)} — Biberon · ${ml} ml`;
