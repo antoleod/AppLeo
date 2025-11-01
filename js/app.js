@@ -2775,12 +2775,21 @@ function saveManualEntry() {
 
 
 async function initFirebaseSync() {
-  const { db: firebaseDb, auth: firebaseAuth } = await import('./firebase.js');
+  const { db: firebaseDb, auth: firebaseAuth, ensureAuth } = await import('./firebase.js');
   firebaseDbInstance = firebaseDb;
   if (!firebaseDbInstance || !firebaseDocId) {
     console.warn("Firebase dependencies not ready.");
     setSaveIndicator('error', 'Dependencias no listas.');
     return;
+  }
+
+  // Asegurarse de que la autenticación anónima se complete antes de continuar.
+  try {
+    await ensureAuth();
+  } catch (authError) {
+    console.error("Firebase authentication failed:", authError);
+    setSaveIndicator('error', 'Error de autenticación.');
+    return; // Detener si la autenticación falla.
   }
 
   try {

@@ -159,7 +159,13 @@ export const Persistence = {
       // Ensure the document exists locally (creates if missing)
       try {
         await ensureDocument();
-      } catch (err) {
+      } catch (err) { 
+        // Si ensureDocument falla (p. ej., por reglas de seguridad),
+        // es un error crítico. Rechazamos la promesa para que el llamador lo sepa.
+        console.error('Persistence: ensureDocument failed critically.', err);
+        emit('sync-status', { status: 'error', message: 'Error al crear el documento. Verifique las reglas de Firestore.' });
+        return reject(new Error('Failed to ensure document exists.'));
+
         console.warn('ensureDocument failed in connect():', err);
         // continue, onSnapshot may still surface permission errors
       }
