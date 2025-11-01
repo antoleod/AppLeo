@@ -99,6 +99,7 @@ function scheduleAutomaticTheme(){
     if(themeState.source !== 'manual'){
       const nextMode = isWithinNightSchedule() ? 'dark' : 'light';
       applyAppTheme(nextMode, 'auto');
+      updateAllCharts(); // Actualiza los gráficos cuando el tema cambia automáticamente
     }
     scheduleAutomaticTheme();
   }, delay);
@@ -117,6 +118,7 @@ function initThemeManager(){
     themeToggleBtn.addEventListener('click', () => {
       const nextMode = themeState.mode === 'dark' ? 'light' : 'dark';
       applyAppTheme(nextMode, 'manual');
+      updateAllCharts(); // Actualiza los gráficos al cambiar el tema manualmente
     });
   }
 }
@@ -741,6 +743,19 @@ function formatStatsDayLabel(dateISO, options = {weekday:'short', day:'numeric'}
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
+function getChartColors() {
+  const style = getComputedStyle(document.documentElement);
+  return {
+    textColor: style.getPropertyValue('--chart-text-color').trim() || '#f5f7ff',
+    gridColor: style.getPropertyValue('--chart-grid-color').trim() || 'rgba(255,255,255,0.15)',
+    breastColor: style.getPropertyValue('--chart-breast-color').trim() || 'rgba(37, 99, 235, 0.6)',
+    bottleColor: style.getPropertyValue('--chart-bottle-color').trim() || 'rgba(249, 115, 22, 0.6)',
+    diaperPeeColor: style.getPropertyValue('--chart-diaper-pee-color').trim() || 'rgba(14, 165, 233, 0.8)',
+    diaperPoopColor: style.getPropertyValue('--chart-diaper-poop-color').trim() || 'rgba(249, 115, 22, 0.8)',
+    diaperBothColor: style.getPropertyValue('--chart-diaper-both-color').trim() || 'rgba(139, 92, 246, 0.8)',
+  };
+}
+
 function buildRangeStats(range = historyRange){
   const bounds = getHistoryRangeBounds(range);
   const base = {
@@ -1204,29 +1219,45 @@ function updateStatsChart(force = false){
   const bottleCtx = statsBottleDayCanvas?.getContext('2d');
   if(bottleCtx){
     if(!statsBottleDayChart){
+      const chartColors = getChartColors();
+      const breastData = summary.breastMinutes;
+      const bottleData = summary.bottleMl;
+
       statsBottleDayChart = new Chart(bottleCtx, {
         type: 'bar',
         data: {
           labels: summary.labels,
-          datasets: [{
-            label: 'Ml por día',
-            data: summary.bottleMl,
-            backgroundColor: 'rgba(249, 115, 22, 0.6)',
-            borderColor: 'rgba(249, 115, 22, 0.9)',
-            borderWidth: 1,
-            borderRadius: 12,
-            maxBarThickness: 40
-          }]
+          datasets: [
+            {
+              label: 'Minutos de lactancia',
+              data: breastData,
+              backgroundColor: chartColors.breastColor,
+              borderColor: chartColors.breastColor.replace('0.6', '0.9'),
+              borderWidth: 1,
+              borderRadius: 6,
+              maxBarThickness: 25,
+            },
+            {
+              label: 'Ml de biberón',
+              data: bottleData,
+              backgroundColor: chartColors.bottleColor,
+              borderColor: chartColors.bottleColor.replace('0.6', '0.9'),
+              borderWidth: 1,
+              borderRadius: 6,
+              maxBarThickness: 25,
+            }
+          ]
         },
         options: {
+          animation: { duration: 800, easing: 'easeOutQuart' }, // Animación añadida
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false },
+            legend: { display: true, position: 'bottom', labels: { color: chartColors.textColor } },
             title: {
               display: true,
-              text: '🍼 / día',
-              color: '#f5f7ff'
+              text: '🍼 Tomas / día',
+              color: chartColors.textColor
             },
             tooltip: {
               callbacks: {
@@ -1239,19 +1270,20 @@ function updateStatsChart(force = false){
           scales: {
             y: {
               beginAtZero: true,
-              ticks: { color: '#f5f7ff' },
-              grid: { color: 'rgba(255,255,255,0.15)' }
+              ticks: { color: chartColors.textColor },
+              grid: { color: chartColors.gridColor }
             },
             x: {
-              ticks: { color: '#f5f7ff' },
-              grid: { display: false }
+              ticks: { color: chartColors.textColor },
+              grid: { color: chartColors.gridColor.replace('0.15', '0.1') }
             }
           }
         }
       });
     }else{
       statsBottleDayChart.data.labels = summary.labels;
-      statsBottleDayChart.data.datasets[0].data = summary.bottleMl;
+      statsBottleDayChart.data.datasets[0].data = summary.breastMinutes;
+      statsBottleDayChart.data.datasets[1].data = summary.bottleMl;
       statsBottleDayChart.update();
     }
   }
@@ -1259,6 +1291,7 @@ function updateStatsChart(force = false){
   const diaperCtx = statsDiaperCanvas?.getContext('2d');
   if(diaperCtx){
     const diaperData = [stats.diapers.wet, stats.diapers.dirty, stats.diapers.both];
+    const chartColors = getChartColors();
     if(!statsDiaperChart){
       statsDiaperChart = new Chart(diaperCtx, {
         type: 'doughnut',
@@ -1267,26 +1300,27 @@ function updateStatsChart(force = false){
           datasets: [{
             data: diaperData,
             backgroundColor: [
-              'rgba(14, 165, 233, 0.8)',
-              'rgba(249, 115, 22, 0.8)',
-              'rgba(139, 92, 246, 0.8)'
+              chartColors.diaperPeeColor,
+              chartColors.diaperPoopColor,
+              chartColors.diaperBothColor
             ],
             borderColor: 'rgba(255,255,255,0.45)',
             borderWidth: 1
           }]
         },
         options: {
+          animation: { animateRotate: true, animateScale: true, duration: 800 }, // Animación añadida
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: '#f5f7ff' }
+              labels: { color: chartColors.textColor }
             },
             title: {
               display: true,
               text: '🧷 pañales',
-              color: '#f5f7ff'
+              color: chartColors.textColor
             }
           }
         }
@@ -1300,6 +1334,7 @@ function updateStatsChart(force = false){
   const growthCtx = statsGrowthCanvas?.getContext('2d');
   if(growthCtx){
     const measurementEntries = stats.measurements.entries;
+    const chartColors = getChartColors();
     const labels = measurementEntries.map(entry => {
       const date = parseDateInput(entry.dateISO);
       return date ? date.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'}) : '';
@@ -1347,6 +1382,7 @@ function updateStatsChart(force = false){
           ]
         },
         options: {
+          animation: { duration: 800, easing: 'easeOutQuart' }, // Animación añadida
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode:'index', intersect:false },
@@ -1354,39 +1390,39 @@ function updateStatsChart(force = false){
             title: {
               display: true,
               text: '📈 crecimiento',
-              color: '#f5f7ff'
+              color: chartColors.textColor
             },
             legend: {
               position: 'bottom',
-              labels: { color: '#f5f7ff' }
+              labels: { color: chartColors.textColor }
             }
           },
           scales: {
             yWeight: {
               type: 'linear',
               position: 'left',
-              title: { display:true, text:'kg', color:'#f5f7ff' },
-              ticks: { color:'#f5f7ff' },
-              grid: { color:'rgba(255,255,255,0.1)' }
+              title: { display:true, text:'kg', color:chartColors.textColor },
+              ticks: { color:chartColors.textColor },
+              grid: { color:chartColors.gridColor }
             },
             yHeight: {
               type: 'linear',
               position: 'right',
-              title: { display:true, text:'cm', color:'#f5f7ff' },
-              ticks: { color:'#f5f7ff' },
+              title: { display:true, text:'cm', color:chartColors.textColor },
+              ticks: { color:chartColors.textColor },
               grid: { drawOnChartArea:false }
             },
             yTemp: {
               type: 'linear',
               position: 'right',
               offset: true,
-              title: { display:true, text:'°C', color:'#f5f7ff' },
-              ticks: { color:'#f5f7ff' },
+              title: { display:true, text:'°C', color:chartColors.textColor },
+              ticks: { color:chartColors.textColor },
               grid: { drawOnChartArea:false }
             },
             x: {
-              ticks: { color:'#f5f7ff' },
-              grid: { color:'rgba(255,255,255,0.08)' }
+              ticks: { color:chartColors.textColor },
+              grid: { color:chartColors.gridColor.replace('0.15', '0.08') }
             }
           }
         }
@@ -1399,6 +1435,11 @@ function updateStatsChart(force = false){
       statsGrowthChart.update();
     }
   }
+}
+
+function updateAllCharts() {
+  // Esta función se puede llamar cuando el tema cambia para redibujar los gráficos con nuevos colores.
+  updateStatsChart(true);
 }
 
 function renderHistory(){
@@ -2875,3 +2916,4 @@ window.addEventListener('offline', () => {
 bootstrap();
 
 
+  updateMa

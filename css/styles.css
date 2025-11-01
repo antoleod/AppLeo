@@ -11,6 +11,15 @@
   --btn-border-glow:linear-gradient(120deg, rgba(80,169,255,.85), rgba(173,108,255,.68), rgba(255,255,255,.92));
   --btn-sheen:linear-gradient(160deg, rgba(255,255,255,.32), rgba(255,255,255,0) 72%);
   --btn-base:linear-gradient(140deg, rgba(14,24,44,.42), rgba(44,59,94,.18));
+
+  /* Chart Colors - Light Mode */
+  --chart-text-color: #11243f;
+  --chart-grid-color: rgba(32, 52, 88, 0.15);
+  --chart-breast-color: rgba(37, 99, 235, 0.7);
+  --chart-bottle-color: rgba(249, 115, 22, 0.7);
+  --chart-diaper-pee-color: rgba(14, 165, 233, 0.85);
+  --chart-diaper-poop-color: rgba(234, 88, 12, 0.85);
+  --chart-diaper-both-color: rgba(139, 92, 246, 0.85);
 }
 :root.dark-mode{
   --bg:#0b1424; --surface:rgba(16,26,44,.9); --text:#f7f9ff; --muted:#aab7cf; --line:rgba(110,132,168,.42); --primary:#7eb4ff; --success:#4cd964;
@@ -19,6 +28,15 @@
   --btn-border-glow:linear-gradient(120deg, rgba(118,182,255,.85), rgba(153,124,255,.68), rgba(255,255,255,.35));
   --btn-sheen:linear-gradient(160deg, rgba(255,255,255,.24), rgba(255,255,255,0) 72%);
   --btn-base:linear-gradient(140deg, rgba(28,44,78,.65), rgba(46,74,116,.38));
+
+  /* Chart Colors - Dark Mode */
+  --chart-text-color: #f5f7ff;
+  --chart-grid-color: rgba(255, 255, 255, 0.15);
+  --chart-breast-color: rgba(129, 178, 255, 0.7);
+  --chart-bottle-color: rgba(253, 164, 71, 0.7);
+  --chart-diaper-pee-color: rgba(56, 189, 248, 0.85);
+  --chart-diaper-poop-color: rgba(251, 146, 60, 0.85);
+  --chart-diaper-both-color: rgba(167, 139, 250, 0.85);
 }
 
 *{box-sizing:border-box}
@@ -781,6 +799,9 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   color:#11243f;
   text-shadow:0 1px 2px rgba(255,255,255,.55);
 }
+.stats-content{
+  overflow-y: auto; /* Permite el scroll vertical cuando sea necesario */
+}
 .stats-content::before{
   content:"";
   position:absolute;
@@ -1359,5 +1380,3 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
 #leo-card .info-btn .muted {
   font-size: 12px; /* Adjusted for readability */
 }
-
-
