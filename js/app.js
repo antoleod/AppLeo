@@ -1533,6 +1533,8 @@ function renderHistory(){
 
         itemContainer.querySelector('.item-edit').dataset.id = row.item.id;
         itemContainer.querySelector('.item-edit').dataset.type = row.type;
+        itemContainer.querySelector('.item-delete').dataset.id = row.item.id;
+        itemContainer.querySelector('.item-delete').dataset.type = row.type;
         itemContainer.querySelector('.swipe-delete-btn').dataset.id = row.item.id;
         itemContainer.querySelector('.swipe-delete-btn').dataset.type = row.type;
 
@@ -1664,10 +1666,10 @@ historyList?.addEventListener('click', (e) => {
     return;
   }
 
-  const deleteBtn = e.target.closest('.swipe-delete-btn');
+  const deleteBtn = e.target.closest('.swipe-delete-btn, .item-delete');
   if (deleteBtn) {
     const { type, id } = deleteBtn.dataset;
-    confirmAndDelete([{ type, id }]);
+    if (type && id) confirmAndDelete([{ type, id }]);
   }
 }); 
 
@@ -2206,13 +2208,13 @@ startStopBottleBtn?.addEventListener('click', () => {
 
 $('#save-biberon')?.addEventListener('click', () => {
     triggerVibration();
-    const amount = parseFloat(bottleAmountInput.value);
-  if(ml > 0){
+  const amount = parseFloat(bottleAmountInput.value);
+  if(amount > 0){
     const entry = {
       id: Date.now()+'',
       dateISO: new Date().toISOString(),
       source: 'bottle',
-      amountMl: ml,
+      amountMl: amount,
       durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined
     };
     saveFeed(entry);
