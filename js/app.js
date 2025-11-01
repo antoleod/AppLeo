@@ -319,6 +319,7 @@ let historyRange = normalizeHistoryRange(store.get(HISTORY_RANGE_KEY, {mode:'day
 let statsChart = null;
 const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
+const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
 let manualType = 'feed';
 let timer = 0;
 let timerStart = null;
@@ -326,6 +327,7 @@ let timerInterval = null;
 let bottleTimer = 0;
 let bottleTimerStart = null;
 let bottleTimerInterval = null;
+let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let isDeleteMode = false;
 
 function cloneDataSnapshot(){
@@ -1275,6 +1277,11 @@ function confirmAndDelete(itemsToDelete) {
     }
     toggleDeleteMode(false);
     closeConfirmModal();
+
+    // Reload the main view to ensure we land back on index.html after deleting.
+    if (window?.location) {
+      window.location.href = './index.html';
+    }
   }
 
   confirmBtn.onclick = onConfirm;
@@ -1584,6 +1591,8 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
   const label = new Date(bottleTimerStart).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = `Commencé à ${label}`);
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Stop');
+  bottlePendingDuration = 0;
+  store.remove(BOTTLE_PENDING_KEY);
   if(persist){
     store.set(BOTTLE_TIMER_KEY, { start: bottleTimerStart });
   }
@@ -1600,28 +1609,6 @@ function stopBottleTimerWithoutSaving(){
   bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = '');
   bottleTimer = 0;
   updateBottleChrono();
-}
-
-function requestBottleAmount(defaultValue = ''){
-  let lastValue = defaultValue;
-  while(true){
-    const raw = window.prompt('Quantité de biberon bue (ml) ?', lastValue);
-    if(raw === null){
-      return null;
-    }
-    const normalized = raw.replace(',', '.').trim();
-    if(!normalized){
-      lastValue = raw;
-      alert('Veuillez entrer une quantité valide en ml.');
-      continue;
-    }
-    const amount = Number(normalized);
-    if(Number.isFinite(amount) && amount > 0){
-      return amount;
-    }
-    lastValue = raw;
-    alert('Veuillez entrer une quantité valide en ml.');
-  }
 }
 
 function setFeedMode(mode){
@@ -1719,22 +1706,14 @@ startStopBottleBtn?.addEventListener('click', () => {
   if(bottleTimerInterval){
     const start = bottleTimerStart || Date.now();
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
-    const defaultValue = bottleAmountInput?.value ? String(bottleAmountInput.value) : '';
-    const amount = requestBottleAmount(defaultValue);
-    if(amount === null){
-      return;
-    }
     stopBottleTimerWithoutSaving();
-    const entry = {
-      id: Date.now()+'',
-      dateISO: new Date().toISOString(),
-      source: 'bottle',
-      amountMl: amount,
-      durationSec: elapsed
-    };
-    saveFeed(entry);
+    bottlePendingDuration = elapsed;
+    store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
     if(bottleAmountInput){
-      bottleAmountInput.value = '';
+      if(!bottleAmountInput.value){
+        bottleAmountInput.placeholder = 'ej. 120';
+      }
+      bottleAmountInput.focus({ preventScroll: false });
     }
   }else{
     setFeedMode('bottle');
@@ -1749,12 +1728,15 @@ $('#save-biberon')?.addEventListener('click', () => {
       id: Date.now()+'',
       dateISO: new Date().toISOString(),
       source: 'bottle',
-      amountMl: ml
+      amountMl: ml,
+      durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined
     };
     saveFeed(entry);
     if(bottleAmountInput){
       bottleAmountInput.value = '';
     }
+    bottlePendingDuration = 0;
+    store.remove(BOTTLE_PENDING_KEY);
   }
 });
 
@@ -1770,6 +1752,12 @@ const savedBottleTimer = store.get(BOTTLE_TIMER_KEY, null);
 if(savedBottleTimer && savedBottleTimer.start){
   setFeedMode('bottle');
   beginBottleTimer(savedBottleTimer.start, false);
+}
+if(bottlePendingDuration > 0){
+  setFeedMode('bottle');
+  if(bottleAmountInput){
+    bottleAmountInput.focus({ preventScroll: false });
+  }
 }
 
 // ===== Eliminations modal logic =====
