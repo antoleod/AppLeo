@@ -664,7 +664,7 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 .item-action:hover{color:var(--text);background:#fff;box-shadow:0 8px 16px rgba(14,27,41,.12);transform:scale(1.05)}
 .item-action:active{transform:scale(.94)}
 .item-action span{font-size:16px;line-height:1}
-.history-item:root.dark-mode, :root.dark-mode .item{
+:root.dark-mode .history-item, :root.dark-mode .item{
   background:linear-gradient(170deg, rgba(28,40,68,.82), rgba(46,64,100,.72));
   border:1px solid rgba(124,150,206,.5);
   box-shadow:0 20px 44px rgba(2,8,20,.5);

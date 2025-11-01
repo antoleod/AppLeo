@@ -2957,6 +2957,7 @@ function handleSwipeStart(e) {
 
   swipeState.target = foreground;
   swipeState.startX = e.pointerId ? e.clientX : e.touches[0].clientX;
+  swipeState.startX = e.clientX;
   swipeState.isSwiping = false;
   historyList.addEventListener('pointermove', handleSwipeMove, { passive: false });
   historyList.addEventListener('pointerup', handleSwipeEnd);
@@ -2967,6 +2968,7 @@ function handleSwipeMove(e) {
   if (!swipeState.target) return;
 
   swipeState.currentX = e.pointerId ? e.clientX : e.touches[0].clientX;
+  swipeState.currentX = e.clientX;
   const deltaX = swipeState.currentX - swipeState.startX;
 
   if (!swipeState.isSwiping && Math.abs(deltaX) > 10) {
