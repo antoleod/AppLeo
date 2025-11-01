@@ -892,9 +892,9 @@ function getStatsChartData(range = historyRange){
 function updateStatsSummary(currentStats = null){
   if(!statsSummaryEl) return;
   const rangeConfigs = [
-    { key: 'today', label: 'Hoy', range: {mode:'day'} },
-    { key: 'week', label: '7 días', range: {mode:'week'} },
-    { key: 'month', label: '30 días', range: {mode:'month'} }
+    { key: 'today', label: 'Hoy', range: {mode:'day'}, icon: '☀️' },
+    { key: 'week', label: '7 días', range: {mode:'week'}, icon: '📅' },
+    { key: 'month', label: '30 días', range: {mode:'month'}, icon: '🗓️' }
   ];
 
   const cardsHtml = rangeConfigs.map(cfg => {
@@ -921,42 +921,58 @@ function updateStatsSummary(currentStats = null){
         measurementParts.push(`${formatNumber(latest.temp, 1, 1)} °C`);
       }
     }
-    const measurementLabel = measurementParts.length ? measurementParts.join(' · ') : 'Sin registros';
-    const dayLabel = dayCount === 1 ? '1 día' : `${dayCount} días`;
+    const measurementLabel = measurementParts.join(' • ');
     return `
-      <article class="stat-card">
-        <div class="stat-card-header">
-          <span class="stat-title">${cfg.label}</span>
-          <span class="stat-sub">${escapeHtml(dayLabel)}</span>
+      <article class="stat-card" data-range="${cfg.key}">
+        <div class="stat-card-head">
+          <span class="stat-pill">${cfg.icon} ${cfg.label}</span>
+          <span class="stat-pill stat-pill-muted">${dayCount}d</span>
         </div>
-        <div class="stat-metric">
-          <span class="metric-label">Tomas</span>
-          <span class="metric-value">${formatNumber(totalFeeds)}</span>
-          <span class="metric-sub">Prom: ${formatNumber(avgFeeds, 1, 1)} / día</span>
+        <div class="stat-card-main">
+          <span class="stat-card-icon">🍼</span>
+          <div class="stat-card-main-values">
+            <span class="stat-card-value">${formatNumber(totalFeeds)}</span>
+            <span class="stat-card-caption">tomas</span>
+          </div>
+          <span class="stat-card-average">Ø ${formatNumber(avgFeeds, 1, 1)}/d</span>
         </div>
-        <div class="stat-metric">
-          <span class="metric-label">Sein (hh:mm)</span>
-          <span class="metric-value">${formatMinutes(totalBreastMinutes)}</span>
-          <span class="metric-sub">Prom: ${formatMinutes(avgBreastMinutes)} / día</span>
-        </div>
-        <div class="stat-metric">
-          <span class="metric-label">Biberón (ml)</span>
-          <span class="metric-value">${formatNumber(totalBottleMl)}</span>
-          <span class="metric-sub">Prom: ${formatNumber(avgBottleMl, 1, 1)} ml / día</span>
-        </div>
-        <div class="stat-metric">
-          <span class="metric-label">Pañales</span>
-          <span class="metric-value">${formatNumber(diapers.total)}</span>
-          <span class="metric-sub">Húmedos ${formatNumber(diapers.wet)} · Sucios ${formatNumber(diapers.dirty)} · Ambos ${formatNumber(diapers.both)}</span>
-        </div>
-        <div class="stat-metric">
-          <span class="metric-label">Medicación</span>
-          <span class="metric-value">${formatNumber(meds)}</span>
-          <span class="metric-sub">Prom: ${formatNumber(meds / dayCount, 1, 1)} dosis / día</span>
-        </div>
-        <div class="stat-metric">
-          <span class="metric-label">Últimas medidas</span>
-          <span class="metric-value">${escapeHtml(measurementLabel)}</span>
+        <div class="stat-card-grid">
+          <div class="stat-chip">
+            <span class="stat-chip-icon">⏱️</span>
+            <div class="stat-chip-data">
+              <span class="stat-chip-value">${formatMinutes(totalBreastMinutes)}</span>
+              <span class="stat-chip-sub">Ø ${formatMinutes(avgBreastMinutes)}/d</span>
+            </div>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip-icon">🥛</span>
+            <div class="stat-chip-data">
+              <span class="stat-chip-value">${formatNumber(totalBottleMl)}</span>
+              <span class="stat-chip-sub">Ø ${formatNumber(avgBottleMl, 1, 1)} ml/d</span>
+            </div>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip-icon">🧷</span>
+            <div class="stat-chip-data">
+              <span class="stat-chip-value">${formatNumber(diapers.total)}</span>
+              <span class="stat-chip-sub">H${formatNumber(diapers.wet)}·S${formatNumber(diapers.dirty)}·A${formatNumber(diapers.both)}</span>
+            </div>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip-icon">💊</span>
+            <div class="stat-chip-data">
+              <span class="stat-chip-value">${formatNumber(meds)}</span>
+              <span class="stat-chip-sub">Ø ${formatNumber(meds / dayCount, 1, 1)}/d</span>
+            </div>
+          </div>
+          ${measurementLabel ? `
+            <div class="stat-chip stat-chip-wide">
+              <span class="stat-chip-icon">📏</span>
+              <div class="stat-chip-data">
+                <span class="stat-chip-value">${escapeHtml(measurementLabel)}</span>
+              </div>
+            </div>
+          ` : ''}
         </div>
       </article>
     `;
@@ -987,19 +1003,18 @@ function updateStatsSummary(currentStats = null){
     const insightItems = [];
     if(busiestDay && (busiestDay.feedCount > 0 || busiestDay.breastMinutes > 0 || busiestDay.bottleMl > 0)){
       const busyLabel = formatStatsDayLabel(busiestDay.dateISO, {weekday:'long', day:'numeric', month:'short'});
-      const sessionsLabel = busiestDay.feedCount === 1 ? '1 sesión' : `${formatNumber(busiestDay.feedCount)} sesiones`;
       const detailParts = [];
       if(busiestDay.breastMinutes > 0){
-        detailParts.push(`${formatMinutes(busiestDay.breastMinutes)} sein`);
+        detailParts.push(`${formatMinutes(busiestDay.breastMinutes)} ⏱️`);
       }
       if(busiestDay.bottleMl > 0){
-        detailParts.push(`${formatNumber(busiestDay.bottleMl)} ml biberón`);
+        detailParts.push(`${formatNumber(busiestDay.bottleMl)} ml 🍼`);
       }
-      const sub = detailParts.length ? `${sessionsLabel} · ${detailParts.join(' · ')}` : sessionsLabel;
       insightItems.push({
-        label: 'Día más activo',
-        value: busyLabel,
-        sub
+        icon: '🌟',
+        value: formatNumber(busiestDay.feedCount),
+        label: busyLabel,
+        sub: detailParts.join(' • ')
       });
     }
 
@@ -1008,37 +1023,42 @@ function updateStatsSummary(currentStats = null){
       const ratioBreast = Math.round((totals.breastSessions / totalSessions) * 100);
       const ratioBottle = Math.max(0, 100 - ratioBreast);
       insightItems.push({
-        label: 'Reparto sesiones',
-        value: `${ratioBreast}% sein | ${ratioBottle}% biberón`,
-        sub: `${formatNumber(totals.breastSessions)} sein · ${formatNumber(totals.bottleSessions)} biberón`
+        icon: '🌀',
+        value: `${ratioBreast}% / ${ratioBottle}%`,
+        label: 'reparto',
+        sub: `${formatNumber(totals.breastSessions)} ⏱️ • ${formatNumber(totals.bottleSessions)} 🍼`
       });
     }
 
     if(totals.feedCount > 0){
-      const sessionDetails = [];
+      const detailParts = [];
       if(totals.breastSessions > 0){
         const avgPerSessionBreast = totals.breastMinutes / Math.max(totals.breastSessions, 1);
-        sessionDetails.push(`${formatMinutes(avgPerSessionBreast)} sein`);
+        detailParts.push(`${formatMinutes(avgPerSessionBreast)} ⏱️`);
       }
       if(totals.bottleSessions > 0){
         const avgPerSessionBottle = totals.bottleMl / Math.max(totals.bottleSessions, 1);
-        sessionDetails.push(`${formatNumber(avgPerSessionBottle, 1, 1)} ml biberón`);
+        detailParts.push(`${formatNumber(avgPerSessionBottle, 1, 1)} ml 🍼`);
       }
-      if(sessionDetails.length){
+      if(detailParts.length){
         insightItems.push({
-          label: 'Promedio por sesión',
-          value: sessionDetails.join(' · '),
-        sub: `${formatNumber(totals.feedCount / dayCount, 1, 1)} sesiones / día`
+          icon: '⚖️',
+          value: `${formatNumber(totals.feedCount / dayCount, 1, 1)}/d`,
+          label: 'promedio',
+          sub: detailParts.join(' • ')
         });
       }
     }
 
     insightsHtml = insightItems.length
       ? `<div class="stat-insights">${insightItems.map(item => `
-          <div class="stat-insight">
-            <span class="stat-insight-label">${escapeHtml(item.label)}</span>
-            <span class="stat-insight-value">${escapeHtml(item.value)}</span>
-            ${item.sub ? `<span class="stat-insight-sub">${escapeHtml(item.sub)}</span>` : ''}
+          <div class="stat-chip stat-chip-inline">
+            <span class="stat-chip-icon">${escapeHtml(item.icon)}</span>
+            <div class="stat-chip-data">
+              <span class="stat-chip-value">${escapeHtml(item.value)}</span>
+              ${item.label ? `<span class="stat-chip-label">${escapeHtml(item.label)}</span>` : ''}
+              ${item.sub ? `<span class="stat-chip-sub">${escapeHtml(item.sub)}</span>` : ''}
+            </div>
           </div>
         `).join('')}</div>`
       : '';
@@ -1057,13 +1077,13 @@ function renderStatsDailyList(stats = null){
   const data = stats || buildRangeStats();
   const perDay = Array.isArray(data?.perDay) ? data.perDay : [];
   if(!perDay.length){
-    statsDailyList.innerHTML = '<div class="stat-placeholder">No hay actividad registrada en este rango.</div>';
+    statsDailyList.innerHTML = '<div class="stat-placeholder">📭 Sin actividad en este rango.</div>';
     return;
   }
 
   const hasActivity = perDay.some(day => (day?.feedCount || 0) > 0 || (day?.breastMinutes || 0) > 0 || (day?.bottleMl || 0) > 0);
   if(!hasActivity){
-    statsDailyList.innerHTML = '<div class="stat-placeholder">No hay actividad registrada en este rango.</div>';
+    statsDailyList.innerHTML = '<div class="stat-placeholder">📭 Sin actividad en este rango.</div>';
     return;
   }
 
@@ -1081,10 +1101,6 @@ function renderStatsDailyList(stats = null){
     const bottlePercent = maxBottle > 0 ? Math.round((bottleMl / maxBottle) * 100) : 0;
     const breastValue = formatMinutes(breastMinutes);
     const bottleValue = `${formatNumber(bottleMl)} ml`;
-    const dayHasActivity = feedCount > 0 || breastMinutes > 0 || bottleMl > 0;
-    const countText = dayHasActivity
-      ? (feedCount === 1 ? '1 sesión' : `${formatNumber(feedCount)} sesiones`)
-      : 'Sin sesiones';
 
     const safeBreastPercent = Math.min(100, Math.max(0, breastPercent));
     const safeBottlePercent = Math.min(100, Math.max(0, bottlePercent));
@@ -1093,21 +1109,23 @@ function renderStatsDailyList(stats = null){
       <article class="stats-day" data-day="${escapeHtml(dateISO)}">
         <div class="stats-day-head">
           <span class="stats-day-date" title="${escapeHtml(labelFull)}">${escapeHtml(labelShort)}</span>
-          <span class="stats-day-count">${escapeHtml(countText)}</span>
+          <span class="stats-day-count">${feedCount > 0 ? `✳️ ${formatNumber(feedCount)}` : '&mdash;'}</span>
         </div>
-        <div class="stats-day-metric">
-          <span class="metric-label"><span class="metric-dot breast"></span> Sein</span>
-          <div class="metric-bar" title="Sein ${escapeHtml(breastValue)}">
-            <div class="stats-bar breast" style="--percent:${safeBreastPercent}%"></div>
+        <div class="stats-day-bars">
+          <div class="stats-meter">
+            <span class="stats-meter-icon">⏱️</span>
+            <div class="stats-meter-bar" title="⏱️ ${escapeHtml(breastValue)}">
+              <span class="stats-meter-fill breast" style="--percent:${safeBreastPercent}%"></span>
+            </div>
+            <span class="stats-meter-value">${escapeHtml(breastValue)}</span>
           </div>
-          <span class="metric-value">${escapeHtml(breastValue)}</span>
-        </div>
-        <div class="stats-day-metric">
-          <span class="metric-label"><span class="metric-dot bottle"></span> Biberón</span>
-          <div class="metric-bar" title="Biberón ${escapeHtml(bottleValue)}">
-            <div class="stats-bar bottle" style="--percent:${safeBottlePercent}%"></div>
+          <div class="stats-meter">
+            <span class="stats-meter-icon">🍼</span>
+            <div class="stats-meter-bar" title="🍼 ${escapeHtml(bottleValue)}">
+              <span class="stats-meter-fill bottle" style="--percent:${safeBottlePercent}%"></span>
+            </div>
+            <span class="stats-meter-value">${escapeHtml(bottleValue)}</span>
           </div>
-          <span class="metric-value">${escapeHtml(bottleValue)}</span>
         </div>
       </article>
     `;
@@ -1151,7 +1169,7 @@ function updateStatsChart(force = false){
             legend: { display: false },
             title: {
               display: true,
-              text: 'Minutos de lactancia por hora',
+              text: '⏱️ / hora',
               color: '#f5f7ff'
             },
             tooltip: {
@@ -1207,7 +1225,7 @@ function updateStatsChart(force = false){
             legend: { display: false },
             title: {
               display: true,
-              text: 'Mililitros por día',
+              text: '🍼 / día',
               color: '#f5f7ff'
             },
             tooltip: {
@@ -1267,7 +1285,7 @@ function updateStatsChart(force = false){
             },
             title: {
               display: true,
-              text: 'Pañales registrados',
+              text: '🧷 pañales',
               color: '#f5f7ff'
             }
           }
@@ -1297,7 +1315,7 @@ function updateStatsChart(force = false){
           labels,
           datasets: [
             {
-              label: 'Peso (kg)',
+              label: 'kg',
               data: weightData,
               borderColor: 'rgba(59, 130, 246, 0.9)',
               backgroundColor: 'rgba(59, 130, 246, 0.2)',
@@ -1307,7 +1325,7 @@ function updateStatsChart(force = false){
               yAxisID: 'yWeight'
             },
             {
-              label: 'Talla (cm)',
+              label: 'cm',
               data: heightData,
               borderColor: 'rgba(16, 185, 129, 0.9)',
               backgroundColor: 'rgba(16, 185, 129, 0.2)',
@@ -1317,7 +1335,7 @@ function updateStatsChart(force = false){
               yAxisID: 'yHeight'
             },
             {
-              label: 'Temperatura (°C)',
+              label: '°C',
               data: tempData,
               borderColor: 'rgba(244, 63, 94, 0.9)',
               backgroundColor: 'rgba(244, 63, 94, 0.2)',
@@ -1335,7 +1353,7 @@ function updateStatsChart(force = false){
           plugins: {
             title: {
               display: true,
-              text: 'Curvas de crecimiento',
+              text: '📈 crecimiento',
               color: '#f5f7ff'
             },
             legend: {
@@ -1347,14 +1365,14 @@ function updateStatsChart(force = false){
             yWeight: {
               type: 'linear',
               position: 'left',
-              title: { display:true, text:'Peso (kg)', color:'#f5f7ff' },
+              title: { display:true, text:'kg', color:'#f5f7ff' },
               ticks: { color:'#f5f7ff' },
               grid: { color:'rgba(255,255,255,0.1)' }
             },
             yHeight: {
               type: 'linear',
               position: 'right',
-              title: { display:true, text:'Talla (cm)', color:'#f5f7ff' },
+              title: { display:true, text:'cm', color:'#f5f7ff' },
               ticks: { color:'#f5f7ff' },
               grid: { drawOnChartArea:false }
             },
@@ -1362,7 +1380,7 @@ function updateStatsChart(force = false){
               type: 'linear',
               position: 'right',
               offset: true,
-              title: { display:true, text:'Temp (°C)', color:'#f5f7ff' },
+              title: { display:true, text:'°C', color:'#f5f7ff' },
               ticks: { color:'#f5f7ff' },
               grid: { drawOnChartArea:false }
             },
@@ -2855,3 +2873,5 @@ window.addEventListener('offline', () => {
 // }
 
 bootstrap();
+
+
