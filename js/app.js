@@ -2095,7 +2095,7 @@ function renderFeedHistory(){
   todaysFeeds.forEach(feed => {
     const div = document.createElement('div');
     div.className = 'item';
-    const time = new Date(feed.dateISO).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const time = new Date(feed.dateISO).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
     let line = '';
     if(feed.source === 'breast'){
       const minsLabel = formatMinutes((feed.durationSec || 0)/60);

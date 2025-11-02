@@ -1274,32 +1274,71 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   .stats-meter-bar{height:7px}
 }
 
-@media screen and (max-width:480px){
+@media screen and (max-width: 480px){
+
   .wrap{--wrap-width:calc(100% - 28px);padding:24px 14px; gap: clamp(16px, 5vw, 24px);}
+
   h1{font-size:clamp(26px,5.6vw,32px);text-align:center;margin-bottom:18px}
+
   .card{padding:calc(var(--card-padding) - 8px)}
+
   .history-actions{width:100%;justify-content:center}
+
   .view-switcher{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+
   .view-switcher #history-range-btn{justify-content:center;font-size:14px}
+
   .view-switcher .pill{justify-self:flex-start;font-size:11px}
+
   .view-switcher #export-pdf{justify-self:flex-end}
+
   .modal .sheet{max-width:100%;border-radius:22px;padding:20px 18px}
+
   .stat-card{padding:16px;border-radius:16px}
+
   .stat-card-value{font-size:30px}
+
   .stat-card-grid{grid-template-columns:1fr}
+
   .stat-chip{padding:10px 14px}
+
   .stat-chip-inline{min-width:100%}
+
+  .seg {
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+  }
+
+  .seg button {
+
+    flex: 1 1 calc(50% - 5px);
+
+    min-width: 120px;
+
+  }
+
 }
 @media screen and (max-width:460px){
   .row{flex-direction:column;gap:12px}
 }
 
-@media screen and (max-width:420px){
+@media screen and (max-width: 420px){
+
   .btn{width:100%}
+
   #history-range-btn .label{font-size:13px}
+
   .view-switcher #export-pdf{padding:10px;max-width:48px}
+
   .view-switcher #export-pdf .label{display:none}
+
   .view-switcher .pill{font-size:11px}
+
+  .footer{flex-direction:column}
+
 }
 
 @media screen and (max-width:360px){
