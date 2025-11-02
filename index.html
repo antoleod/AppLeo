@@ -137,7 +137,6 @@
           <div class="seg seg-sides">
             <button id="side-left" class="active">Gauche</button>
             <button id="side-right">Droite</button>
-            <button id="side-both">Les deux</button>
           </div>
           <div class="text-center">
             <div class="time" id="chrono">00:00:00</div>
@@ -147,17 +146,19 @@
         </div>
 
         <!-- Biberón -->
-        <div id="pane-biberon" class="stack is-hidden">
+        <div id="pane-biberon" class="stack">
           <div class="text-center">
             <div class="time" id="bottle-chrono">00:00:00</div>
             <div id="bottle-start-time-display" class="muted"></div>
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
           </div>
-          <div class="field field-padded">
-            <label for="ml">Quantité (ml)</label>
-            <input id="ml" class="input" type="number" inputmode="numeric" placeholder="ej. 120" />
+          <div id="bottle-form" class="stack">
+            <div class="field field-padded" id="bottle-amount-field">
+              <label for="ml">Quantité (ml)</label>
+              <input id="ml" class="input" type="number" inputmode="numeric" placeholder="ej. 120" />
+            </div>
+            <button class="btn btn-primary" id="save-biberon">Enregistrer</button>
           </div>
-          <button class="btn btn-primary" id="save-biberon">Enregistrer</button>
         </div>
 
         <div class="report-line" id="summary-feed"></div>

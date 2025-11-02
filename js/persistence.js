@@ -323,26 +323,28 @@ export const Persistence = {
     }, reason);
   },
 
-  async deleteEntries(type, ids, reason = "Delete entries") {
-    const key = TYPE_KEYS[type];
-    if (!key) {
-      throw new Error(`Unknown entry type "${type}"`);
-    }
-    const idSet = new Set(Array.isArray(ids) ? ids.map(String) : []);
-    if (!idSet.size) {
+  async deleteEntries(items, reason = "Delete entries") {
+    if (!Array.isArray(items) || !items.length) {
       return;
     }
     await withMutation((snapshot) => {
-      // Filtramos las entradas existentes para eliminar solo las especificadas.
-      const initialCount = snapshot[key].length;
-      snapshot[key] = snapshot[key].filter(
-        (item) => !item || !idSet.has(String(item.id))
-      );
-      // Solo devolvemos el snapshot si algo ha cambiado para evitar escrituras innecesarias.
-      if (snapshot[key].length < initialCount) {
+      let changed = false;
+      items.forEach(itemToDelete => {
+        const key = TYPE_KEYS[itemToDelete.type];
+        if (key && itemToDelete.id) {
+          const initialCount = snapshot[key].length;
+          snapshot[key] = snapshot[key].filter(
+            (item) => !item || String(item.id) !== String(itemToDelete.id)
+          );
+          if (snapshot[key].length < initialCount) {
+            changed = true;
+          }
+        }
+      });
+      if (changed) {
         return snapshot;
       }
-      return snapshot;
+      return undefined; // No changes, no write
     }, reason);
   },
 

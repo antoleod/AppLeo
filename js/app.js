@@ -183,6 +183,27 @@ function formatMinutes(totalMinutes){
   return String(minutes);
 }
 
+function formatDuration(totalSeconds) {
+  const safe = Math.max(0, Math.round(Number(totalSeconds) || 0));
+  if (safe < 60) {
+    return `${safe} sec`;
+  }
+  const minutes = Math.floor(safe / 60);
+  const seconds = safe % 60;
+  if (minutes < 60) {
+    if (seconds > 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+    return `${minutes} min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (remainingMinutes > 0) {
+    return `${hours}h ${remainingMinutes}m`;
+  }
+  return `${hours}h`;
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 // ===== Hero background =====
 const HERO_KEY = 'heroImage';
@@ -406,7 +427,9 @@ const selectionActions = $('#selection-actions');
 const startTimeDisplay = $('#start-time-display');
 const bottleStartTimeDisplay = $('#bottle-start-time-display');
 const bottleChrono = $('#bottle-chrono');
+const bottleForm = $('#bottle-form');
 const bottleAmountInput = $('#ml');
+const saveBottleBtn = $('#save-biberon');
 const manualMedFields = $('#manual-med-fields');
 const manualMedSelect = $('#manual-med-select');
 const manualMedOtherField = $('#manual-med-other-field');
@@ -417,6 +440,7 @@ const manualMesuresFields = $('#manual-mesures-fields');
 const manualMesureTemp = $('#manual-mesure-temp');
 const manualMesurePoids = $('#manual-mesure-poids');
 const manualMesureTaille = $('#manual-mesure-taille');
+const quickAddBottleBtn = $('#quick-add-bottle');
 
 const SAVE_MESSAGES = {
   idle: 'Prêt',
@@ -464,6 +488,7 @@ let statsGrowthChart = null;
 const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
 const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
+const BOTTLE_AMOUNT_KEY = 'bottlePendingAmount';
 let manualType = 'feed';
 let timer = 0;
 let timerStart = null;
@@ -472,7 +497,12 @@ let bottleTimer = 0;
 let bottleTimerStart = null;
 let bottleTimerInterval = null;
 let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
+let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
 let isDeleteMode = false;
+
+if(bottleAmountInput && bottlePendingAmount != null){
+  bottleAmountInput.value = String(bottlePendingAmount);
+}
 
 function cloneDataSnapshot(){
   return {
@@ -1496,8 +1526,8 @@ function renderHistory(){
 
         if(row.type === 'feed'){
           if(row.item.source === 'breast'){
-            const minsLabel = formatMinutes((row.item.durationSec || 0) / 60);
-            title = `🍼 Sein (${row.item.breastSide || ''}) · ${minsLabel}`;
+            const durationLabel = formatDuration(row.item.durationSec || 0);
+            title = `🍼 Sein (${row.item.breastSide || ''}) · ${durationLabel}`;
           }else{
             const ml = Number(row.item.amountMl || 0);
             title = `🍼 Biberon · ${ml} ml`;
@@ -1555,6 +1585,68 @@ function renderHistory(){
   updateStatsChart();
 }
 syncHistoryRangeUI();
+
+const mesureTempInput = $('#mesure-temp');
+const mesurePoidsInput = $('#mesure-poids');
+const mesureTailleInput = $('#mesure-taille');
+
+function validateNumericInput(event) {
+  const allowedKeys = [
+    'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ','
+  ];
+  const key = event.key;
+
+  if (event.ctrlKey || event.metaKey) {
+    return;
+  }
+
+  if (!allowedKeys.includes(key)) {
+    event.preventDefault();
+  }
+}
+
+if (mesureTempInput) {
+  mesureTempInput.addEventListener('keydown', validateNumericInput);
+}
+if (mesurePoidsInput) {
+    mesurePoidsInput.addEventListener('keydown', validateNumericInput);
+}
+if (mesureTailleInput) {
+    mesureTailleInput.addEventListener('keydown', validateNumericInput);
+}
+
+quickAddBottleBtn?.addEventListener('click', () => {
+    const amount = prompt('Quantité (ml) prise ?');
+
+    if (amount) {
+        const amountMl = parseFloat(amount.replace(',', '.'));
+        if (!isNaN(amountMl) && amountMl > 0) {
+            const newFeed = {
+                id: `feed-${Date.now()}`,
+                dateISO: new Date().toISOString(),
+                source: 'bottle',
+                amountMl: amountMl,
+                durationSec: 0
+            };
+
+            const api = getPersistenceApi();
+            if (api) {
+                api.saveEntry('feed', newFeed).then(() => {
+                    updateState(data => ({
+                        ...data,
+                        feeds: [newFeed, ...data.feeds]
+                    }));
+                    renderHistory();
+                    closeModal('#modal-leche');
+                });
+            }
+        } else {
+            alert('Veuillez entrer un nombre valide.');
+        }
+    }
+});
+
 renderHistory();
 
 historyRangeBtn?.addEventListener('click', (event) => {
@@ -1702,9 +1794,15 @@ function showUndoToast(items) {
 function executeUndo() {
   if (undoState.timer) clearTimeout(undoState.timer);
   $('#undo-toast').classList.remove('show');
-  
-  // Simplemente renderiza de nuevo el historial para restaurar los elementos
-  renderHistory();
+
+  // Restore items in the UI
+  const idsToRestore = new Set(undoState.items.map(item => item.id));
+  $$('.history-item.is-deleting').forEach(el => {
+    const checkbox = el.querySelector('.history-item-checkbox');
+    if (checkbox && idsToRestore.has(checkbox.dataset.id)) {
+      el.classList.remove('is-deleting');
+    }
+  });
 
   undoState.items = [];
   undoState.timer = null;
@@ -1712,9 +1810,32 @@ function executeUndo() {
 
 function commitDeletion() {
   if (!undoState.items.length) return;
+  
+  const itemsToDelete = undoState.items;
+
+  // 1. Update state
+  updateState(currentData => {
+    itemsToDelete.forEach(({ type, id }) => {
+      const key = type + 's';
+      if (currentData[key]) {
+        currentData[key] = currentData[key].filter(item => String(item.id) !== String(id));
+      }
+    });
+    return currentData;
+  });
+
+  // 2. Call persistence API
   const api = getPersistenceApi();
-  api?.deleteEntries(undoState.items);
-  executeUndo(); // Limpia el estado de deshacer
+  api?.deleteEntries(itemsToDelete);
+
+  // 3. Clean up
+  undoState.items = [];
+  if (undoState.timer) clearTimeout(undoState.timer);
+  undoState.timer = null;
+  $('#undo-toast').classList.remove('show');
+
+  // 4. Re-render history to remove the items from the DOM
+  renderHistory();
 }
 
 function confirmAndDelete(itemsToDelete) {
@@ -1750,18 +1871,9 @@ function confirmAndDelete(itemsToDelete) {
       }
     });
 
-    // Update state but keep items in undo buffer
-    updateState(currentData => {
-      itemsToDelete.forEach(({ type, id }) => {
-        const key = type + 's';
-        if (currentData[key]) {
-          currentData[key] = currentData[key].filter(item => String(item.id) !== String(id));
-        }
-      });
-      return currentData;
-    });
-
+    // Don't update state here, just show undo toast
     showUndoToast(itemsToDelete);
+    
     toggleDeleteMode(false);
     closeConfirmModal();
   }
@@ -2036,6 +2148,15 @@ function closeModal(id){
   modal.__prevFocus = null;
 }
 
+function closeAllModals(){
+  const openModals = $$('.modal.open');
+  openModals.forEach(modal => {
+    if(modal.id){
+      closeModal(`#${modal.id}`);
+    }
+  });
+}
+
 // ===== Leche modal logic =====
 let feedMode = 'breast';
 let breastSide = 'Gauche';
@@ -2060,6 +2181,20 @@ function updateBottleChrono(){
 }
 updateBottleChrono();
 
+function showBottlePrompt(){
+  bottleForm.classList.add('is-visible');
+}
+
+function hideBottlePrompt({ clearValue = false } = {}){
+  if(bottleForm){
+    bottleForm.classList.remove('is-visible');
+  }
+  if(clearValue && bottleAmountInput){
+    bottleAmountInput.value = '';
+  }
+}
+hideBottlePrompt();
+
 function tickBottleTimer(){
   if(!bottleTimerStart) return;
   bottleTimer = Math.max(0, Math.floor((Date.now() - bottleTimerStart) / 1000));
@@ -2067,10 +2202,17 @@ function tickBottleTimer(){
 }
 
 function beginBottleTimer(startTimestamp = Date.now(), persist = true){
+  hideBottlePrompt();
   bottleTimerStart = startTimestamp;
-  bottleTimerInterval && clearInterval(bottleTimerInterval);
+  if(bottleTimerInterval){
+    clearInterval(bottleTimerInterval);
+  }
+  if(persist){
+    triggerVibration();
+  }
+  bottleTimer = Math.max(0, Math.floor((Date.now() - bottleTimerStart) / 1000));
+  updateBottleChrono();
   bottleTimerInterval = setInterval(tickBottleTimer, 1000);
-    if(bottleTimerInterval) return; triggerVibration();
   const label = new Date(bottleTimerStart).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = `Commencé à ${label}`);
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Stop');
@@ -2081,7 +2223,7 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
   }
 }
 
-function stopBottleTimerWithoutSaving(){
+function stopBottleTimerWithoutSaving({ resetDisplay = true } = {}){
   if(bottleTimerInterval){
     triggerVibration();
     clearInterval(bottleTimerInterval);
@@ -2090,9 +2232,11 @@ function stopBottleTimerWithoutSaving(){
   bottleTimerStart = null;
   store.remove(BOTTLE_TIMER_KEY);
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
-  bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = '');
-  bottleTimer = 0;
-  updateBottleChrono();
+  if(resetDisplay){
+    bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = '');
+    bottleTimer = 0;
+    updateBottleChrono();
+  }
 }
 
 function setFeedMode(mode){
@@ -2148,15 +2292,21 @@ function stopTimerWithoutSaving(){
   updateChrono();
 }
 
-function saveFeed(entry){
+async function saveFeed(entry){
   updateState(currentData => {
     currentData.feeds.push(entry);
     return currentData;
   });
+  renderHistory();
   closeModal('#modal-leche');
   const api = getPersistenceApi();
-  api?.saveEntry?.('feed', entry, 'Save feed entry');
-  renderHistory();
+  try{
+    if(api?.saveEntry){
+      await api.saveEntry('feed', entry, 'Save feed entry');
+    }
+  }catch(err){
+    console.error('Failed to save feed entry to persistence:', err);
+  }
 }
 
 $('#btn-leche')?.addEventListener('click', ()=> openModal('#modal-leche'));
@@ -2169,7 +2319,7 @@ $('#side-left')?.addEventListener('click', ()=> setBreastSide('Gauche'));
 $('#side-right')?.addEventListener('click', ()=> setBreastSide('Droite'));
 $('#side-both')?.addEventListener('click', ()=> setBreastSide('Les deux'));
 
-startStopBtn?.addEventListener('click', () => {
+startStopBtn?.addEventListener('click', async () => {
   if(timerInterval){
     const elapsed = Math.max(1, Math.floor((Date.now() - timerStart) / 1000));
     stopTimerWithoutSaving();
@@ -2180,7 +2330,7 @@ startStopBtn?.addEventListener('click', () => {
       breastSide,
       durationSec: elapsed
     };
-    saveFeed(entry);
+    await saveFeed(entry);
   }else{
     setFeedMode('breast');
     beginTimer(Date.now(), true);
@@ -2191,39 +2341,83 @@ startStopBottleBtn?.addEventListener('click', () => {
   if(bottleTimerInterval){
     const start = bottleTimerStart || Date.now();
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
-    stopBottleTimerWithoutSaving();
+    stopBottleTimerWithoutSaving({ resetDisplay: false });
+    bottleTimer = elapsed;
+    updateBottleChrono();
+    if(bottleStartTimeDisplay){
+      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const s = String(elapsed % 60).padStart(2, '0');
+      bottleStartTimeDisplay.textContent = `Durée : ${h}:${m}:${s}`;
+    }
     bottlePendingDuration = elapsed;
     store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
-    if(bottleAmountInput){
-      if(!bottleAmountInput.value){
-        bottleAmountInput.placeholder = 'ej. 120';
+    const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '');
+    const promptValue = window.prompt('Quantité (ml) prise ?', defaultPromptValue);
+    if(promptValue !== null){
+      const normalized = promptValue.replace(',', '.').trim();
+      if(normalized === ''){
+        bottlePendingAmount = null;
+        store.remove(BOTTLE_AMOUNT_KEY);
+      }else{
+        const parsed = parseFloat(normalized);
+        if(Number.isFinite(parsed) && parsed > 0){
+          bottlePendingAmount = parsed;
+          store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
+        }else{
+          alert('Veuillez saisir une quantité valide en ml.');
+          bottlePendingAmount = null;
+          store.remove(BOTTLE_AMOUNT_KEY);
+        }
       }
+    }
+    showBottlePrompt();
+    if(bottleAmountInput){
+      bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';
+      bottleAmountInput.placeholder = 'ej. 120';
       bottleAmountInput.focus({ preventScroll: false });
     }
   }else{
+    bottlePendingAmount = null;
+    store.remove(BOTTLE_AMOUNT_KEY);
+    if(bottleAmountInput){
+      bottleAmountInput.value = '';
+    }
     setFeedMode('bottle');
     beginBottleTimer(Date.now(), true);
   }
 });
 
-$('#save-biberon')?.addEventListener('click', () => {
-    triggerVibration();
-  const amount = parseFloat(bottleAmountInput.value);
-  if(amount > 0){
-    const entry = {
-      id: Date.now()+'',
-      dateISO: new Date().toISOString(),
-      source: 'bottle',
-      amountMl: amount,
-      durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined
-    };
-    saveFeed(entry);
-    if(bottleAmountInput){
-      bottleAmountInput.value = '';
-    }
-    bottlePendingDuration = 0;
-    store.remove(BOTTLE_PENDING_KEY);
+saveBottleBtn?.addEventListener('click', async () => {
+  triggerVibration();
+  const rawValue = bottleAmountInput?.value ?? '';
+  const normalizedValue = rawValue.replace(',', '.').trim();
+  const amount = parseFloat(normalizedValue);
+  if(!Number.isFinite(amount) || amount <= 0){
+    alert('Veuillez saisir une quantité valide en ml.');
+    bottleAmountInput?.focus({ preventScroll: false });
+    return;
   }
+
+  bottlePendingAmount = amount;
+  store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
+
+  const entry = {
+    id: Date.now()+'',
+    dateISO: new Date().toISOString(),
+    source: 'bottle',
+    amountMl: bottlePendingAmount,
+    durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined
+  };
+
+  await saveFeed(entry);
+
+  bottlePendingDuration = 0;
+  store.remove(BOTTLE_PENDING_KEY);
+  bottlePendingAmount = null;
+  store.remove(BOTTLE_AMOUNT_KEY);
+  hideBottlePrompt({ clearValue: true });
+  stopBottleTimerWithoutSaving();
 });
 
 setFeedMode('breast');
@@ -2241,7 +2435,19 @@ if(savedBottleTimer && savedBottleTimer.start){
 }
 if(bottlePendingDuration > 0){
   setFeedMode('bottle');
+  showBottlePrompt();
+  bottleTimer = bottlePendingDuration;
+  updateBottleChrono();
+  if(bottleStartTimeDisplay){
+    const h = String(Math.floor(bottlePendingDuration / 3600)).padStart(2, '0');
+    const m = String(Math.floor((bottlePendingDuration % 3600) / 60)).padStart(2, '0');
+    const s = String(bottlePendingDuration % 60).padStart(2, '0');
+    bottleStartTimeDisplay.textContent = `Durée : ${h}:${m}:${s}`;
+  }
+  startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
   if(bottleAmountInput){
+    bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';
+    bottleAmountInput.placeholder = 'ej. 120';
     bottleAmountInput.focus({ preventScroll: false });
   }
 }
