@@ -1487,9 +1487,19 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   will-change: transform, filter, opacity;
 }
 .save-biberon::after {
-  animation: save-biberon-sheen 1.6s ease-out 2;
+  background-image:
+    linear-gradient(160deg, rgba(255,255,255,.6), rgba(255,255,255,0) 65%),
+    radial-gradient(12px 12px at 12% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 68%),
+    radial-gradient(16px 16px at 86% 22%, rgba(233,255,240,.9), rgba(233,255,240,0) 70%),
+    radial-gradient(14px 14px at 22% 82%, rgba(255,255,255,.85), rgba(255,255,255,0) 68%),
+    radial-gradient(18px 18px at 78% 76%, rgba(229,255,238,.82), rgba(229,255,238,0) 70%);
+  background-repeat: no-repeat;
+  background-size: 180% 180%, 24px 24px, 30px 30px, 22px 22px, 28px 28px;
+  background-position: center, 10% 24%, 88% 26%, 18% 80%, 82% 78%;
+  mix-blend-mode: screen;
+  animation: save-biberon-sheen 1.6s ease-out 2, save-biberon-stars 3.4s linear infinite;
   transform-origin: center top;
-  will-change: transform, opacity;
+  will-change: transform, opacity, background-position, background-size;
 }
 :root.dark-mode .save-biberon {
   border-color: rgba(76,217,100,.55);
@@ -1497,6 +1507,14 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
 }
 :root.dark-mode .save-biberon::before {
   opacity: .65;
+}
+:root.dark-mode .save-biberon::after {
+  background-image:
+    linear-gradient(150deg, rgba(255,255,255,.18), rgba(255,255,255,0) 70%),
+    radial-gradient(12px 12px at 14% 28%, rgba(208,255,222,.95), rgba(208,255,222,0) 68%),
+    radial-gradient(16px 16px at 86% 24%, rgba(214,255,226,.88), rgba(214,255,226,0) 70%),
+    radial-gradient(14px 14px at 24% 80%, rgba(221,255,231,.92), rgba(221,255,231,0) 70%),
+    radial-gradient(18px 18px at 80% 78%, rgba(204,255,222,.9), rgba(204,255,222,0) 70%);
 }
 
 @keyframes save-biberon-animation {
@@ -1533,6 +1551,28 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
     opacity: .25;
     filter: blur(18px);
     transform: scale(1);
+  }
+}
+@keyframes save-biberon-stars {
+  0% {
+    background-position: center, 10% 24%, 88% 26%, 18% 80%, 82% 78%;
+    background-size: 180% 180%, 24px 24px, 30px 30px, 22px 22px, 28px 28px;
+  }
+  25% {
+    background-position: center, 12% 20%, 84% 30%, 16% 84%, 78% 72%;
+    background-size: 180% 180%, 18px 18px, 26px 26px, 26px 26px, 24px 24px;
+  }
+  50% {
+    background-position: center, 14% 28%, 82% 24%, 22% 78%, 84% 70%;
+    background-size: 180% 180%, 26px 26px, 32px 32px, 20px 20px, 30px 30px;
+  }
+  75% {
+    background-position: center, 10% 22%, 90% 28%, 20% 86%, 76% 76%;
+    background-size: 180% 180%, 16px 16px, 28px 28px, 24px 24px, 22px 22px;
+  }
+  100% {
+    background-position: center, 10% 24%, 88% 26%, 18% 80%, 82% 78%;
+    background-size: 180% 180%, 24px 24px, 30px 30px, 22px 22px, 28px 28px;
   }
 }
 @keyframes save-biberon-sheen {
