@@ -10,6 +10,24 @@ const store = {
   remove(key){ localStorage.removeItem(key); }
 };
 
+// ===== Random Background Image =====
+const backgroundImages = [
+  '../img/baby.jpg',
+  '../img/baby1.jpg',
+  '../img/baby2.jpg',
+  '../img/baby3.jpg',
+  '../img/baby4.jpg'
+];
+
+function setRandomBackgroundImage() {
+  const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+  const selectedImage = backgroundImages[randomIndex];
+  document.documentElement.style.setProperty('--hero-image', `url('${selectedImage}')`);
+}
+
+// Call this function when the DOM is loaded
+document.addEventListener('DOMContentLoaded', setRandomBackgroundImage);
+
 // ===== Haptic Feedback =====
 function triggerVibration(duration = 50) {
   if (navigator.vibrate) {
