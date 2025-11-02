@@ -2372,6 +2372,12 @@ startStopBottleBtn?.addEventListener('click', () => {
       }
     }
     showBottlePrompt();
+    if (saveBottleBtn) {
+        saveBottleBtn.classList.add('save-biberon');
+        setTimeout(() => {
+            saveBottleBtn.classList.remove('save-biberon');
+        }, 2000);
+    }
     if(bottleAmountInput){
       bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';
       bottleAmountInput.placeholder = 'ej. 120';
@@ -2390,6 +2396,11 @@ startStopBottleBtn?.addEventListener('click', () => {
 
 saveBottleBtn?.addEventListener('click', async () => {
   triggerVibration();
+  saveBottleBtn.classList.add('save-biberon');
+  setTimeout(() => {
+    saveBottleBtn.classList.remove('save-biberon');
+  }, 1000);
+
   const rawValue = bottleAmountInput?.value ?? '';
   const normalizedValue = rawValue.replace(',', '.').trim();
   const amount = parseFloat(normalizedValue);
