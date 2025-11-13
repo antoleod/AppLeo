@@ -12,17 +12,19 @@ const store = {
 
 // ===== Random Background Image =====
 const backgroundImages = [
-  '../img/baby.jpg',
-  '../img/baby1.jpg',
-  '../img/baby2.jpg',
-  '../img/baby3.jpg',
-  '../img/baby4.jpg'
+  'img/baby.jpg',
+  'img/baby1.jpg',
+  'img/baby2.jpg',
+  'img/baby3.jpg',
+  'img/baby4.jpg'
 ];
 
 function setRandomBackgroundImage() {
   const randomIndex = Math.floor(Math.random() * backgroundImages.length);
   const selectedImage = backgroundImages[randomIndex];
-  document.documentElement.style.setProperty('--hero-image', `url('${selectedImage}')`);
+  const cssPath = toCssPath(selectedImage) || selectedImage;
+  document.documentElement.style.setProperty('--hero-image', `url('${cssPath}')`);
+  document.documentElement.classList.remove('no-hero-image');
 }
 
 // Call this function when the DOM is loaded
@@ -2364,6 +2366,79 @@ function setBreastSide(side){
   }
 }
 
+function normalizeBreastSideToken(currentSide = 'Gauche'){
+  const value = (currentSide || '').toLowerCase();
+  if(value.includes('droite') || value.includes('right')){
+    return 'right';
+  }
+  return 'left';
+}
+
+function normalizeMilkTypeFromApp(type = 'maternal'){
+  return type === 'supplement' ? 'formula' : 'maternal';
+}
+
+function parseBottleAmountInput(){
+  const rawValue = bottleAmountInput?.value ?? '';
+  const normalized = rawValue.replace(',', '.').trim();
+  const parsed = parseFloat(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function mapFloatingDraftToEntry(draft){
+  if(!draft) return null;
+  const durationSec = Math.max(1, Math.round((draft.durationMs || 0) / 1000));
+  if(draft.mode === 'sein'){
+    return {
+      id: Date.now()+'',
+      dateISO: new Date().toISOString(),
+      source: 'breast',
+      breastSide: draft.side === 'right' ? 'Droite' : 'Gauche',
+      durationSec
+    };
+  }
+  if(draft.mode === 'biberon'){
+    if(!Number.isFinite(draft.amountMl) || draft.amountMl <= 0){
+      alert('Ajoutez la quantité totale en ml avant de valider le biberon.');
+      return null;
+    }
+    const startTs = draft.startTimestamp || Date.now();
+    const endTs = draft.endTimestamp || startTs;
+    return {
+      id: Date.now()+'',
+      dateISO: new Date().toISOString(),
+      source: 'bottle',
+      bottleType: mapMilkTypeToBottleType(draft.milkType),
+      amountMl: draft.amountMl,
+      durationSec,
+      bottleStartISO: new Date(startTs).toISOString(),
+      bottleEndISO: new Date(endTs).toISOString()
+    };
+  }
+  return null;
+}
+
+function mapMilkTypeToBottleType(value = 'maternal'){
+  if(value === 'formula' || value === 'mixta'){
+    return 'supplement';
+  }
+  return 'maternal';
+}
+
+function setFloatingButtonState(mode, isActive){
+  const target = mode === 'sein' ? startStopBtn : startStopBottleBtn;
+  if(!target) return;
+  target.disabled = !!isActive;
+  if(isActive){
+    target.textContent = 'Fenêtre active';
+    return;
+  }
+  const timerRunning = mode === 'sein' ? Boolean(timerInterval) : Boolean(bottleTimerInterval);
+  if(!timerRunning){
+    target.textContent = 'Démarrer';
+  }
+}
+
 function tickTimer(){
   if(!timerStart) return;
   timer = Math.max(0, Math.floor((Date.now() - timerStart) / 1000));
@@ -2426,6 +2501,19 @@ $('#side-right')?.addEventListener('click', ()=> setBreastSide('Droite'));
 $('#side-both')?.addEventListener('click', ()=> setBreastSide('Les deux'));
 
 startStopBtn?.addEventListener('click', async () => {
+  if(!timerInterval){
+    const tracker = window.appleoFloatingTracker;
+    if(tracker?.openSession){
+      const handled = await tracker.openSession('sein', {
+        side: normalizeBreastSideToken(breastSide),
+        autoStart: true
+      });
+      if(handled){
+        return;
+      }
+    }
+  }
+
   if(timerInterval){
     const elapsed = Math.max(1, Math.floor((Date.now() - timerStart) / 1000));
     stopTimerWithoutSaving();
@@ -2443,7 +2531,22 @@ startStopBtn?.addEventListener('click', async () => {
   }
 });
 
-startStopBottleBtn?.addEventListener('click', () => {
+startStopBottleBtn?.addEventListener('click', async () => {
+  if(!bottleTimerInterval){
+    const tracker = window.appleoFloatingTracker;
+    if(tracker?.openSession){
+      const initialAmount = parseBottleAmountInput();
+      const handled = await tracker.openSession('biberon', {
+        amount: initialAmount ?? 0,
+        milkType: normalizeMilkTypeFromApp(bottleType),
+        autoStart: true
+      });
+      if(handled){
+        return;
+      }
+    }
+  }
+
   if(bottleTimerInterval){
     const start = bottleTimerStart || Date.now();
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
@@ -2550,6 +2653,27 @@ saveBottleBtn?.addEventListener('click', async () => {
   store.remove(BOTTLE_PENDING_START_KEY);
   hideBottlePrompt({ clearValue: true });
   stopBottleTimerWithoutSaving();
+});
+
+window.addEventListener('appleo:floating-feed:session-started', (event) => {
+  const mode = event?.detail?.mode;
+  if(!mode) return;
+  setFloatingButtonState(mode, true);
+});
+
+window.addEventListener('appleo:floating-feed:session-ended', (event) => {
+  const mode = event?.detail?.mode;
+  if(!mode) return;
+  setFloatingButtonState(mode, false);
+});
+
+window.addEventListener('appleo:floating-draft:complete', async (event) => {
+  const draft = event?.detail;
+  if(!draft) return;
+  const entry = mapFloatingDraftToEntry(draft);
+  if(!entry) return;
+  await saveFeed(entry);
+  window.appleoFloatingTracker?.clearDraft?.();
 });
 
 setFeedMode('breast');
