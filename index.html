@@ -152,6 +152,10 @@
             <div id="bottle-start-time-display" class="muted"></div>
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
           </div>
+          <div class="seg seg-sides" id="bottle-type-toggle" role="group" aria-label="Type de biberon">
+            <button type="button" class="active" data-type="maternal">Maternel</button>
+            <button type="button" data-type="supplement">Complément</button>
+          </div>
           <div id="bottle-form" class="stack">
             <div class="field field-padded" id="bottle-amount-field">
               <label for="ml">Quantité (ml)</label>
@@ -302,6 +306,13 @@
         <div class="field is-hidden" id="manual-amount-field">
           <label for="manual-amount">Quantité (ml)</label>
           <input id="manual-amount" class="input" type="text" inputmode="numeric" min="0" step="10" placeholder="ex. 120" />
+        </div>
+        <div class="field is-hidden" id="manual-bottle-type-field">
+          <label>Type de biberon</label>
+          <div class="seg seg-sides" id="manual-bottle-type" role="group" aria-label="Type de biberon (manuel)">
+            <button type="button" class="active" data-type="maternal">Maternel</button>
+            <button type="button" data-type="supplement">Complément</button>
+          </div>
         </div>
         <div class="field span-2">
           <label for="manual-notes">Notes</label>

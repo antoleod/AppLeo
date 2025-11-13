@@ -821,6 +821,32 @@ body.modal-open .wrap{opacity:.45;filter:blur(2px);transform:scale(.99);pointer-
   min-width:160px;
 }
 .seg button.active{background:var(--primary);color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(10,132,255,.25), inset 0 1px 2px rgba(0,0,0,.15);}
+#bottle-type-toggle button,
+#manual-bottle-type button{
+  position:relative;
+  overflow:hidden;
+}
+#bottle-type-toggle button::after,
+#manual-bottle-type button::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  border-radius:8px;
+  background:radial-gradient(circle at var(--glow-x,50%) var(--glow-y,50%), rgba(255,255,255,.7), transparent 60%);
+  opacity:0;
+  transition:opacity .25s ease, transform .3s ease;
+  pointer-events:none;
+}
+#bottle-type-toggle button.active,
+#manual-bottle-type button.active{
+  transform:translateY(-1px);
+  box-shadow:0 15px 28px rgba(10,132,255,.18);
+}
+#bottle-type-toggle button.active::after,
+#manual-bottle-type button.active::after{
+  opacity:1;
+  transform:scale(1.1);
+}
 #manual-type button:disabled{opacity:.55;cursor:not-allowed}
 #manual-type button {
   display: inline-flex;

@@ -222,6 +222,42 @@ function formatDuration(totalSeconds) {
   return `${hours}h`;
 }
 
+function toValidDate(value){
+  if(value == null) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatDateTimeLabel(date){
+  if(!date) return '';
+  const dateLabel = date.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+  const timeLabel = date.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  return `${dateLabel} ${timeLabel}`;
+}
+
+function formatBottleWindow(startISO, endISO){
+  const startDate = toValidDate(startISO);
+  const endDate = toValidDate(endISO);
+  if(!startDate && !endDate) return '';
+  const parts = [];
+  if(startDate){
+    parts.push(`Inicio ${formatDateTimeLabel(startDate)}`);
+  }
+  if(endDate){
+    parts.push(`Fin ${formatDateTimeLabel(endDate)}`);
+  }
+  return parts.join(' · ');
+}
+
+const BOTTLE_TYPE_LABELS = {
+  maternal: 'Maternel',
+  supplement: 'Complément'
+};
+
+function getBottleTypeLabel(type){
+  return BOTTLE_TYPE_LABELS[type] || '';
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 // ===== Hero background =====
 const HERO_KEY = 'heroImage';
@@ -425,6 +461,8 @@ const manualSource = $('#manual-source');
 const manualBreastField = $('#manual-breast-field');
 const manualDurationField = $('#manual-duration-field');
 const manualAmountField = $('#manual-amount-field');
+const manualBottleTypeField = $('#manual-bottle-type-field');
+const manualBottleTypeButtons = $$('#manual-bottle-type button');
 const manualBreast = $('#manual-breast');
 const manualDuration = $('#manual-duration');
 const manualAmount = $('#manual-amount');
@@ -447,6 +485,7 @@ const bottleStartTimeDisplay = $('#bottle-start-time-display');
 const bottleChrono = $('#bottle-chrono');
 const bottleForm = $('#bottle-form');
 const bottleAmountInput = $('#ml');
+const bottleTypeButtons = $$('#bottle-type-toggle button');
 const saveBottleBtn = $('#save-biberon');
 const manualMedFields = $('#manual-med-fields');
 const manualMedSelect = $('#manual-med-select');
@@ -473,7 +512,7 @@ const summaryMedEl = $('#summary-med');
 
 // ===== State =====
 const state = {
-  feeds: [], // {id,dateISO,source,breastSide,durationSec,amountMl}
+  feeds: [], // {id,dateISO,source,breastSide,durationSec,amountMl,bottleType,bottleStartISO,bottleEndISO}
   elims: [], // {id,dateISO,pee,poop,vomit}
   meds: [], // {id,dateISO,name}
   measurements: [] // {id,dateISO,temp,weight,height}
@@ -507,7 +546,10 @@ const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
 const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
 const BOTTLE_AMOUNT_KEY = 'bottlePendingAmount';
+const BOTTLE_TYPE_PREF_KEY = 'bottleTypePreference';
+const BOTTLE_PENDING_START_KEY = 'bottlePendingStart';
 let manualType = 'feed';
+let manualBottleType = 'maternal';
 let timer = 0;
 let timerStart = null;
 let timerInterval = null;
@@ -516,6 +558,8 @@ let bottleTimerStart = null;
 let bottleTimerInterval = null;
 let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
+let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
+let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
 let isDeleteMode = false;
 
 if(bottleAmountInput && bottlePendingAmount != null){
@@ -1548,7 +1592,8 @@ function renderHistory(){
             title = `🍼 Sein (${row.item.breastSide || ''}) · ${durationLabel}`;
           }else{
             const ml = Number(row.item.amountMl || 0);
-            title = `🍼 Biberon · ${ml} ml`;
+            const typeLabel = getBottleTypeLabel(row.item.bottleType);
+            title = `🍼 Biberon${typeLabel ? ` (${typeLabel})` : ''} · ${ml} ml`;
           }
         }else if(row.type === 'elim'){
           title = `🚼 Eliminations · P:${row.item.pee} · C:${row.item.poop} · V:${row.item.vomit}`;
@@ -1567,6 +1612,12 @@ function renderHistory(){
         if(row.type === 'med' && row.item.medKey){
           const medLabel = row.item.medKey === 'other' ? 'AUTRE' : String(row.item.medKey).toUpperCase();
           metaHtml.push(`<span class="item-meta-tag">${escapeHtml(medLabel)}</span>`);
+        }
+        if(row.type === 'feed' && row.item.source === 'bottle'){
+          const windowLabel = formatBottleWindow(row.item.bottleStartISO, row.item.bottleEndISO);
+          if(windowLabel){
+            metaHtml.push(`<span class="item-meta-tag">${escapeHtml(windowLabel)}</span>`);
+          }
         }
         if(row.item.notes){
           metaHtml.push(`<span class="item-note">${escapeHtml(row.item.notes)}</span>`);
@@ -1640,12 +1691,16 @@ quickAddBottleBtn?.addEventListener('click', () => {
     if (amount) {
         const amountMl = parseFloat(amount.replace(',', '.'));
         if (!isNaN(amountMl) && amountMl > 0) {
+            const nowIso = new Date().toISOString();
             const newFeed = {
                 id: `feed-${Date.now()}`,
-                dateISO: new Date().toISOString(),
+                dateISO: nowIso,
                 source: 'bottle',
+                bottleType,
                 amountMl: amountMl,
-                durationSec: 0
+                durationSec: 0,
+                bottleStartISO: nowIso,
+                bottleEndISO: nowIso
             };
 
             const api = getPersistenceApi();
@@ -2019,11 +2074,19 @@ function updateSummaries(){
       const breastMinutesTotal = breast.reduce((sum,f)=> sum + (f.durationSec || 0), 0) / 60;
       const breastLabel = formatMinutes(breastMinutesTotal);
       const bottleMl = bottle.reduce((sum,f)=> sum + (f.amountMl || 0), 0);
+      const maternalMl = bottle.filter(f => (f.bottleType || 'maternal') === 'maternal')
+        .reduce((sum,f)=> sum + (f.amountMl || 0), 0);
+      const supplementMl = bottle.filter(f => (f.bottleType || 'maternal') === 'supplement')
+        .reduce((sum,f)=> sum + (f.amountMl || 0), 0);
+      const breakdown = [];
+      if(maternalMl > 0) breakdown.push(`Maternel ${maternalMl} ml`);
+      if(supplementMl > 0) breakdown.push(`Complément ${supplementMl} ml`);
       summaryFeedEl.innerHTML = `
         <strong>Aujourd'hui</strong>
         <span>${todayFeeds.length} séances</span>
         <span>Sein ${breastLabel}</span>
         <span>Biberon ${bottleMl} ml</span>
+        ${breakdown.length ? `<span>${breakdown.join(' · ')}</span>` : ''}
       `;
     }
   }
@@ -2120,9 +2183,17 @@ function renderFeedHistory(){
       line = `🍼 ${escapeHtml(time)} — Sein (${escapeHtml(feed.breastSide || '')}) · ${minsLabel}`;
     }else{
       const ml = Number(feed.amountMl || 0);
-      line = `🍼 ${escapeHtml(time)} — Biberon · ${ml} ml`;
+      const typeLabel = getBottleTypeLabel(feed.bottleType);
+      const typeSuffix = typeLabel ? ` (${escapeHtml(typeLabel)})` : '';
+      line = `🍼 ${escapeHtml(time)} — Biberon${typeSuffix} · ${ml} ml`;
     }
     let html = `<div class="feed-history-line">${line}</div>`;
+    if(feed.source === 'bottle'){
+      const windowLabel = formatBottleWindow(feed.bottleStartISO, feed.bottleEndISO);
+      if(windowLabel){
+        html += `<div class="item-meta">${escapeHtml(windowLabel)}</div>`;
+      }
+    }
     if(feed.notes){
       html += `<div class="item-note">${escapeHtml(feed.notes)}</div>`;
     }
@@ -2221,6 +2292,8 @@ function tickBottleTimer(){
 
 function beginBottleTimer(startTimestamp = Date.now(), persist = true){
   hideBottlePrompt();
+  bottlePendingStart = null;
+  store.remove(BOTTLE_PENDING_START_KEY);
   bottleTimerStart = startTimestamp;
   if(bottleTimerInterval){
     clearInterval(bottleTimerInterval);
@@ -2265,6 +2338,20 @@ function setFeedMode(mode){
   biberon?.classList?.toggle('active', mode === 'bottle');
   panePecho?.classList?.toggle('is-hidden', mode !== 'breast');
   paneBiberon?.classList?.toggle('is-hidden', mode !== 'bottle');
+}
+
+function setBottleType(type, {persist = true} = {}){
+  const allowed = new Set(['maternal','supplement']);
+  const next = allowed.has(type) ? type : 'maternal';
+  bottleType = next;
+  bottleTypeButtons.forEach(btn => {
+    const isActive = (btn.dataset.type || '') === next;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+  if(persist){
+    store.set(BOTTLE_TYPE_PREF_KEY, bottleType);
+  }
 }
 
 function setBreastSide(side){
@@ -2332,6 +2419,7 @@ $('#close-leche')?.addEventListener('click', ()=> closeModal('#modal-leche'));
 
 $('#seg-pecho')?.addEventListener('click', ()=> setFeedMode('breast'));
 $('#seg-biberon')?.addEventListener('click', ()=> setFeedMode('bottle'));
+bottleTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setBottleType(btn.dataset.type)));
 
 $('#side-left')?.addEventListener('click', ()=> setBreastSide('Gauche'));
 $('#side-right')?.addEventListener('click', ()=> setBreastSide('Droite'));
@@ -2370,6 +2458,8 @@ startStopBottleBtn?.addEventListener('click', () => {
     }
     bottlePendingDuration = elapsed;
     store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
+    bottlePendingStart = start;
+    store.set(BOTTLE_PENDING_START_KEY, bottlePendingStart);
     const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '');
     const promptValue = window.prompt('Quantité (ml) prise ?', defaultPromptValue);
     if(promptValue !== null){
@@ -2404,6 +2494,10 @@ startStopBottleBtn?.addEventListener('click', () => {
   }else{
     bottlePendingAmount = null;
     store.remove(BOTTLE_AMOUNT_KEY);
+    bottlePendingDuration = 0;
+    store.remove(BOTTLE_PENDING_KEY);
+    bottlePendingStart = null;
+    store.remove(BOTTLE_PENDING_START_KEY);
     if(bottleAmountInput){
       bottleAmountInput.value = '';
     }
@@ -2431,12 +2525,19 @@ saveBottleBtn?.addEventListener('click', async () => {
   bottlePendingAmount = amount;
   store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
 
+  const now = Date.now();
+  const durationMs = bottlePendingDuration > 0 ? bottlePendingDuration * 1000 : 0;
+  const startTs = Number.isFinite(bottlePendingStart) ? bottlePendingStart : (durationMs ? now - durationMs : now);
+  const endTs = durationMs ? startTs + durationMs : now;
   const entry = {
     id: Date.now()+'',
     dateISO: new Date().toISOString(),
     source: 'bottle',
+    bottleType,
     amountMl: bottlePendingAmount,
-    durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined
+    durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined,
+    bottleStartISO: new Date(startTs).toISOString(),
+    bottleEndISO: new Date(endTs).toISOString()
   };
 
   await saveFeed(entry);
@@ -2445,11 +2546,14 @@ saveBottleBtn?.addEventListener('click', async () => {
   store.remove(BOTTLE_PENDING_KEY);
   bottlePendingAmount = null;
   store.remove(BOTTLE_AMOUNT_KEY);
+  bottlePendingStart = null;
+  store.remove(BOTTLE_PENDING_START_KEY);
   hideBottlePrompt({ clearValue: true });
   stopBottleTimerWithoutSaving();
 });
 
 setFeedMode('breast');
+setBottleType(bottleType, {persist:false});
 setBreastSide(breastSide);
 const savedTimer = store.get(TIMER_KEY, null);
 if(savedTimer && savedTimer.start){
@@ -2468,10 +2572,19 @@ if(bottlePendingDuration > 0){
   bottleTimer = bottlePendingDuration;
   updateBottleChrono();
   if(bottleStartTimeDisplay){
-    const h = String(Math.floor(bottlePendingDuration / 3600)).padStart(2, '0');
-    const m = String(Math.floor((bottlePendingDuration % 3600) / 60)).padStart(2, '0');
-    const s = String(bottlePendingDuration % 60).padStart(2, '0');
-    bottleStartTimeDisplay.textContent = `Durée : ${h}:${m}:${s}`;
+    const pendingStartISO = Number.isFinite(bottlePendingStart) ? new Date(bottlePendingStart).toISOString() : null;
+    const pendingEndISO = pendingStartISO && bottlePendingDuration > 0
+      ? new Date(bottlePendingStart + bottlePendingDuration * 1000).toISOString()
+      : null;
+    const windowLabel = formatBottleWindow(pendingStartISO, pendingEndISO);
+    if(windowLabel){
+      bottleStartTimeDisplay.textContent = windowLabel;
+    }else{
+      const h = String(Math.floor(bottlePendingDuration / 3600)).padStart(2, '0');
+      const m = String(Math.floor((bottlePendingDuration % 3600) / 60)).padStart(2, '0');
+      const s = String(bottlePendingDuration % 60).padStart(2, '0');
+      bottleStartTimeDisplay.textContent = `Durée : ${h}:${m}:${s}`;
+    }
   }
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
   if(bottleAmountInput){
@@ -2727,12 +2840,26 @@ function setManualType(type){
   if(type === 'med') updateManualMedFields();
 }
 
+function setManualBottleType(type){
+  const allowed = new Set(['maternal','supplement']);
+  manualBottleType = allowed.has(type) ? type : 'maternal';
+  manualBottleTypeButtons.forEach(btn => {
+    const isActive = (btn.dataset.type || '') === manualBottleType;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
 function updateManualSourceFields(){
   const source = manualSource?.value || 'breast';
   const isBreast = source === 'breast';
   manualBreastField?.classList?.toggle('is-hidden', !isBreast);
   manualDurationField?.classList?.toggle('is-hidden', !isBreast);
   manualAmountField?.classList?.toggle('is-hidden', isBreast);
+  manualBottleTypeField?.classList?.toggle('is-hidden', isBreast);
+  if(!isBreast && !manualBottleType){
+    setManualBottleType('maternal');
+  }
 }
 
 function updateManualMedFields(){
@@ -2794,6 +2921,7 @@ function resetManualFields(){
   if(manualBreast) manualBreast.value = 'Gauche';
   if(manualDuration) manualDuration.value = '';
   if(manualAmount) manualAmount.value = '';
+  setManualBottleType('maternal');
   if(manualNotes) manualNotes.value = '';
   if(manualPee) manualPee.value = 0;
   if(manualPoop) manualPoop.value = 0;
@@ -2828,6 +2956,7 @@ function populateManualForm(type, entry){
     }else{
       if(manualAmount) manualAmount.value = entry.amountMl != null ? entry.amountMl : '';
       if(manualDuration) manualDuration.value = '';
+      setManualBottleType(entry.bottleType || 'maternal');
     }
     if(manualNotes) manualNotes.value = entry.notes || '';
   }else if(type === 'elim'){
@@ -2942,6 +3071,7 @@ function saveManualEntry() {
   if(Number.isNaN(date.getTime())) date = new Date();
   let reason = null;
   let entry = null;
+  const originalEntry = isEdit && editingEntry ? findEntryById(editingEntry.type, editingEntry.id) : null;
 
   updateState(currentData => {
     if (targetType === 'feed') {
@@ -2953,9 +3083,21 @@ function saveManualEntry() {
         entry.breastSide = manualBreast?.value || 'Gauche';
       } else {
         entry.amountMl = Math.max(0, Number(manualAmount?.value || 0));
+        entry.bottleType = manualBottleType || 'maternal';
+        if(originalEntry && originalEntry.source === 'bottle'){
+          entry.bottleStartISO = originalEntry.bottleStartISO || originalEntry.dateISO;
+          entry.bottleEndISO = originalEntry.bottleEndISO || originalEntry.dateISO;
+        }else{
+          entry.bottleStartISO = entry.dateISO;
+          entry.bottleEndISO = entry.dateISO;
+        }
       }
       const notes = manualNotes?.value?.trim();
       if (notes) entry.notes = notes;
+      if(sourceValue !== 'bottle'){
+        delete entry.bottleStartISO;
+        delete entry.bottleEndISO;
+      }
 
       if (isEdit) {
         const idx = currentData.feeds.findIndex(item => String(item.id) === String(entry.id));
@@ -3193,10 +3335,12 @@ saveManualBtn?.addEventListener('click', () => {
 });
 manualTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setManualType(btn.dataset.type)));
 manualSource?.addEventListener('change', updateManualSourceFields);
+manualBottleTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setManualBottleType(btn.dataset.type)));
 manualMedSelect?.addEventListener('change', updateManualMedFields);
 if(manualModal){
   setManualType('feed');
   updateManualSourceFields();
+  setManualBottleType(manualBottleType);
   updateManualMedFields();
 }
 
