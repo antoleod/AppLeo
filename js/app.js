@@ -12,19 +12,17 @@ const store = {
 
 // ===== Random Background Image =====
 const backgroundImages = [
-  'img/baby.jpg',
-  'img/baby1.jpg',
-  'img/baby2.jpg',
-  'img/baby3.jpg',
-  'img/baby4.jpg'
+  '../img/baby.jpg',
+  '../img/baby1.jpg',
+  '../img/baby2.jpg',
+  '../img/baby3.jpg',
+  '../img/baby4.jpg'
 ];
 
 function setRandomBackgroundImage() {
   const randomIndex = Math.floor(Math.random() * backgroundImages.length);
   const selectedImage = backgroundImages[randomIndex];
-  const cssPath = toCssPath(selectedImage) || selectedImage;
-  document.documentElement.style.setProperty('--hero-image', `url('${cssPath}')`);
-  document.documentElement.classList.remove('no-hero-image');
+  document.documentElement.style.setProperty('--hero-image', `url('${selectedImage}')`);
 }
 
 // Call this function when the DOM is loaded
@@ -2279,6 +2277,7 @@ function setBreastSide(side){
   }
 }
 
+<<<<<<< HEAD
 function normalizeBreastSideToken(currentSide = 'Gauche'){
   const value = (currentSide || '').toLowerCase();
   if(value.includes('deux') || value.includes('both')){
@@ -2361,6 +2360,8 @@ function setFloatingButtonState(mode, isActive){
   }
 }
 
+=======
+>>>>>>> parent of 55e6df3 (popup)
 function tickTimer(){
   if(!timerStart) return;
   timer = Math.max(0, Math.floor((Date.now() - timerStart) / 1000));
@@ -2422,19 +2423,6 @@ $('#side-right')?.addEventListener('click', ()=> setBreastSide('Droite'));
 $('#side-both')?.addEventListener('click', ()=> setBreastSide('Les deux'));
 
 startStopBtn?.addEventListener('click', async () => {
-  if(!timerInterval){
-    const tracker = window.appleoFloatingTracker;
-    if(tracker?.openSession){
-      const handled = await tracker.openSession('sein', {
-        side: normalizeBreastSideToken(breastSide),
-        autoStart: true
-      });
-      if(handled){
-        return;
-      }
-    }
-  }
-
   if(timerInterval){
     const elapsed = Math.max(1, Math.floor((Date.now() - timerStart) / 1000));
     stopTimerWithoutSaving();
@@ -2452,6 +2440,7 @@ startStopBtn?.addEventListener('click', async () => {
   }
 });
 
+<<<<<<< HEAD
 startStopBottleBtn?.addEventListener('click', async () => {
   if(!bottleTimerInterval){
     const tracker = window.appleoFloatingTracker;
@@ -2471,6 +2460,9 @@ startStopBottleBtn?.addEventListener('click', async () => {
     }
   }
 
+=======
+startStopBottleBtn?.addEventListener('click', () => {
+>>>>>>> parent of 55e6df3 (popup)
   if(bottleTimerInterval){
     const start = bottleTimerStart || Date.now();
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
@@ -2562,27 +2554,6 @@ saveBottleBtn?.addEventListener('click', async () => {
   store.remove(BOTTLE_AMOUNT_KEY);
   hideBottlePrompt({ clearValue: true });
   stopBottleTimerWithoutSaving();
-});
-
-window.addEventListener('appleo:floating-feed:session-started', (event) => {
-  const mode = event?.detail?.mode;
-  if(!mode) return;
-  setFloatingButtonState(mode, true);
-});
-
-window.addEventListener('appleo:floating-feed:session-ended', (event) => {
-  const mode = event?.detail?.mode;
-  if(!mode) return;
-  setFloatingButtonState(mode, false);
-});
-
-window.addEventListener('appleo:floating-draft:complete', async (event) => {
-  const draft = event?.detail;
-  if(!draft) return;
-  const entry = mapFloatingDraftToEntry(draft);
-  if(!entry) return;
-  await saveFeed(entry);
-  window.appleoFloatingTracker?.clearDraft?.();
 });
 
 setFeedMode('breast');
