@@ -97,6 +97,9 @@ function updateBottleDefaultPreference(finalAmount) {
 class FloatingFeedController {
   constructor() {
     this.windowRef = null;
+    this.inlineMode = false;
+    this.overlayRoot = null;
+    this.inlineFrame = null;
     this.mode = null;
     this.doc = null;
     this.timerHandle = null;
@@ -137,7 +140,13 @@ class FloatingFeedController {
     };
 
     if (this.windowRef && !this.windowRef.closed) {
-      this.windowRef.focus();
+      if (this.inlineMode) {
+        this.focusInlineOverlay();
+        this.overlayRoot?.classList?.add('floating-inline-overlay--pulse');
+        window.setTimeout(() => this.overlayRoot?.classList?.remove('floating-inline-overlay--pulse'), 600);
+      } else {
+        this.windowRef.focus();
+      }
       return true;
     }
 
@@ -147,9 +156,18 @@ class FloatingFeedController {
   async prepareWindow(mode, context = {}) {
     this.resetSession(mode, context);
     try {
-      const win = await this.requestWindow();
-      this.windowRef = win;
-      this.renderWindow(win, mode);
+      let targetWindow = await this.requestWindow();
+      if (targetWindow) {
+        this.inlineMode = false;
+      } else {
+        this.inlineMode = true;
+        targetWindow = this.renderInlineOverlay(mode);
+        if (!targetWindow) {
+          throw new Error('Inline overlay indisponible');
+        }
+      }
+      this.windowRef = targetWindow;
+      this.renderWindow(targetWindow, mode);
       this.captureElements();
       this.bindEvents();
       this.updateSideUI();
@@ -159,7 +177,11 @@ class FloatingFeedController {
       } else {
         this.updateStatus('Prêt à démarrer');
       }
-      win.focus();
+      if (!this.inlineMode && targetWindow?.focus) {
+        targetWindow.focus();
+      } else {
+        this.focusInlineOverlay();
+      }
       this.activeSession = true;
       this.announcedStart = true;
       window.dispatchEvent(new CustomEvent('appleo:floating-feed:session-started', { detail: { mode } }));
@@ -183,7 +205,7 @@ class FloatingFeedController {
 
     const popup = window.open('', 'appleo-floating-feed', 'width=360,height=520,menubar=0,toolbar=0,status=0');
     if (!popup) {
-      throw new Error('Le navigateur a bloqué la fenêtre popup.');
+      return null;
     }
     return popup;
   }
@@ -465,6 +487,119 @@ class FloatingFeedController {
     doc.close();
   }
 
+  renderInlineOverlay(mode) {
+    this.removeInlineOverlay();
+    const config = MODE_CONFIG[mode];
+    const title = mode === 'sein' ? 'Suivi tétée' : 'Suivi biberon';
+    const overlay = document.createElement('div');
+    overlay.id = 'floating-inline-overlay';
+    overlay.innerHTML = `
+      <div class="floating-inline-backdrop" data-inline-dismiss="true"></div>
+      <div class="floating-inline-frame" role="dialog" aria-label="${title}">
+        <iframe id="floating-inline-frame" title="${title}" allow="autoplay"></iframe>
+        <button type="button" class="floating-inline-close" data-inline-dismiss="true" aria-label="Fermer la fenêtre flottante">×</button>
+      </div>`;
+    const style = document.createElement('style');
+    style.textContent = `
+      html.floating-inline-open {
+        overflow: hidden;
+      }
+      #floating-inline-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #floating-inline-overlay .floating-inline-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(6px);
+      }
+      #floating-inline-overlay .floating-inline-frame {
+        position: relative;
+        width: min(420px, calc(100% - 24px));
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.35);
+        background: transparent;
+      }
+      #floating-inline-overlay iframe {
+        width: 100%;
+        height: min(600px, calc(100vh - 32px));
+        border: none;
+        border-radius: inherit;
+        background: transparent;
+        display: block;
+      }
+      #floating-inline-overlay .floating-inline-close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #111;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      }
+      .floating-inline-overlay--pulse .floating-inline-frame {
+        animation: floating-inline-pulse 0.6s ease;
+      }
+      @keyframes floating-inline-pulse {
+        0% { transform: scale(0.96); opacity: 0.8; }
+        60% { transform: scale(1.02); opacity: 1; }
+        100% { transform: scale(1); }
+      }
+    `;
+    overlay.appendChild(style);
+    document.body.appendChild(overlay);
+    document.documentElement.classList.add('floating-inline-open');
+    const iframe = overlay.querySelector('#floating-inline-frame');
+    if (!iframe || !iframe.contentWindow) {
+      console.error('Impossible de créer la fenêtre inline pour le suivi');
+      overlay.remove();
+      document.documentElement.classList.remove('floating-inline-open');
+      return null;
+    }
+    this.overlayRoot = overlay;
+    this.inlineFrame = iframe;
+    // Propagate accent/background via inline styles on iframe body once chargé
+    iframe.addEventListener('load', () => {
+      try {
+        const frameDoc = iframe.contentDocument;
+        frameDoc?.body?.setAttribute('style', `--accent:${config.accent};background:${config.background};`);
+      } catch (err) {
+        console.warn('Impossible de styler l\'iframe inline', err);
+      }
+    }, { once: true });
+    overlay.querySelectorAll('[data-inline-dismiss]').forEach((node) => {
+      node.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.closeWindow();
+      });
+    });
+    return iframe.contentWindow;
+  }
+
+  focusInlineOverlay() {
+    this.inlineFrame?.focus();
+  }
+
+  removeInlineOverlay() {
+    if (this.overlayRoot) {
+      this.overlayRoot.remove();
+      this.overlayRoot = null;
+    }
+    this.inlineFrame = null;
+    document.documentElement.classList.remove('floating-inline-open');
+  }
+
   captureElements() {
     if (!this.windowRef) return;
     this.doc = this.windowRef.document;
@@ -522,8 +657,10 @@ class FloatingFeedController {
       this.milkType = event.target.value;
     });
 
-    this.windowRef.addEventListener('pagehide', this.boundCleanup);
-    this.windowRef.addEventListener('beforeunload', this.boundCleanup);
+    if (!this.inlineMode) {
+      this.windowRef.addEventListener('pagehide', this.boundCleanup);
+      this.windowRef.addEventListener('beforeunload', this.boundCleanup);
+    }
   }
 
   toggleTimer() {
@@ -650,7 +787,9 @@ class FloatingFeedController {
   }
 
   closeWindow() {
-    if (this.windowRef && !this.windowRef.closed) {
+    if (this.inlineMode) {
+      this.removeInlineOverlay();
+    } else if (this.windowRef && !this.windowRef.closed) {
       this.windowRef.removeEventListener('pagehide', this.boundCleanup);
       this.windowRef.removeEventListener('beforeunload', this.boundCleanup);
       this.windowRef.close();
@@ -664,11 +803,16 @@ class FloatingFeedController {
       window.clearInterval(this.timerHandle);
       this.timerHandle = null;
     }
-    if (this.windowRef) {
+    if (this.windowRef && !this.inlineMode) {
       this.windowRef.removeEventListener('pagehide', this.boundCleanup);
       this.windowRef.removeEventListener('beforeunload', this.boundCleanup);
     }
+    if (this.inlineMode) {
+      this.removeInlineOverlay();
+    }
     this.windowRef = null;
+    this.inlineFrame = null;
+    this.inlineMode = false;
     this.doc = null;
     this.running = false;
     if (this.announcedStart && endedMode) {
