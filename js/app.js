@@ -2368,6 +2368,9 @@ function setBreastSide(side){
 
 function normalizeBreastSideToken(currentSide = 'Gauche'){
   const value = (currentSide || '').toLowerCase();
+  if(value.includes('deux') || value.includes('both')){
+    return 'both';
+  }
   if(value.includes('droite') || value.includes('right')){
     return 'right';
   }
@@ -2389,11 +2392,17 @@ function mapFloatingDraftToEntry(draft){
   if(!draft) return null;
   const durationSec = Math.max(1, Math.round((draft.durationMs || 0) / 1000));
   if(draft.mode === 'sein'){
+    let breastSideLabel = 'Gauche';
+    if(draft.side === 'right'){
+      breastSideLabel = 'Droite';
+    } else if(draft.side === 'both'){
+      breastSideLabel = 'Les deux';
+    }
     return {
       id: Date.now()+'',
       dateISO: new Date().toISOString(),
       source: 'breast',
-      breastSide: draft.side === 'right' ? 'Droite' : 'Gauche',
+      breastSide: breastSideLabel,
       durationSec
     };
   }
@@ -2536,11 +2545,14 @@ startStopBottleBtn?.addEventListener('click', async () => {
     const tracker = window.appleoFloatingTracker;
     if(tracker?.openSession){
       const initialAmount = parseBottleAmountInput();
-      const handled = await tracker.openSession('biberon', {
-        amount: initialAmount ?? 0,
+      const floatingContext = {
         milkType: normalizeMilkTypeFromApp(bottleType),
         autoStart: true
-      });
+      };
+      if(Number.isFinite(initialAmount)){
+        floatingContext.amount = initialAmount;
+      }
+      const handled = await tracker.openSession('biberon', floatingContext);
       if(handled){
         return;
       }

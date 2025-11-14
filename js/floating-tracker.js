@@ -13,6 +13,87 @@ const MODE_CONFIG = {
   }
 };
 
+const BOTTLE_DEFAULT_KEY = 'appleo:bottleDefaultQuantity';
+const BOTTLE_COUNTS_KEY = 'appleo:bottleQuantityCounts';
+const INITIAL_BOTTLE_DEFAULT = 90;
+const inMemoryStorage = Object.create(null);
+
+function safeStorageGet(key) {
+  try {
+    const value = window.localStorage?.getItem(key);
+    if (value !== null && value !== undefined) {
+      inMemoryStorage[key] = value;
+      return value;
+    }
+  } catch {
+    // Storage might be unavailable (private mode, etc.)
+  }
+  return Object.prototype.hasOwnProperty.call(inMemoryStorage, key)
+    ? inMemoryStorage[key]
+    : null;
+}
+
+function safeStorageSet(key, value) {
+  inMemoryStorage[key] = value;
+  try {
+    window.localStorage?.setItem(key, value);
+  } catch {
+    // Ignore storage failures
+  }
+}
+
+function getBottleDefaultPreference() {
+  const raw = safeStorageGet(BOTTLE_DEFAULT_KEY);
+  if (!raw) {
+    return INITIAL_BOTTLE_DEFAULT;
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    const value = Number(parsed);
+    return Number.isFinite(value) && value > 0 ? value : INITIAL_BOTTLE_DEFAULT;
+  } catch {
+    return INITIAL_BOTTLE_DEFAULT;
+  }
+}
+
+function persistBottleDefaultPreference(value) {
+  safeStorageSet(BOTTLE_DEFAULT_KEY, JSON.stringify(value));
+}
+
+function loadBottleQuantityCounts() {
+  const raw = safeStorageGet(BOTTLE_COUNTS_KEY);
+  if (!raw) {
+    return {};
+  }
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistBottleQuantityCounts(counts) {
+  safeStorageSet(BOTTLE_COUNTS_KEY, JSON.stringify(counts));
+}
+
+function updateBottleDefaultPreference(finalAmount) {
+  const normalized = Math.max(0, Math.round(finalAmount));
+  if (normalized <= 0) {
+    return getBottleDefaultPreference();
+  }
+  const counts = loadBottleQuantityCounts();
+  const key = String(normalized);
+  counts[key] = (counts[key] || 0) + 1;
+  persistBottleQuantityCounts(counts);
+  const currentDefault = getBottleDefaultPreference();
+  if (normalized > currentDefault && counts[key] >= 2) {
+    persistBottleDefaultPreference(normalized);
+    return normalized;
+  }
+  return currentDefault;
+}
+
 class FloatingFeedController {
   constructor() {
     this.windowRef = null;
@@ -41,6 +122,7 @@ class FloatingFeedController {
     this.mlValueEl = null;
     this.mlInputEl = null;
     this.milkTypeSelect = null;
+    this.defaultBottleQuantity = getBottleDefaultPreference();
   }
 
   async open(mode, context = {}) {
@@ -115,8 +197,15 @@ class FloatingFeedController {
     this.elapsedMs = 0;
     this.baseElapsed = 0;
     this.running = false;
-    this.side = context.side || 'left';
-    this.ml = Number.isFinite(context.amount) ? context.amount : 0;
+    this.defaultBottleQuantity = getBottleDefaultPreference();
+    const allowedSides = ['left', 'right', 'both'];
+    this.side = allowedSides.includes(context.side) ? context.side : 'left';
+    const providedAmount = Number.isFinite(context.amount) ? context.amount : null;
+    if (mode === 'biberon') {
+      this.ml = providedAmount !== null ? providedAmount : this.defaultBottleQuantity;
+    } else {
+      this.ml = 0;
+    }
     this.milkType = context.milkType || 'maternal';
     this.lastContext = context;
     this.autoStart = context.autoStart !== false;
@@ -263,7 +352,8 @@ class FloatingFeedController {
     .pip-side-buttons button.active {
       border-color: var(--accent);
       color: var(--accent);
-      background: rgba(245, 143, 183, 0.08);
+      background: rgba(0,0,0,0.04);
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
     }
     .pip-side-swap {
       border: none;
@@ -290,6 +380,12 @@ class FloatingFeedController {
       background: #fff;
       padding: 10px;
       font-weight: 600;
+    }
+    .pip-amount-controls .pip-amount-minus {
+      color: #e25555;
+    }
+    .pip-amount-controls .pip-amount-plus {
+      color: #1f8a58;
     }
     .pip-input {
       display: flex;
@@ -334,8 +430,9 @@ class FloatingFeedController {
       <div class="pip-side-buttons">
         <button type="button" data-side="left" class="active" id="floating-side-left">Gauche</button>
         <button type="button" data-side="right" id="floating-side-right">Droite</button>
+        <button type="button" data-side="both" id="floating-side-both">Les deux</button>
       </div>
-      <button type="button" class="pip-side-swap" id="floating-side-swap">Changer de sein</button>
+      <button type="button" class="pip-side-swap" id="floating-side-swap">Alterner gauche/droite/les deux</button>
       <small id="floating-current-side">Gauche en cours</small>
     </section>
     <section class="pip-card pip-biberon" id="floating-biberon-panel" style="${mode === 'biberon' ? '' : 'display:none'}">
@@ -344,10 +441,8 @@ class FloatingFeedController {
         <strong id="floating-ml-value">0 ml</strong>
       </div>
       <div class="pip-amount-controls">
-        <button type="button" data-delta="30">+30 ml</button>
-        <button type="button" data-delta="60">+60 ml</button>
-        <button type="button" data-delta="90">+90 ml</button>
-        <button type="button" data-delta="120">+120 ml</button>
+        <button type="button" data-delta="-10" class="pip-amount-minus">-10 ml</button>
+        <button type="button" data-delta="10" class="pip-amount-plus">+10 ml</button>
       </div>
       <label class="pip-input">
         <span>Saisir manuellement</span>
@@ -397,10 +492,15 @@ class FloatingFeedController {
 
     const sideLeft = this.doc.getElementById('floating-side-left');
     const sideRight = this.doc.getElementById('floating-side-right');
+    const sideBoth = this.doc.getElementById('floating-side-both');
     sideLeft?.addEventListener('click', () => this.setSide('left'));
     sideRight?.addEventListener('click', () => this.setSide('right'));
+    sideBoth?.addEventListener('click', () => this.setSide('both'));
     this.doc.getElementById('floating-side-swap')?.addEventListener('click', () => {
-      this.setSide(this.side === 'left' ? 'right' : 'left');
+      const order = ['left', 'right', 'both'];
+      const currentIdx = order.indexOf(this.side);
+      const nextIdx = currentIdx === -1 ? 0 : (currentIdx + 1) % order.length;
+      this.setSide(order[nextIdx]);
     });
 
     this.doc.querySelectorAll('[data-delta]').forEach(btn => {
@@ -489,14 +589,22 @@ class FloatingFeedController {
 
   setSide(nextSide) {
     if (this.mode !== 'sein') return;
-    this.side = nextSide;
+    const allowedSides = ['left', 'right', 'both'];
+    const normalized = allowedSides.includes(nextSide) ? nextSide : 'left';
+    this.side = normalized;
     const buttons = this.doc?.querySelectorAll('[data-side]');
     buttons?.forEach(btn => {
-      const isActive = btn.getAttribute('data-side') === nextSide;
+      const isActive = btn.getAttribute('data-side') === normalized;
       btn.classList.toggle('active', isActive);
     });
     if (this.sideOutput) {
-      this.sideOutput.textContent = nextSide === 'left' ? 'Gauche en cours' : 'Droite en cours';
+      let label = 'Gauche en cours';
+      if (normalized === 'right') {
+        label = 'Droite en cours';
+      } else if (normalized === 'both') {
+        label = 'Les deux en cours';
+      }
+      this.sideOutput.textContent = label;
     }
   }
 
@@ -532,6 +640,9 @@ class FloatingFeedController {
       milkType: this.mode === 'biberon' ? this.milkType : null,
       createdAt: now
     };
+    if (this.mode === 'biberon' && Number.isFinite(this.ml) && this.ml > 0) {
+      this.defaultBottleQuantity = updateBottleDefaultPreference(this.ml);
+    }
     const completeEvent = new CustomEvent('appleo:floating-draft:complete', { detail: draft });
     window.dispatchEvent(completeEvent);
     this.closeWindow();
