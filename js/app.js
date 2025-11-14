@@ -243,6 +243,33 @@ function formatDuration(totalSeconds) {
   return `${hours}h`;
 }
 
+function toValidDate(value){
+  if(value == null) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatDateTimeLabel(date){
+  if(!date) return '';
+  const dateLabel = date.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
+  const timeLabel = date.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  return `${dateLabel} ${timeLabel}`;
+}
+
+function formatBottleWindow(startISO, endISO){
+  const startDate = toValidDate(startISO);
+  const endDate = toValidDate(endISO);
+  if(!startDate && !endDate) return '';
+  const parts = [];
+  if(startDate){
+    parts.push(`Inicio ${formatDateTimeLabel(startDate)}`);
+  }
+  if(endDate){
+    parts.push(`Fin ${formatDateTimeLabel(endDate)}`);
+  }
+  return parts.join(' · ');
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 // ===== Hero background =====
 const HERO_KEY = 'heroImage';
@@ -469,11 +496,9 @@ const bottleStartTimeDisplay = $('#bottle-start-time-display');
 const bottleChrono = $('#bottle-chrono');
 const bottleForm = $('#bottle-form');
 const bottleAmountInput = $('#ml');
-<<<<<<< HEAD
+
 const bottleTypeButtons = $$('#bottle-type-toggle button');
 const bottlePresetButtons = $$('#bottle-preset-buttons button');
-=======
->>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 const saveBottleBtn = $('#save-biberon');
 const manualMedFields = $('#manual-med-fields');
 const manualMedSelect = $('#manual-med-select');
@@ -571,7 +596,7 @@ const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
 const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
 const BOTTLE_AMOUNT_KEY = 'bottlePendingAmount';
-<<<<<<< HEAD
+
 const BOTTLE_TYPE_PREF_KEY = 'bottleTypePreference';
 const BOTTLE_PENDING_START_KEY = 'bottlePendingStart';
 const SLEEP_TIMER_KEY = 'sleepTimerState';
@@ -582,8 +607,6 @@ const BOTTLE_PRESET_COUNTS_KEY = 'bottlePresetCounts';
 const BOTTLE_PRESET_VALUES = [30, 60, 90, 120];
 const BOTTLE_PRESET_PROMOTION_THRESHOLD = 3;
 const BOTTLE_BASE_DEFAULT_PRESET = 90;
-=======
->>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 let manualType = 'feed';
 let timer = 0;
 let timerStart = null;
@@ -593,7 +616,7 @@ let bottleTimerStart = null;
 let bottleTimerInterval = null;
 let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
-<<<<<<< HEAD
+
 let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
 let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
 let bottlePresetCounts = normalizeBottlePresetCounts(store.get(BOTTLE_PRESET_COUNTS_KEY, {}));
@@ -612,8 +635,6 @@ let pumpLongPressHandled = false;
 let pumpMilestoneTwentyReached = false;
 let pumpMilestoneThirtyReached = false;
 let pumpSessionStart = null;
-=======
->>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 let isDeleteMode = false;
 
 if(bottleAmountInput){
@@ -1770,7 +1791,7 @@ function renderHistory(){
           const medLabel = row.item.medKey === 'other' ? 'AUTRE' : String(row.item.medKey).toUpperCase();
           metaHtml.push(`<span class="item-meta-tag">${escapeHtml(medLabel)}</span>`);
         }
-<<<<<<< HEAD
+
         if(row.type === 'feed' && row.item.source === 'bottle'){
           const windowLabel = formatBottleWindow(row.item.bottleStartISO, row.item.bottleEndISO);
           if(windowLabel){
@@ -1789,8 +1810,6 @@ function renderHistory(){
             metaHtml.push(`<span class="item-meta-tag">${escapeHtml(windowLabel)}</span>`);
           }
         }
-=======
->>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
         if(row.item.notes){
           metaHtml.push(`<span class="item-note">${escapeHtml(row.item.notes)}</span>`);
         }
@@ -2938,7 +2957,7 @@ function setFeedMode(mode){
   paneBiberon?.classList?.toggle('is-hidden', mode !== 'bottle');
 }
 
-<<<<<<< HEAD
+
 function normalizeBottlePresetCounts(rawCounts){
   if(!rawCounts || typeof rawCounts !== 'object'){
     return {};
@@ -3083,8 +3102,6 @@ function setBottleType(type, {persist = true} = {}){
   }
 }
 
-=======
->>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 function setBreastSide(side){
   breastSide = side;
   $('#side-left')?.classList?.toggle('active', side === 'Gauche');
@@ -3095,9 +3112,7 @@ function setBreastSide(side){
   }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 function normalizeBreastSideToken(currentSide = 'Gauche'){
   const value = (currentSide || '').toLowerCase();
   if(value.includes('deux') || value.includes('both')){
@@ -3180,12 +3195,6 @@ function setFloatingButtonState(mode, isActive){
   }
 }
 
-=======
->>>>>>> parent of 55e6df3 (popup)
-=======
->>>>>>> parent of 55e6df3 (popup)
-=======
->>>>>>> parent of 55e6df3 (popup)
 function tickTimer(){
   if(!timerStart) return;
   timer = Math.max(0, Math.floor((Date.now() - timerStart) / 1000));
@@ -3241,7 +3250,7 @@ $('#close-leche')?.addEventListener('click', ()=> closeModal('#modal-leche'));
 
 $('#seg-pecho')?.addEventListener('click', ()=> setFeedMode('breast'));
 $('#seg-biberon')?.addEventListener('click', ()=> setFeedMode('bottle'));
-<<<<<<< HEAD
+
 bottleTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setBottleType(btn.dataset.type)));
 bottlePresetButtons.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -3331,8 +3340,6 @@ saveSleepBtn?.addEventListener('click', async () => {
   }
   await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
 });
-=======
->>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 
 $('#side-left')?.addEventListener('click', ()=> setBreastSide('Gauche'));
 $('#side-right')?.addEventListener('click', ()=> setBreastSide('Droite'));
@@ -3356,9 +3363,7 @@ startStopBtn?.addEventListener('click', async () => {
   }
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 startStopBottleBtn?.addEventListener('click', async () => {
   if(!bottleTimerInterval){
     const tracker = window.appleoFloatingTracker;
@@ -3378,15 +3383,6 @@ startStopBottleBtn?.addEventListener('click', async () => {
     }
   }
 
-=======
-startStopBottleBtn?.addEventListener('click', () => {
->>>>>>> parent of 55e6df3 (popup)
-=======
-startStopBottleBtn?.addEventListener('click', () => {
->>>>>>> parent of 55e6df3 (popup)
-=======
-startStopBottleBtn?.addEventListener('click', () => {
->>>>>>> parent of 55e6df3 (popup)
   if(bottleTimerInterval){
     const start = bottleTimerStart || Date.now();
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
