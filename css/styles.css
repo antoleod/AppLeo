@@ -257,10 +257,11 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
   position:absolute;
   inset:1px;
   border-radius:calc(var(--btn-radius) - 2px);
-  background: linear-gradient(160deg, rgba(255,255,255,.6), rgba(255,255,255,0) 65%);
-  opacity: 1;
+  background: var(--btn-sheen);
+  background-size: 240% 240%;
+  opacity: .9;
   pointer-events:none;
-  transition: opacity .3s ease;
+  transition: opacity .3s ease, transform .3s ease;
 }
 .btn .btn-icon{
   display:inline-flex;
@@ -299,6 +300,7 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
   }
   .btn:hover::after{
     opacity: 1;
+    animation: buttonSheen 1.8s linear infinite;
   }
   .btn:hover .btn-icon{
     transform: scale(1.1) rotate(-5deg);
@@ -313,7 +315,7 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 }
 .btn:active{
   transform:translateY(1px) scale(.985);
-  box-shadow:0 12px 24px rgba(8,16,40,.16), inset 0 1px 0 1px rgba(255,255,255,.4);
+  box-shadow:none;
 }
 .btn:active::before {
   opacity: .2;
@@ -354,6 +356,8 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 .btn-success{--btn-border-glow:linear-gradient(120deg, rgba(109,255,198,.9), rgba(16,201,131,.8), rgba(255,255,255,.9)); color: #0b532d;}
 .btn-warning{--btn-border-glow:linear-gradient(120deg, rgba(255,196,120,.9), rgba(255,118,102,.75), rgba(255,255,255,.85)); color: #7a3a04;}
 .btn-info{--btn-border-glow:linear-gradient(120deg, rgba(172,102,255,.9), rgba(120,138,255,.8), rgba(255,255,255,.9)); color: #4a2c7a;}
+.btn-sleep{--btn-border-glow:linear-gradient(120deg, rgba(94,92,230,.95), rgba(147,112,255,.85), rgba(255,255,255,.9)); color:#2d1b5e;}
+.btn-pump{--btn-border-glow:linear-gradient(125deg, rgba(61,199,255,.92), rgba(86,149,255,.82), rgba(255,255,255,.95)); color:#0b1a33;}
 .btn-danger { --btn-border-glow: linear-gradient(120deg, rgba(255,100,100,.9), rgba(255,118,102,.75), rgba(255,255,255,.85)); color: #7a0404; }
 
 .btn-danger::before {
@@ -1463,6 +1467,18 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
     filter: blur(20px);
   }
 }
+
+@keyframes buttonSheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
 @keyframes shockwave {
   0% {
     box-shadow: 0 0 0 0 rgba(10, 132, 255, 0.7), 0 12px 24px rgba(8,16,40,.16), inset 0 1px 0 1px rgba(255,255,255,.4);
@@ -1491,6 +1507,217 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   padding-top: var(--card-padding);
   padding-bottom: var(--card-padding);
 }
+
+.preset-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.preset-btn {
+  flex: 1 1 calc(25% - 10px);
+  min-width: 68px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+:root.dark-mode .preset-btn {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.preset-btn.is-selected {
+  background: var(--primary);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(10, 132, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+:root.dark-mode .preset-btn.is-selected {
+  color: #0b1424;
+  box-shadow: 0 12px 28px rgba(10, 132, 255, 0.5);
+}
+
+.pump-card {
+  margin-top: var(--gap);
+  padding: var(--card-padding);
+  border-radius: var(--radius);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+  color: #f7f9ff;
+  font-family: 'Arial Black','Arial','Segoe UI',sans-serif;
+  --pump-text-shadow: 0 0 12px rgba(0, 0, 0, .65), 0 5px 22px rgba(3, 7, 22, .55), 0 0 1px rgba(255,255,255,.65);
+  --pump-gray-shadow: 0 6px 18px rgba(55,65,81,.45);
+}
+
+:root.dark-mode .pump-card{
+  background: transparent;
+  border-color: rgba(255,255,255,.18);
+  box-shadow: none;
+}
+
+.pump-card.is-paused{
+  background: transparent;
+  color: #fff;
+  border-color: rgba(250, 204, 21, .4);
+  box-shadow: none;
+  --pump-text-shadow: 0 0 16px rgba(255, 252, 240, .95), 0 8px 24px rgba(120, 63, 4, .65);
+}
+
+:root.dark-mode .pump-card.is-paused{
+  background: transparent;
+  box-shadow: none;
+}
+
+.pump-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(59,130,246,.12), rgba(152,201,255,.08));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.pump-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pump-label {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  text-shadow: var(--pump-text-shadow), var(--pump-gray-shadow);
+  letter-spacing: .05em;
+}
+
+.pump-hint {
+  font-size: .85rem;
+  margin: 0;
+  color: rgba(224, 231, 255, .9);
+  text-shadow: var(--pump-text-shadow), var(--pump-gray-shadow);
+  filter: drop-shadow(0 3px 8px rgba(4, 8, 22, .35));
+}
+
+.pump-display {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+
+.pump-timer {
+  font-size: clamp(38px, 4vw, 48px);
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-shadow: var(--pump-text-shadow), var(--pump-gray-shadow);
+}
+
+.pump-status {
+  font-size: .95rem;
+  color: #fff;
+  text-shadow: var(--pump-text-shadow), 0 0 8px rgba(55, 65, 81, .7), 0 6px 14px rgba(15, 23, 42, .55), var(--pump-gray-shadow);
+  filter: drop-shadow(0 4px 10px rgba(55, 65, 81, .45));
+}
+
+.pump-icon {
+  font-size: 1.8rem;
+  display: inline-flex;
+  line-height: 1;
+  transition: transform .4s ease, filter .4s ease;
+  text-shadow: var(--pump-text-shadow), var(--pump-gray-shadow);
+}
+
+
+.pump-card .btn {
+  width: auto;
+  align-self: flex-start;
+}
+
+.pump-card.is-running .pump-status {
+  color: var(--primary);
+}
+
+.pump-card.is-alert-20::before {
+  opacity: .35;
+  animation: pumpGlow 2.4s ease-in-out infinite;
+}
+
+.pump-card.is-alert-20 .pump-icon {
+  animation: pumpPulse 1.2s ease-in-out infinite;
+}
+
+.pump-card.is-alert-30 .pump-timer {
+  color: #ff5d78;
+}
+
+.pump-card.is-alert-30 .pump-status {
+  color: #ff5d78;
+  font-weight: 600;
+}
+
+.pump-card.just-reset::before {
+  opacity: .45;
+}
+
+.pump-card.is-paused .pump-timer,
+.pump-card.is-paused .pump-icon {
+  opacity: 0.8;
+  color: #fff;
+  text-shadow: 0 6px 18px rgba(55,65,81,.45), 0 0 14px rgba(244, 187, 68, .55);
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.pump-card.is-paused .pump-status {
+  color: #fff;
+  font-weight: 600;
+  background: rgba(122, 66, 8, .75);
+  padding: 2px 10px;
+  border-radius: 999px;
+  box-shadow: 0 12px 26px rgba(55,65,81,.25);
+}
+
+.pump-card.is-paused .btn-pump {
+  --btn-border-glow: linear-gradient(125deg, rgba(251, 191, 36, .9), rgba(245, 158, 11, .8), rgba(255, 255, 255, .9));
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 6px 18px rgba(55,65,81,.45);
+}
+
+:root.dark-mode .pump-card.is-paused .pump-status{
+  background: rgba(63, 38, 11, .8);
+  color: #fed7aa;
+  box-shadow: 0 16px 32px rgba(0,0,0,.45);
+}
+
+@keyframes pumpPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes pumpGlow {
+  0% { filter: blur(12px); opacity: .15; }
+  50% { filter: blur(18px); opacity: .4; }
+  100% { filter: blur(12px); opacity: .15; }
+}
+
 
 .item-meta-time-elapsed {
   font-size: 12px;
@@ -1631,4 +1858,41 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
     opacity: 1;
     transform: translateY(0);
   }
+}
+.btn-heartbeat::after{
+  animation: none;
+}
+
+.btn-heartbeat.pressed{
+  animation: heartbeatButton .6s ease forwards;
+}
+
+.btn-heartbeat.pressed::before{
+  animation: heartbeatGlow .6s ease forwards;
+}
+
+.btn-heartbeat.pressed::after{
+  animation: heartbeatSheen .6s ease forwards;
+}
+
+@keyframes heartbeatButton{
+  0% { transform: scale(1); }
+  30% { transform: scale(1.08); }
+  60% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes heartbeatGlow{
+  0% { opacity: .3; filter: blur(10px); }
+  50% { opacity: .8; filter: blur(6px); }
+  100% { opacity: .3; filter: blur(12px); }
+}
+
+@keyframes heartbeatSheen{
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: .6; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.pump-card.is-hidden {
+  display: none;
 }

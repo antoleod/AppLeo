@@ -12,7 +12,9 @@ const TYPE_KEYS = {
   feed: "feeds",
   elim: "elims",
   med: "meds",
-  measurement: "measurements"
+  measurement: "measurements",
+  sleep: "sleepSessions",
+  pump: "pumpSessions"
 };
 
 let firestoreInstance = null;
@@ -42,7 +44,9 @@ function baseSnapshot() {
     feeds: [],
     elims: [],
     meds: [],
-    measurements: []
+    measurements: [],
+    sleepSessions: [],
+    pumpSessions: []
   };
 }
 

@@ -12,24 +12,32 @@ const store = {
 
 // ===== Random Background Image =====
 const backgroundImages = [
-  '../img/baby.jpg',
-  '../img/baby1.jpg',
-  '../img/baby2.jpg',
-  '../img/baby3.jpg',
-  '../img/baby4.jpg'
+  'img/baby.jpg',
+  'img/baby1.jpg',
+  'img/baby2.jpeg',
+  'img/baby3.jpg',
+  'img/baby4.jpeg'
 ];
 
 function setRandomBackgroundImage() {
   const randomIndex = Math.floor(Math.random() * backgroundImages.length);
   const selectedImage = backgroundImages[randomIndex];
-  document.documentElement.style.setProperty('--hero-image', `url('${selectedImage}')`);
+  document.documentElement.style.setProperty('--hero-image', `url('../${selectedImage}')`);
 }
 
 // Call this function when the DOM is loaded
 document.addEventListener('DOMContentLoaded', setRandomBackgroundImage);
 
 // ===== Haptic Feedback =====
+let vibrationUnlocked = false;
+const unlockVibration = () => {
+  vibrationUnlocked = true;
+  window.removeEventListener('pointerdown', unlockVibration, true);
+};
+window.addEventListener('pointerdown', unlockVibration, { once: true, capture: true });
+
 function triggerVibration(duration = 50) {
+  if (!vibrationUnlocked) return;
   if (navigator.vibrate) {
     try {
       // Using a short, distinct vibration pattern for confirmation
@@ -199,6 +207,19 @@ function formatMinutes(totalMinutes){
     return `${hours}:${String(minutes).padStart(2, '0')}`;
   }
   return String(minutes);
+}
+
+function formatSleepMinutesLabel(totalMinutes){
+  const safe = Math.max(0, Math.round(Number(totalMinutes) || 0));
+  if(safe >= 60){
+    const hours = Math.floor(safe / 60);
+    const minutes = safe % 60;
+    if(minutes > 0){
+      return `${hours}h ${minutes}m`;
+    }
+    return `${hours}h`;
+  }
+  return `${safe}m`;
 }
 
 function formatDuration(totalSeconds) {
@@ -416,6 +437,7 @@ const infoChevron = $('#info-chevron');
 const leoSummaryInfoEl = $('#leo-summary-info');
 const addManualBtn = $('#add-manual');
 const summaryFeedEl = $('#summary-feed');
+const summarySleepEl = $('#summary-sleep');
 const manualModal = $('#modal-manual');
 const manualTitle = manualModal ? manualModal.querySelector('h2') : null;
 const manualTypeButtons = $$('#manual-type button');
@@ -447,6 +469,11 @@ const bottleStartTimeDisplay = $('#bottle-start-time-display');
 const bottleChrono = $('#bottle-chrono');
 const bottleForm = $('#bottle-form');
 const bottleAmountInput = $('#ml');
+<<<<<<< HEAD
+const bottleTypeButtons = $$('#bottle-type-toggle button');
+const bottlePresetButtons = $$('#bottle-preset-buttons button');
+=======
+>>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 const saveBottleBtn = $('#save-biberon');
 const manualMedFields = $('#manual-med-fields');
 const manualMedSelect = $('#manual-med-select');
@@ -459,6 +486,38 @@ const manualMesureTemp = $('#manual-mesure-temp');
 const manualMesurePoids = $('#manual-mesure-poids');
 const manualMesureTaille = $('#manual-mesure-taille');
 const quickAddBottleBtn = $('#quick-add-bottle');
+const pumpCard = $('#pump-card');
+const pumpTimerEl = $('#pump-timer');
+const pumpStatusEl = $('#pump-status');
+const pumpControlBtn = $('#pump-control');
+const pumpIcon = $('#pump-icon');
+const btnPump = $('#btn-pump');
+const closePumpBtn = $('#close-pump');
+const btnSleep = $('#btn-sleep');
+const sleepModal = $('#modal-sleep');
+const closeSleepBtn = $('#close-sleep');
+const cancelSleepBtn = $('#cancel-sleep');
+const sleepChrono = $('#sleep-chrono');
+const sleepStartTimeDisplay = $('#sleep-start-time-display');
+const startStopSleepBtn = $('#startStopSleep');
+const sleepStartInput = $('#sleep-start');
+const sleepEndInput = $('#sleep-end');
+const sleepNotesInput = $('#sleep-notes');
+const saveSleepBtn = $('#save-sleep');
+
+function applyHeartbeatEffect(buttonsSelector = '.btn-heartbeat'){
+  const heartbeatButtons = $$(buttonsSelector);
+  heartbeatButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.remove('pressed');
+      // force reflow to restart animation
+      void btn.offsetWidth;
+      btn.classList.add('pressed');
+      setTimeout(() => btn.classList.remove('pressed'), 700);
+    });
+  });
+}
+applyHeartbeatEffect();
 
 const SAVE_MESSAGES = {
   idle: 'Prêt',
@@ -476,7 +535,9 @@ const state = {
   feeds: [], // {id,dateISO,source,breastSide,durationSec,amountMl}
   elims: [], // {id,dateISO,pee,poop,vomit}
   meds: [], // {id,dateISO,name}
-  measurements: [] // {id,dateISO,temp,weight,height}
+  measurements: [], // {id,dateISO,temp,weight,height}
+  sleepSessions: [], // {id,dateISO,startISO,endISO,durationSec,notes}
+  pumpSessions: [] // {id,dateISO,startISO,endISO,durationSec}
 };
 
 function updateState(updater) {
@@ -486,6 +547,8 @@ function updateState(updater) {
   state.elims = newState.elims ?? [];
   state.meds = newState.meds ?? [];
   state.measurements = newState.measurements ?? [];
+  state.sleepSessions = newState.sleepSessions ?? [];
+  state.pumpSessions = newState.pumpSessions ?? [];
   
   // La persistencia es manejada por el módulo de persistencia.
   // No se usa store.set() aquí. Las llamadas a persistenceApi se hacen
@@ -496,6 +559,7 @@ const HISTORY_RANGE_KEY = 'historyRange';
 
 // Variable para el modo de edición, se gestionará a través de las funciones del modal
 let editingEntry = null;
+let editingSleepEntry = null;
 
 
 let historyRange = normalizeHistoryRange(store.get(HISTORY_RANGE_KEY, {mode:'day'}));
@@ -507,6 +571,19 @@ const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
 const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
 const BOTTLE_AMOUNT_KEY = 'bottlePendingAmount';
+<<<<<<< HEAD
+const BOTTLE_TYPE_PREF_KEY = 'bottleTypePreference';
+const BOTTLE_PENDING_START_KEY = 'bottlePendingStart';
+const SLEEP_TIMER_KEY = 'sleepTimerState';
+const SLEEP_PENDING_START_KEY = 'sleepPendingStart';
+const SLEEP_PENDING_DURATION_KEY = 'sleepPendingDuration';
+const BOTTLE_PRESET_DEFAULT_KEY = 'bottlePresetDefault';
+const BOTTLE_PRESET_COUNTS_KEY = 'bottlePresetCounts';
+const BOTTLE_PRESET_VALUES = [30, 60, 90, 120];
+const BOTTLE_PRESET_PROMOTION_THRESHOLD = 3;
+const BOTTLE_BASE_DEFAULT_PRESET = 90;
+=======
+>>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 let manualType = 'feed';
 let timer = 0;
 let timerStart = null;
@@ -516,10 +593,36 @@ let bottleTimerStart = null;
 let bottleTimerInterval = null;
 let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
+<<<<<<< HEAD
+let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
+let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
+let bottlePresetCounts = normalizeBottlePresetCounts(store.get(BOTTLE_PRESET_COUNTS_KEY, {}));
+let bottleDefaultPreset = resolveBottleDefaultPreset();
+let sleepTimer = 0;
+let sleepTimerStart = null;
+let sleepTimerInterval = null;
+let sleepPendingDuration = store.get(SLEEP_PENDING_DURATION_KEY, 0) || 0;
+let sleepPendingStart = store.get(SLEEP_PENDING_START_KEY, null);
+let pumpTimerSeconds = 0;
+let pumpTimerStart = null;
+let pumpTimerInterval = null;
+let pumpState = 'idle';
+let pumpLongPressTimer = null;
+let pumpLongPressHandled = false;
+let pumpMilestoneTwentyReached = false;
+let pumpMilestoneThirtyReached = false;
+let pumpSessionStart = null;
+=======
+>>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 let isDeleteMode = false;
 
-if(bottleAmountInput && bottlePendingAmount != null){
-  bottleAmountInput.value = String(bottlePendingAmount);
+if(bottleAmountInput){
+  if(bottlePendingAmount != null){
+    bottleAmountInput.value = String(bottlePendingAmount);
+    handleBottleAmountInputChange();
+  }else{
+    applyBottleDefaultAmount();
+  }
 }
 
 function cloneDataSnapshot(){
@@ -527,7 +630,9 @@ function cloneDataSnapshot(){
     feeds: state.feeds.map(f => ({...f})),
     elims: state.elims.map(e => ({...e})),
     meds: state.meds.map(m => ({...m})),
-    measurements: state.measurements.map(m => ({...m}))
+    measurements: state.measurements.map(m => ({...m})),
+    sleepSessions: state.sleepSessions.map(s => ({...s})),
+    pumpSessions: state.pumpSessions.map(p => ({...p}))
   };
 }
 
@@ -552,13 +657,17 @@ function replaceDataFromSnapshot(snapshot, {skipRender = false} = {}){
       feeds: [],
       elims: [],
       meds: [],
-      measurements: []
+      measurements: [],
+      sleepSessions: [],
+      pumpSessions: []
     };
     if (snapshot && typeof snapshot === 'object') {
       data.feeds = Array.isArray(snapshot.feeds) ? snapshot.feeds.map(f => ({...f})) : [];
       data.elims = Array.isArray(snapshot.elims) ? snapshot.elims.map(e => ({...e})) : [];
       data.meds = Array.isArray(snapshot.meds) ? snapshot.meds.map(m => ({...m})) : [];
       data.measurements = Array.isArray(snapshot.measurements) ? snapshot.measurements.map(m => ({...m})) : [];
+      data.sleepSessions = Array.isArray(snapshot.sleepSessions) ? snapshot.sleepSessions.map(s => ({...s})) : [];
+      data.pumpSessions = Array.isArray(snapshot.pumpSessions) ? snapshot.pumpSessions.map(p => ({...p})) : [];
     }
     return data;
   });
@@ -598,6 +707,22 @@ function toDateInputValue(date){
   const m = String(parsed.getMonth() + 1).padStart(2, '0');
   const d = String(parsed.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+function toDateTimeInputValue(date){
+  if(!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${y}-${m}-${d}T${hh}:${mm}`;
+}
+
+function parseDateTimeInput(value){
+  if(!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function normalizeHistoryRange(raw){
@@ -783,7 +908,9 @@ function getHistoryEntriesForRange(range = historyRange){
     ...state.feeds.map(f => ({type:'feed', item:f})),
     ...state.elims.map(e => ({type:'elim', item:e})),
     ...state.meds.map(m => ({type:'med', item:m})),
-    ...state.measurements.map(m => ({type:'measurement', item:m}))
+    ...state.measurements.map(m => ({type:'measurement', item:m})),
+    ...state.sleepSessions.map(s => ({type:'sleep', item:s})),
+    ...state.pumpSessions.map(p => ({type:'pump', item:p}))
   ]
     .filter(entry => {
       const timestamp = new Date(entry.item.dateISO).getTime();
@@ -845,6 +972,13 @@ function buildRangeStats(range = historyRange){
     measurements: {
       entries: [],
       latest: null
+    },
+    sleep: {
+      totalMinutes: 0,
+      sessions: 0,
+      avgPerDayMinutes: 0,
+      avgSessionMinutes: 0,
+      longest: null
     }
   };
 
@@ -865,7 +999,9 @@ function buildRangeStats(range = historyRange){
       breastMinutes: 0,
       bottleMl: 0,
       breastSessions: 0,
-      bottleSessions: 0
+      bottleSessions: 0,
+      sleepMinutes: 0,
+      sleepSessions: 0
     });
   }
 
@@ -932,15 +1068,44 @@ function buildRangeStats(range = historyRange){
   base.measurements.entries = measurementEntries;
   base.measurements.latest = measurementEntries.length ? measurementEntries[measurementEntries.length - 1] : null;
 
+  const sleepSessions = Array.isArray(state.sleepSessions) ? state.sleepSessions : [];
+  for(const session of sleepSessions){
+    const startTs = Date.parse(session.startISO || session.dateISO);
+    const endTs = Date.parse(session.endISO || session.dateISO);
+    if(!Number.isFinite(startTs) || !Number.isFinite(endTs)) continue;
+    if(endTs < bounds.start || endTs > bounds.end) continue;
+    const baseSeconds = Number.isFinite(session.durationSec)
+      ? session.durationSec
+      : Math.max(0, (endTs - startTs) / 1000);
+    const durationMinutes = Math.max(0, Math.round(baseSeconds / 60));
+    const dayKey = toDateInputValue(new Date(startTs));
+    const bucket = perDayMap.get(dayKey);
+    if(bucket){
+      bucket.sleepMinutes = (bucket.sleepMinutes || 0) + durationMinutes;
+      bucket.sleepSessions = (bucket.sleepSessions || 0) + 1;
+    }
+    base.sleep.totalMinutes += durationMinutes;
+    base.sleep.sessions += 1;
+    if(!base.sleep.longest || durationMinutes > base.sleep.longest.durationMinutes){
+      base.sleep.longest = {
+        durationMinutes,
+        startISO: session.startISO || session.dateISO,
+        endISO: session.endISO || session.dateISO
+      };
+    }
+  }
+
   base.perDay = orderedKeys.map(key => {
-    const bucket = perDayMap.get(key) || {feedCount:0, breastMinutes:0, bottleMl:0, breastSessions:0, bottleSessions:0};
+    const bucket = perDayMap.get(key) || {feedCount:0, breastMinutes:0, bottleMl:0, breastSessions:0, bottleSessions:0, sleepMinutes:0, sleepSessions:0};
     return {
       dateISO: key,
       feedCount: bucket.feedCount,
       breastMinutes: Number(bucket.breastMinutes.toFixed(2)),
       bottleMl: Math.round(bucket.bottleMl),
       breastSessions: bucket.breastSessions,
-      bottleSessions: bucket.bottleSessions
+      bottleSessions: bucket.bottleSessions,
+      sleepMinutes: Math.round(bucket.sleepMinutes || 0),
+      sleepSessions: bucket.sleepSessions || 0
     };
   });
 
@@ -948,6 +1113,8 @@ function buildRangeStats(range = historyRange){
   base.feedTotals.breastMinutes = Number(base.feedTotals.breastMinutes.toFixed(2));
   base.feedTotals.bottleMl = Math.round(base.feedTotals.bottleMl);
   base.dayCount = base.perDay.length;
+  base.sleep.avgPerDayMinutes = base.dayCount > 0 ? base.sleep.totalMinutes / base.dayCount : 0;
+  base.sleep.avgSessionMinutes = base.sleep.sessions > 0 ? base.sleep.totalMinutes / base.sleep.sessions : 0;
   return base;
 }
 
@@ -968,9 +1135,9 @@ function getStatsChartData(range = historyRange){
 function updateStatsSummary(currentStats = null){
   if(!statsSummaryEl) return;
   const rangeConfigs = [
-    { key: 'today', label: 'Hoy', range: {mode:'day'}, icon: '☀️' },
-    { key: 'week', label: '7 días', range: {mode:'week'}, icon: '📅' },
-    { key: 'month', label: '30 días', range: {mode:'month'}, icon: '🗓️' }
+    { key: 'today', label: "Aujourd'hui", range: {mode:'day'}, icon: '☀️' },
+    { key: 'week', label: '7 jours', range: {mode:'week'}, icon: '📅' },
+    { key: 'month', label: '30 jours', range: {mode:'month'}, icon: '🗓️' }
   ];
 
   const cardsHtml = rangeConfigs.map(cfg => {
@@ -998,6 +1165,7 @@ function updateStatsSummary(currentStats = null){
       }
     }
     const measurementLabel = measurementParts.join(' • ');
+    const sleepStats = data.sleep || { totalMinutes:0, sessions:0, avgPerDayMinutes:0 };
     return `
       <article class="stat-card" data-range="${cfg.key}">
         <div class="stat-card-head">
@@ -1008,37 +1176,44 @@ function updateStatsSummary(currentStats = null){
           <span class="stat-card-icon">🍼</span>
           <div class="stat-card-main-values">
             <span class="stat-card-value">${formatNumber(totalFeeds)}</span>
-            <span class="stat-card-caption">tomas</span>
+            <span class="stat-card-caption">tétées</span>
           </div>
-          <span class="stat-card-average">Ø ${formatNumber(avgFeeds, 1, 1)}/d</span>
+          <span class="stat-card-average">Ø ${formatNumber(avgFeeds, 1, 1)}/j</span>
         </div>
         <div class="stat-card-grid">
           <div class="stat-chip">
             <span class="stat-chip-icon">⏱️</span>
             <div class="stat-chip-data">
               <span class="stat-chip-value">${formatMinutes(totalBreastMinutes)}</span>
-              <span class="stat-chip-sub">Ø ${formatMinutes(avgBreastMinutes)}/d</span>
+              <span class="stat-chip-sub">Ø ${formatMinutes(avgBreastMinutes)}/j</span>
             </div>
           </div>
           <div class="stat-chip">
             <span class="stat-chip-icon">🥛</span>
             <div class="stat-chip-data">
               <span class="stat-chip-value">${formatNumber(totalBottleMl)}</span>
-              <span class="stat-chip-sub">Ø ${formatNumber(avgBottleMl, 1, 1)} ml/d</span>
+              <span class="stat-chip-sub">Ø ${formatNumber(avgBottleMl, 1, 1)} ml/j</span>
             </div>
           </div>
           <div class="stat-chip">
             <span class="stat-chip-icon">🧷</span>
             <div class="stat-chip-data">
               <span class="stat-chip-value">${formatNumber(diapers.total)}</span>
-              <span class="stat-chip-sub">H${formatNumber(diapers.wet)}·S${formatNumber(diapers.dirty)}·A${formatNumber(diapers.both)}</span>
+              <span class="stat-chip-sub">P${formatNumber(diapers.wet)} • C${formatNumber(diapers.dirty)} • PC${formatNumber(diapers.both)}</span>
             </div>
           </div>
           <div class="stat-chip">
             <span class="stat-chip-icon">💊</span>
             <div class="stat-chip-data">
               <span class="stat-chip-value">${formatNumber(meds)}</span>
-              <span class="stat-chip-sub">Ø ${formatNumber(meds / dayCount, 1, 1)}/d</span>
+              <span class="stat-chip-sub">Ø ${formatNumber(meds / dayCount, 1, 1)}/j</span>
+            </div>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-chip-icon">💤</span>
+            <div class="stat-chip-data">
+              <span class="stat-chip-value">${formatSleepMinutesLabel(sleepStats.totalMinutes)}</span>
+              <span class="stat-chip-sub">${formatNumber(sleepStats.sessions)} sieste(s) • Ø ${formatSleepMinutesLabel(sleepStats.avgPerDayMinutes || 0)}/j</span>
             </div>
           </div>
           ${measurementLabel ? `
@@ -1101,7 +1276,7 @@ function updateStatsSummary(currentStats = null){
       insightItems.push({
         icon: '🌀',
         value: `${ratioBreast}% / ${ratioBottle}%`,
-        label: 'reparto',
+        label: 'répartition',
         sub: `${formatNumber(totals.breastSessions)} ⏱️ • ${formatNumber(totals.bottleSessions)} 🍼`
       });
     }
@@ -1119,11 +1294,26 @@ function updateStatsSummary(currentStats = null){
       if(detailParts.length){
         insightItems.push({
           icon: '⚖️',
-          value: `${formatNumber(totals.feedCount / dayCount, 1, 1)}/d`,
-          label: 'promedio',
+          value: `${formatNumber(totals.feedCount / dayCount, 1, 1)}/j`,
+          label: 'moyenne par jour',
           sub: detailParts.join(' • ')
         });
       }
+    }
+    const sleepStats = statsData.sleep || {};
+    if(sleepStats.sessions > 0){
+      const subParts = [`Ø ${formatSleepMinutesLabel(sleepStats.avgSessionMinutes || 0)} / sieste`];
+      if(sleepStats.longest){
+        const longestDate = parseDateTimeInput(sleepStats.longest.startISO || sleepStats.longest.endISO);
+        const longestLabel = longestDate ? longestDate.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'}) : '';
+        subParts.push(`Max ${formatSleepMinutesLabel(sleepStats.longest.durationMinutes || 0)}${longestLabel ? ` (${longestLabel})` : ''}`);
+      }
+      insightItems.push({
+        icon: '💤',
+        value: `${formatSleepMinutesLabel(sleepStats.avgPerDayMinutes || 0)}/j`,
+        label: `${formatNumber(sleepStats.sessions)} sieste(s)`,
+        sub: subParts.join(' • ')
+      });
     }
 
     insightsHtml = insightItems.length
@@ -1546,6 +1736,9 @@ function renderHistory(){
           if(row.item.source === 'breast'){
             const durationLabel = formatDuration(row.item.durationSec || 0);
             title = `🍼 Sein (${row.item.breastSide || ''}) · ${durationLabel}`;
+          }else if(row.item.source === 'pump'){
+            const durationLabel = formatDuration(row.item.durationSec || 0);
+            title = `🌀 Tirage ${durationLabel}`;
           }else{
             const ml = Number(row.item.amountMl || 0);
             title = `🍼 Biberon · ${ml} ml`;
@@ -1556,18 +1749,48 @@ function renderHistory(){
           const doseSuffix = row.item.dose ? ` · ${row.item.dose}` : '';
           title = `💊 ${row.item.name}${doseSuffix}`;
         }else if(row.type === 'measurement'){
-          const parts = ['📏 Mesures'];
+          const parts = ['🌡️ Mesures'];
           if(row.item.temp) parts.push(`Temp ${row.item.temp}°C`);
           if(row.item.weight) parts.push(`Poids ${row.item.weight}kg`);
           if(row.item.height) parts.push(`Taille ${row.item.height}cm`);
           title = parts.join(' · ');
+        }else if(row.type === 'sleep'){
+          const durationSeconds = Number.isFinite(row.item.durationSec)
+            ? row.item.durationSec
+            : Math.max(0, ((Date.parse(row.item.endISO) || 0) - (Date.parse(row.item.startISO) || 0)) / 1000);
+          title = `💤 Sommeil ${formatDuration(durationSeconds)}`;
+        }else if(row.type === 'pump'){
+          const durationSeconds = Number.isFinite(row.item.durationSec)
+            ? row.item.durationSec
+            : Math.max(0, ((Date.parse(row.item.endISO) || 0) - (Date.parse(row.item.startISO) || 0)) / 1000);
+          title = `🌀 Tirage ${formatDuration(durationSeconds)}`;
         }
-
         const metaHtml = [`<span class="item-meta-time">${escapeHtml(dateString)}</span>`];
         if(row.type === 'med' && row.item.medKey){
           const medLabel = row.item.medKey === 'other' ? 'AUTRE' : String(row.item.medKey).toUpperCase();
           metaHtml.push(`<span class="item-meta-tag">${escapeHtml(medLabel)}</span>`);
         }
+<<<<<<< HEAD
+        if(row.type === 'feed' && row.item.source === 'bottle'){
+          const windowLabel = formatBottleWindow(row.item.bottleStartISO, row.item.bottleEndISO);
+          if(windowLabel){
+            metaHtml.push(`<span class="item-meta-tag">${escapeHtml(windowLabel)}</span>`);
+          }
+        }
+        if(row.type === 'sleep'){
+          const windowLabel = formatBottleWindow(row.item.startISO, row.item.endISO);
+          if(windowLabel){
+            metaHtml.push(`<span class="item-meta-tag">${escapeHtml(windowLabel)}</span>`);
+          }
+        }
+        if(row.type === 'pump'){
+          const windowLabel = formatBottleWindow(row.item.startISO, row.item.endISO);
+          if(windowLabel){
+            metaHtml.push(`<span class="item-meta-tag">${escapeHtml(windowLabel)}</span>`);
+          }
+        }
+=======
+>>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
         if(row.item.notes){
           metaHtml.push(`<span class="item-note">${escapeHtml(row.item.notes)}</span>`);
         }
@@ -1579,8 +1802,22 @@ function renderHistory(){
         checkbox.dataset.id = row.item.id;
         checkbox.dataset.type = row.type;
 
-        itemContainer.querySelector('.item-edit').dataset.id = row.item.id;
-        itemContainer.querySelector('.item-edit').dataset.type = row.type;
+        const editBtn = itemContainer.querySelector('.item-edit');
+        if(editBtn){
+          if(row.type === 'pump'){
+            editBtn.dataset.id = '';
+            editBtn.dataset.type = '';
+            editBtn.style.display = 'none';
+            editBtn.setAttribute('aria-hidden','true');
+            editBtn.tabIndex = -1;
+          }else{
+            editBtn.style.display = '';
+            editBtn.removeAttribute('aria-hidden');
+            editBtn.tabIndex = 0;
+            editBtn.dataset.id = row.item.id;
+            editBtn.dataset.type = row.type;
+          }
+        }
         itemContainer.querySelector('.item-delete').dataset.id = row.item.id;
         itemContainer.querySelector('.item-delete').dataset.type = row.type;
         itemContainer.querySelector('.swipe-delete-btn').dataset.id = row.item.id;
@@ -1799,7 +2036,7 @@ function showUndoToast(items) {
   }
 
   undoState.items = items;
-  messageEl.textContent = `${items.length} elemento(s) eliminado(s)`;
+  messageEl.textContent = `${items.length} élément(s) supprimé(s)`;
   toast.classList.add('show');
 
   undoBtn.onclick = () => executeUndo();
@@ -1834,7 +2071,7 @@ function commitDeletion() {
   // 1. Update state
   updateState(currentData => {
     itemsToDelete.forEach(({ type, id }) => {
-      const key = type + 's';
+      const key = getStateKeyForType(type);
       if (currentData[key]) {
         currentData[key] = currentData[key].filter(item => String(item.id) !== String(id));
       }
@@ -2028,6 +2265,41 @@ function updateSummaries(){
     }
   }
 
+  if(summarySleepEl){
+    const todaySleep = state.sleepSessions
+      .filter(s => {
+        const ts = new Date(s.dateISO || s.endISO || s.startISO || '').getTime();
+        return Number.isFinite(ts) && ts >= start;
+      })
+      .sort((a,b)=> (a.dateISO || a.endISO || '') < (b.dateISO || b.endISO || '') ? 1 : -1);
+    if(!todaySleep.length){
+      summarySleepEl.innerHTML = "<strong>Sommeil</strong><span>Aucune sieste enregistrée</span>";
+    }else{
+      const minutesTotal = todaySleep.reduce((sum, session) => {
+        if(Number.isFinite(session.durationSec)){
+          return sum + (session.durationSec / 60);
+        }
+        const startDate = parseDateTimeInput(session.startISO);
+        const endDate = parseDateTimeInput(session.endISO);
+        if(startDate && endDate){
+          return sum + Math.max(0, (endDate.getTime() - startDate.getTime()) / 60000);
+        }
+        return sum;
+      }, 0);
+      const avgMinutes = minutesTotal / Math.max(todaySleep.length, 1);
+      const lastEnd = toValidDate(todaySleep[0].endISO || todaySleep[0].dateISO);
+      const totalLabel = formatSleepMinutesLabel(minutesTotal);
+      const avgLabel = formatSleepMinutesLabel(avgMinutes);
+      summarySleepEl.innerHTML = `
+        <strong>Sommeil</strong>
+        <span>${todaySleep.length} sieste(s)</span>
+        <span>Total ${totalLabel}</span>
+        <span>Ø ${avgLabel}</span>
+        ${lastEnd ? `<span>Dernier réveil ${lastEnd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>` : ''}
+      `;
+    }
+  }
+
   if(summaryElimEl || dashboardElimEl){
     const todayElims = state.elims.filter(e => new Date(e.dateISO).getTime() >= start);
     if(!todayElims.length){
@@ -2199,6 +2471,404 @@ function updateBottleChrono(){
 }
 updateBottleChrono();
 
+function formatPumpTimer(seconds){
+  const total = Math.max(0, Math.floor(Number(seconds) || 0));
+  const minutes = Math.floor(total / 60);
+  const sec = total % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
+function setPumpStatus(message){
+  if(pumpStatusEl && typeof message === 'string'){
+    pumpStatusEl.textContent = message;
+  }
+}
+
+function updatePumpUI(){
+  if(pumpTimerEl){
+    pumpTimerEl.textContent = formatPumpTimer(pumpTimerSeconds);
+  }
+  if(pumpControlBtn){
+    let label = 'Commencer le tirage';
+    if(pumpState === 'running'){
+      label = 'Mettre en pause';
+    }else if(pumpState === 'paused' && pumpTimerSeconds > 0){
+      label = 'Reprendre';
+    }
+    pumpControlBtn.textContent = label;
+  }
+  if(pumpCard){
+    pumpCard.classList.toggle('is-running', pumpState === 'running');
+    pumpCard.classList.toggle('is-paused', pumpState === 'paused');
+    pumpCard.classList.toggle('is-alert-20', pumpMilestoneTwentyReached);
+    pumpCard.classList.toggle('is-alert-30', pumpMilestoneThirtyReached);
+  }
+}
+updatePumpUI();
+
+function handlePumpMilestones(seconds){
+  if(seconds >= 1200 && !pumpMilestoneTwentyReached){
+    pumpMilestoneTwentyReached = true;
+    setPumpStatus('20 minutes atteintes — ajustez votre position.');
+    triggerVibration(120);
+    updatePumpUI();
+  }
+  if(seconds >= 1800 && !pumpMilestoneThirtyReached){
+    pumpMilestoneThirtyReached = true;
+    setPumpStatus('30 minutes atteintes — prenez une pause.');
+    triggerVibration([160, 60, 160]);
+    updatePumpUI();
+  }
+}
+
+function startPumpSession(){
+  pumpState = 'running';
+  setPumpStatus('Tirage en cours');
+  if(!Number.isFinite(pumpSessionStart)){
+    pumpSessionStart = Date.now() - pumpTimerSeconds * 1000;
+  }
+  pumpTimerStart = Date.now() - pumpTimerSeconds * 1000;
+  if(pumpTimerInterval){
+    clearInterval(pumpTimerInterval);
+  }
+  pumpTimerInterval = setInterval(tickPumpTimer, 1000);
+  tickPumpTimer();
+}
+
+function pausePumpSession(){
+  if(pumpTimerInterval){
+    clearInterval(pumpTimerInterval);
+    pumpTimerInterval = null;
+  }
+  if(pumpTimerStart){
+    pumpTimerSeconds = Math.max(0, Math.floor((Date.now() - pumpTimerStart) / 1000));
+  }
+  pumpTimerStart = null;
+  pumpState = 'paused';
+  setPumpStatus('En pause — appuyez pour reprendre');
+  updatePumpUI();
+}
+
+function resetPumpSession({ silentStatus = false } = {}){
+  if(pumpTimerInterval){
+    clearInterval(pumpTimerInterval);
+    pumpTimerInterval = null;
+  }
+  pumpTimerSeconds = 0;
+  pumpTimerStart = null;
+  pumpState = 'idle';
+  pumpMilestoneTwentyReached = false;
+  pumpMilestoneThirtyReached = false;
+  pumpSessionStart = null;
+  if(!silentStatus){
+    setPumpStatus('Prête');
+  }
+  updatePumpUI();
+}
+
+function tickPumpTimer(){
+  if(!pumpTimerStart){
+    return;
+  }
+  pumpTimerSeconds = Math.max(0, Math.floor((Date.now() - pumpTimerStart) / 1000));
+  updatePumpUI();
+  handlePumpMilestones(pumpTimerSeconds);
+}
+
+function togglePumpSession(){
+  if(pumpState === 'running'){
+    pausePumpSession();
+    if(pumpTimerSeconds > 0){
+      completePumpSession({ reason: 'Tirage (chrono)' });
+    }
+  }else{
+    startPumpSession();
+  }
+}
+
+function buildPumpEntry(startTimestamp, durationSec){
+  if(!Number.isFinite(startTimestamp) || !Number.isFinite(durationSec) || durationSec <= 0){
+    return null;
+  }
+  const duration = Math.round(durationSec);
+  const startDate = new Date(startTimestamp);
+  const endDate = new Date(startTimestamp + duration * 1000);
+  return {
+    id: `pump-${Date.now()}`,
+    dateISO: endDate.toISOString(),
+    startISO: startDate.toISOString(),
+    endISO: endDate.toISOString(),
+    durationSec: duration
+  };
+}
+
+function upsertPumpEntry(entry){
+  updateState(currentData => {
+    const list = Array.isArray(currentData.pumpSessions) ? [...currentData.pumpSessions] : [];
+    const idx = list.findIndex(item => item && String(item.id) === String(entry.id));
+    if(idx > -1){
+      list[idx] = entry;
+    }else{
+      list.push(entry);
+    }
+    return { ...currentData, pumpSessions: list };
+  });
+  renderHistory();
+}
+
+async function persistPumpEntry(entry, reason){
+  const api = getPersistenceApi();
+  try{
+    await api?.saveEntry?.('pump', entry, reason);
+  }catch(err){
+    console.error('Failed to save pump entry:', err);
+  }
+}
+
+async function completePumpSession({ reason = 'Tirage auto' } = {}){
+  const duration = pumpTimerSeconds;
+  if(!Number.isFinite(duration) || duration <= 0){
+    resetPumpSession();
+    return;
+  }
+  const startTs = Number.isFinite(pumpSessionStart)
+    ? pumpSessionStart
+    : (Number.isFinite(pumpTimerStart) ? pumpTimerStart : Date.now() - duration * 1000);
+  const entry = buildPumpEntry(startTs, duration);
+  resetPumpSession({ silentStatus: true });
+  if(!entry){
+    setPumpStatus('Prête');
+    return;
+  }
+  upsertPumpEntry(entry);
+  await persistPumpEntry(entry, reason);
+  setPumpStatus('Tirage enregistré');
+  setTimeout(() => setPumpStatus('Prête'), 1800);
+}
+
+function beginPumpLongPress(event){
+  if(event && event.pointerType === 'mouse' && event.button !== 0){
+    return;
+  }
+  pumpLongPressHandled = false;
+  if(pumpLongPressTimer){
+    clearTimeout(pumpLongPressTimer);
+  }
+  pumpLongPressTimer = setTimeout(() => {
+    pumpLongPressHandled = true;
+    pumpLongPressTimer = null;
+    completePumpSession({ reason: 'Tirage réinitialisé' }).finally(() => {
+      triggerVibration(80);
+      pumpCard?.classList.add('just-reset');
+      setTimeout(() => pumpCard?.classList.remove('just-reset'), 600);
+    });
+  }, 1100);
+}
+
+function cancelPumpLongPress(){
+  if(pumpLongPressTimer){
+    clearTimeout(pumpLongPressTimer);
+    pumpLongPressTimer = null;
+  }
+}
+
+// Pump card is shown inside modal, no inline toggling.
+
+function updateSleepChrono(){
+  if(!sleepChrono) return;
+  const h = String(Math.floor(sleepTimer / 3600)).padStart(2, '0');
+  const m = String(Math.floor((sleepTimer % 3600) / 60)).padStart(2, '0');
+  const s = String(sleepTimer % 60).padStart(2, '0');
+  sleepChrono.textContent = `${h}:${m}:${s}`;
+}
+updateSleepChrono();
+
+function tickSleepTimer(){
+  if(!sleepTimerStart) return;
+  sleepTimer = Math.max(0, Math.floor((Date.now() - sleepTimerStart) / 1000));
+  updateSleepChrono();
+}
+
+function beginSleepTimer(startTimestamp = Date.now(), persist = true){
+  sleepTimerStart = startTimestamp;
+  if(sleepTimerInterval){
+    clearInterval(sleepTimerInterval);
+  }
+  if(persist){
+    triggerVibration();
+  }
+  tickSleepTimer();
+  sleepTimerInterval = setInterval(tickSleepTimer, 1000);
+  const label = new Date(startTimestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  if(sleepStartTimeDisplay){
+    sleepStartTimeDisplay.textContent = `Commencé à ${label}`;
+  }
+  startStopSleepBtn && (startStopSleepBtn.textContent = 'Arrêter');
+  if(sleepStartInput){
+    sleepStartInput.value = toDateTimeInputValue(new Date(startTimestamp));
+  }
+  if(persist){
+    store.set(SLEEP_TIMER_KEY, { start: startTimestamp });
+  }
+}
+
+function stopSleepTimer({ persist = true, resetDisplay = false } = {}){
+  if(sleepTimerInterval){
+    clearInterval(sleepTimerInterval);
+    sleepTimerInterval = null;
+  }
+  if(persist){
+    store.remove(SLEEP_TIMER_KEY);
+  }
+  if(sleepTimerStart){
+    sleepTimer = Math.max(0, Math.floor((Date.now() - sleepTimerStart) / 1000));
+    updateSleepChrono();
+  }
+  const finishedStart = sleepTimerStart;
+  sleepTimerStart = null;
+  startStopSleepBtn && (startStopSleepBtn.textContent = 'Commencer');
+  if(resetDisplay && sleepStartTimeDisplay){
+    sleepStartTimeDisplay.textContent = '';
+  }
+  return finishedStart;
+}
+
+function clearSleepPending(){
+  sleepPendingStart = null;
+  sleepPendingDuration = 0;
+  store.remove(SLEEP_PENDING_START_KEY);
+  store.remove(SLEEP_PENDING_DURATION_KEY);
+}
+
+function applySleepPendingToInputs(){
+  if(!sleepStartInput || sleepPendingStart == null || !Number.isFinite(sleepPendingDuration) || sleepPendingDuration <= 0){
+    return false;
+  }
+  const startDate = new Date(sleepPendingStart);
+  const endDate = new Date(sleepPendingStart + sleepPendingDuration * 1000);
+  sleepStartInput.value = toDateTimeInputValue(startDate);
+  if(sleepEndInput){
+    sleepEndInput.value = toDateTimeInputValue(endDate);
+  }
+  if(sleepStartTimeDisplay){
+    const windowLabel = formatBottleWindow(startDate.toISOString(), endDate.toISOString());
+    sleepStartTimeDisplay.textContent = windowLabel || '';
+  }
+  return true;
+}
+
+function setSleepPendingFromRange(startTs, durationSec){
+  if(!Number.isFinite(startTs) || !Number.isFinite(durationSec) || durationSec <= 0){
+    clearSleepPending();
+    return;
+  }
+  sleepPendingStart = startTs;
+  sleepPendingDuration = durationSec;
+  store.set(SLEEP_PENDING_START_KEY, sleepPendingStart);
+  store.set(SLEEP_PENDING_DURATION_KEY, sleepPendingDuration);
+  applySleepPendingToInputs();
+}
+
+function buildSleepEntry({ startDate, endDate, notes, entryId }){
+  if(!(startDate instanceof Date) || Number.isNaN(startDate.getTime())) return null;
+  if(!(endDate instanceof Date) || Number.isNaN(endDate.getTime())) return null;
+  if(endDate.getTime() <= startDate.getTime()) return null;
+  const durationSec = Math.max(1, Math.round((endDate.getTime() - startDate.getTime()) / 1000));
+  const entry = {
+    id: entryId || Date.now()+'',
+    dateISO: endDate.toISOString(),
+    startISO: startDate.toISOString(),
+    endISO: endDate.toISOString(),
+    durationSec
+  };
+  if(notes){
+    entry.notes = notes;
+  }
+  return entry;
+}
+
+async function persistSleepEntry(entry, reason){
+  const api = getPersistenceApi();
+  try{
+    await api?.saveEntry?.('sleep', entry, reason);
+  }catch(err){
+    console.error('Failed to save sleep entry:', err);
+  }
+}
+
+async function saveSleepEntry(entry, { reason, autoClose = true } = {}){
+  if(!entry) return null;
+  updateState(currentData => {
+    currentData.sleepSessions = Array.isArray(currentData.sleepSessions) ? currentData.sleepSessions : [];
+    const idx = currentData.sleepSessions.findIndex(item => item && String(item.id) === String(entry.id));
+    if(idx > -1){
+      currentData.sleepSessions[idx] = entry;
+    }else{
+      currentData.sleepSessions.push(entry);
+    }
+    return currentData;
+  });
+  renderHistory();
+  await persistSleepEntry(entry, reason || 'Enregistrer sommeil');
+  editingSleepEntry = null;
+  clearSleepPending();
+  resetSleepForm();
+  if(autoClose){
+    closeSleepModal();
+  }
+  return entry;
+}
+
+function resetSleepForm(){
+  if(sleepStartInput){
+    sleepStartInput.value = '';
+  }
+  if(sleepEndInput){
+    sleepEndInput.value = '';
+  }
+  if(sleepNotesInput){
+    sleepNotesInput.value = '';
+  }
+  if(sleepStartTimeDisplay){
+    sleepStartTimeDisplay.textContent = '';
+  }
+  stopSleepTimer({ persist: false, resetDisplay: true });
+  sleepTimer = 0;
+  updateSleepChrono();
+}
+
+function openSleepModal(entry = null){
+  resetSleepForm();
+  editingSleepEntry = entry ? {...entry} : null;
+  if(entry){
+    const startDate = parseDateTimeInput(entry.startISO || entry.dateISO);
+    const endDate = parseDateTimeInput(entry.endISO || entry.dateISO);
+    if(startDate && sleepStartInput){
+      sleepStartInput.value = toDateTimeInputValue(startDate);
+    }
+    if(endDate && sleepEndInput){
+      sleepEndInput.value = toDateTimeInputValue(endDate);
+    }
+    if(sleepNotesInput){
+      sleepNotesInput.value = entry.notes || '';
+    }
+    if(sleepStartTimeDisplay){
+      const label = formatBottleWindow(entry.startISO, entry.endISO);
+      sleepStartTimeDisplay.textContent = label || '';
+    }
+  }else{
+    applySleepPendingToInputs();
+  }
+  openModal('#modal-sleep');
+  requestAnimationFrame(() => sleepStartInput?.focus());
+}
+
+function closeSleepModal(){
+  editingSleepEntry = null;
+  resetSleepForm();
+  closeModal('#modal-sleep');
+}
+
 function showBottlePrompt(){
   bottleForm.classList.add('is-visible');
 }
@@ -2209,6 +2879,7 @@ function hideBottlePrompt({ clearValue = false } = {}){
   }
   if(clearValue && bottleAmountInput){
     bottleAmountInput.value = '';
+    handleBottleAmountInputChange();
   }
 }
 hideBottlePrompt();
@@ -2267,6 +2938,153 @@ function setFeedMode(mode){
   paneBiberon?.classList?.toggle('is-hidden', mode !== 'bottle');
 }
 
+<<<<<<< HEAD
+function normalizeBottlePresetCounts(rawCounts){
+  if(!rawCounts || typeof rawCounts !== 'object'){
+    return {};
+  }
+  return Object.entries(rawCounts).reduce((acc, [key, value]) => {
+    const numericKey = Number(key);
+    const numericValue = Number(value);
+    if(
+      Number.isFinite(numericKey) &&
+      BOTTLE_PRESET_VALUES.includes(numericKey) &&
+      Number.isFinite(numericValue) &&
+      numericValue > 0
+    ){
+      acc[numericKey] = numericValue;
+    }
+    return acc;
+  }, {});
+}
+
+function getBottlePresetUpgradeCandidate(){
+  let candidate = null;
+  BOTTLE_PRESET_VALUES.forEach(value => {
+    if(value <= BOTTLE_BASE_DEFAULT_PRESET){
+      return;
+    }
+    const usageCount = Number(bottlePresetCounts?.[value]) || 0;
+    if(usageCount >= BOTTLE_PRESET_PROMOTION_THRESHOLD){
+      candidate = candidate === null ? value : Math.max(candidate, value);
+    }
+  });
+  return candidate;
+}
+
+function resolveBottleDefaultPreset(){
+  const storedRaw = store.get(BOTTLE_PRESET_DEFAULT_KEY, null);
+  const storedValue = typeof storedRaw === 'number'
+    ? storedRaw
+    : (storedRaw === null || storedRaw === undefined ? NaN : Number(storedRaw));
+  let resolved = BOTTLE_PRESET_VALUES.includes(storedValue) ? storedValue : BOTTLE_BASE_DEFAULT_PRESET;
+  if(!BOTTLE_PRESET_VALUES.includes(storedValue)){
+    store.set(BOTTLE_PRESET_DEFAULT_KEY, resolved);
+  }
+  const candidate = getBottlePresetUpgradeCandidate();
+  if(candidate && candidate !== resolved){
+    resolved = candidate;
+    store.set(BOTTLE_PRESET_DEFAULT_KEY, resolved);
+  }
+  return resolved;
+}
+
+function maybeUpdateBottleDefaultFromCounts(){
+  const candidate = getBottlePresetUpgradeCandidate();
+  if(candidate && candidate !== bottleDefaultPreset){
+    bottleDefaultPreset = candidate;
+    store.set(BOTTLE_PRESET_DEFAULT_KEY, bottleDefaultPreset);
+  }
+}
+
+function incrementBottlePresetUsage(value){
+  const numericValue = Number(value);
+  if(!BOTTLE_PRESET_VALUES.includes(numericValue)){
+    return;
+  }
+  bottlePresetCounts = {
+    ...bottlePresetCounts,
+    [numericValue]: (Number(bottlePresetCounts?.[numericValue]) || 0) + 1
+  };
+  store.set(BOTTLE_PRESET_COUNTS_KEY, bottlePresetCounts);
+  maybeUpdateBottleDefaultFromCounts();
+}
+
+function highlightBottlePresetButton(value){
+  if(!bottlePresetButtons.length){
+    return false;
+  }
+  const numericValue = Number(value);
+  const hasValue = Number.isFinite(numericValue);
+  let matched = false;
+  bottlePresetButtons.forEach(btn => {
+    const btnValue = Number(btn.dataset.value);
+    const isMatch = hasValue && Number.isFinite(btnValue) && btnValue === numericValue;
+    btn.classList.toggle('is-selected', isMatch);
+    btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+    if(isMatch){
+      matched = true;
+    }
+  });
+  if(!matched && !hasValue){
+    bottlePresetButtons.forEach(btn => btn.setAttribute('aria-pressed', 'false'));
+  }
+  return matched;
+}
+
+function selectBottlePresetValue(value, {countUsage = false} = {}){
+  const numericValue = Number(value);
+  if(!Number.isFinite(numericValue)){
+    highlightBottlePresetButton(null);
+    return;
+  }
+  if(bottleAmountInput){
+    bottleAmountInput.value = String(numericValue);
+  }
+  highlightBottlePresetButton(numericValue);
+  if(countUsage){
+    incrementBottlePresetUsage(numericValue);
+  }
+}
+
+function applyBottleDefaultAmount(){
+  const defaultValue = Number.isFinite(bottleDefaultPreset) ? bottleDefaultPreset : BOTTLE_BASE_DEFAULT_PRESET;
+  selectBottlePresetValue(defaultValue, {countUsage: false});
+}
+
+function handleBottleAmountInputChange(){
+  if(!bottleAmountInput){
+    return;
+  }
+  const rawValue = bottleAmountInput.value.trim();
+  if(rawValue === ''){
+    highlightBottlePresetButton(null);
+    return;
+  }
+  const normalized = parseFloat(rawValue.replace(',', '.'));
+  if(Number.isFinite(normalized)){
+    highlightBottlePresetButton(normalized);
+  }else{
+    highlightBottlePresetButton(null);
+  }
+}
+
+function setBottleType(type, {persist = true} = {}){
+  const allowed = new Set(['maternal','supplement']);
+  const next = allowed.has(type) ? type : 'maternal';
+  bottleType = next;
+  bottleTypeButtons.forEach(btn => {
+    const isActive = (btn.dataset.type || '') === next;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+  if(persist){
+    store.set(BOTTLE_TYPE_PREF_KEY, bottleType);
+  }
+}
+
+=======
+>>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 function setBreastSide(side){
   breastSide = side;
   $('#side-left')?.classList?.toggle('active', side === 'Gauche');
@@ -2423,6 +3241,98 @@ $('#close-leche')?.addEventListener('click', ()=> closeModal('#modal-leche'));
 
 $('#seg-pecho')?.addEventListener('click', ()=> setFeedMode('breast'));
 $('#seg-biberon')?.addEventListener('click', ()=> setFeedMode('bottle'));
+<<<<<<< HEAD
+bottleTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setBottleType(btn.dataset.type)));
+bottlePresetButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const value = Number(btn.dataset.value);
+    if(Number.isFinite(value)){
+      selectBottlePresetValue(value, {countUsage: true});
+      triggerVibration(30);
+    }
+  });
+});
+bottleAmountInput?.addEventListener('input', handleBottleAmountInputChange);
+pumpControlBtn?.addEventListener('pointerdown', beginPumpLongPress);
+pumpControlBtn?.addEventListener('pointerup', cancelPumpLongPress);
+pumpControlBtn?.addEventListener('pointerleave', cancelPumpLongPress);
+pumpControlBtn?.addEventListener('pointercancel', cancelPumpLongPress);
+pumpControlBtn?.addEventListener('click', event => {
+  if(pumpLongPressHandled){
+    pumpLongPressHandled = false;
+    event?.preventDefault();
+    return;
+  }
+  togglePumpSession();
+});
+btnPump?.addEventListener('click', () => openModal('#modal-pump'));
+closePumpBtn?.addEventListener('click', () => closeModal('#modal-pump'));
+btnSleep?.addEventListener('click', () => openSleepModal());
+closeSleepBtn?.addEventListener('click', () => closeSleepModal());
+cancelSleepBtn?.addEventListener('click', () => {
+  clearSleepPending();
+  closeSleepModal();
+});
+startStopSleepBtn?.addEventListener('click', async () => {
+  if(sleepTimerInterval){
+    triggerVibration();
+    const startedAt = sleepTimerStart;
+    const elapsed = Math.max(1, Math.floor((Date.now() - sleepTimerStart) / 1000));
+    stopSleepTimer({ resetDisplay: false });
+    if(Number.isFinite(startedAt)){
+      const startDate = new Date(startedAt);
+      const endDate = new Date(startedAt + elapsed * 1000);
+      const notes = sleepNotesInput?.value?.trim();
+      const entry = buildSleepEntry({ startDate, endDate, notes });
+      if(entry){
+        await saveSleepEntry(entry, { reason: 'Sommeil (chrono)' });
+      }
+    }
+  }else{
+    const desiredStart = parseDateTimeInput(sleepStartInput?.value);
+    const useProvidedStart = Boolean(editingSleepEntry && desiredStart);
+    const ts = useProvidedStart ? desiredStart.getTime() : Date.now();
+    beginSleepTimer(ts, true);
+    if(!useProvidedStart && sleepEndInput){
+      sleepEndInput.value = '';
+    }
+    clearSleepPending();
+  }
+});
+saveSleepBtn?.addEventListener('click', async () => {
+  triggerVibration();
+  const startDate = parseDateTimeInput(sleepStartInput?.value);
+  if(!startDate){
+    alert('Veuillez indiquer l\'heure de début.');
+    sleepStartInput?.focus();
+    return;
+  }
+  const endDate = parseDateTimeInput(sleepEndInput?.value);
+  if(!endDate){
+    alert('Veuillez indiquer l\'heure de fin.');
+    sleepEndInput?.focus();
+    return;
+  }
+  if(endDate.getTime() <= startDate.getTime()){
+    alert('L\'heure de fin doit être postérieure au début.');
+    sleepEndInput?.focus();
+    return;
+  }
+  const notes = sleepNotesInput?.value?.trim();
+  const entry = buildSleepEntry({
+    startDate,
+    endDate,
+    notes,
+    entryId: editingSleepEntry ? editingSleepEntry.id : undefined
+  });
+  if(!entry){
+    alert('Impossible d\'enregistrer cette session.');
+    return;
+  }
+  await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
+});
+=======
+>>>>>>> 581e45daa0c1531f94aaaf9f9ab8c35a80e64051
 
 $('#side-left')?.addEventListener('click', ()=> setBreastSide('Gauche'));
 $('#side-right')?.addEventListener('click', ()=> setBreastSide('Droite'));
@@ -2519,7 +3429,8 @@ startStopBottleBtn?.addEventListener('click', () => {
     }
     if(bottleAmountInput){
       bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';
-      bottleAmountInput.placeholder = 'ej. 120';
+      bottleAmountInput.placeholder = 'ex. 120';
+      handleBottleAmountInputChange();
       bottleAmountInput.focus({ preventScroll: false });
     }
   }else{
@@ -2527,6 +3438,7 @@ startStopBottleBtn?.addEventListener('click', () => {
     store.remove(BOTTLE_AMOUNT_KEY);
     if(bottleAmountInput){
       bottleAmountInput.value = '';
+      handleBottleAmountInputChange();
     }
     setFeedMode('bottle');
     beginBottleTimer(Date.now(), true);
@@ -2567,6 +3479,7 @@ saveBottleBtn?.addEventListener('click', async () => {
   bottlePendingAmount = null;
   store.remove(BOTTLE_AMOUNT_KEY);
   hideBottlePrompt({ clearValue: true });
+  applyBottleDefaultAmount();
   stopBottleTimerWithoutSaving();
 });
 
@@ -2597,9 +3510,17 @@ if(bottlePendingDuration > 0){
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
   if(bottleAmountInput){
     bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';
-    bottleAmountInput.placeholder = 'ej. 120';
+    bottleAmountInput.placeholder = 'ex. 120';
+    handleBottleAmountInputChange();
     bottleAmountInput.focus({ preventScroll: false });
   }
+}
+const savedSleepTimer = store.get(SLEEP_TIMER_KEY, null);
+if(savedSleepTimer && savedSleepTimer.start){
+  beginSleepTimer(savedSleepTimer.start, false);
+}
+if(sleepPendingDuration > 0 && sleepPendingStart != null){
+  applySleepPendingToInputs();
 }
 
 // ===== Eliminations modal logic =====
@@ -2867,12 +3788,19 @@ function updateManualMedFields(){
   }
 }
 
-function getListByType(type){
-  if(type === 'feed') return state.feeds;
-  if(type === 'elim') return state.elims;
-  if(type === 'med') return state.meds;
-  if(type === 'measurement') return state.measurements;
+function getStateKeyForType(type){
+  if(type === 'feed') return 'feeds';
+  if(type === 'elim') return 'elims';
+  if(type === 'med') return 'meds';
+  if(type === 'measurement') return 'measurements';
+  if(type === 'sleep') return 'sleepSessions';
+  if(type === 'pump') return 'pumpSessions';
   return null;
+}
+
+function getListByType(type){
+  const key = getStateKeyForType(type);
+  return key ? state[key] : null;
 }
 
 function findEntryById(type, id){
@@ -3044,6 +3972,10 @@ function beginEditEntry(type, id){
     console.warn('Entry not found for editing', type, id);
     return;
   }
+  if(type === 'sleep'){
+    openSleepModal(existing);
+    return;
+  }
   const copy = JSON.parse(JSON.stringify(existing));
   openManualModal({mode:'edit', type, entry: copy});
 
@@ -3200,13 +4132,15 @@ async function initFirebaseSync() {
         feeds: Array.isArray(initialData.feeds) ? initialData.feeds.length : 0,
         elims: Array.isArray(initialData.elims) ? initialData.elims.length : 0,
         meds: Array.isArray(initialData.meds) ? initialData.meds.length : 0,
-        measurements: Array.isArray(initialData.measurements) ? initialData.measurements.length : 0
+        measurements: Array.isArray(initialData.measurements) ? initialData.measurements.length : 0,
+        pumpSessions: Array.isArray(initialData.pumpSessions) ? initialData.pumpSessions.length : 0
       };
       const sample = {
         feeds: (initialData.feeds || []).slice(0,5).map(i => i && i.id).filter(Boolean),
         elims: (initialData.elims || []).slice(0,5).map(i => i && i.id).filter(Boolean),
         meds: (initialData.meds || []).slice(0,5).map(i => i && i.id).filter(Boolean),
-        measurements: (initialData.measurements || []).slice(0,5).map(i => i && i.id).filter(Boolean)
+        measurements: (initialData.measurements || []).slice(0,5).map(i => i && i.id).filter(Boolean),
+        pumpSessions: (initialData.pumpSessions || []).slice(0,5).map(i => i && i.id).filter(Boolean)
       };
       console.info('Initial snapshot summary:', counts, sample);
     } catch (e) {
@@ -3228,7 +4162,8 @@ async function initFirebaseSync() {
               feeds: Array.isArray(raw.snapshot ? raw.snapshot.feeds : raw.feeds) ? (raw.snapshot ? raw.snapshot.feeds.length : raw.feeds.length) : 0,
               elims: Array.isArray(raw.snapshot ? raw.snapshot.elims : raw.elims) ? (raw.snapshot ? raw.snapshot.elims.length : raw.elims.length) : 0,
               meds: Array.isArray(raw.snapshot ? raw.snapshot.meds : raw.meds) ? (raw.snapshot ? raw.snapshot.meds.length : raw.meds.length) : 0,
-              measurements: Array.isArray(raw.snapshot ? raw.snapshot.measurements : raw.measurements) ? (raw.snapshot ? raw.snapshot.measurements.length : raw.measurements.length) : 0
+              measurements: Array.isArray(raw.snapshot ? raw.snapshot.measurements : raw.measurements) ? (raw.snapshot ? raw.snapshot.measurements.length : raw.measurements.length) : 0,
+              pumpSessions: Array.isArray(raw.snapshot ? raw.snapshot.pumpSessions : raw.pumpSessions) ? (raw.snapshot ? raw.snapshot.pumpSessions.length : raw.pumpSessions.length) : 0
             };
             console.info('Server raw document summary for', payload.docId || firebaseDocId, 'source=', payload.source || '?', rawCounts);
             // Also log a short sample of ids for manual inspection
@@ -3236,7 +4171,8 @@ async function initFirebaseSync() {
               feeds: (raw.snapshot ? raw.snapshot.feeds : raw.feeds || []).slice(0,5).map(i=>i && i.id).filter(Boolean),
               elims: (raw.snapshot ? raw.snapshot.elims : raw.elims || []).slice(0,5).map(i=>i && i.id).filter(Boolean),
               meds: (raw.snapshot ? raw.snapshot.meds : raw.meds || []).slice(0,5).map(i=>i && i.id).filter(Boolean),
-              measurements: (raw.snapshot ? raw.snapshot.measurements : raw.measurements || []).slice(0,5).map(i=>i && i.id).filter(Boolean)
+              measurements: (raw.snapshot ? raw.snapshot.measurements : raw.measurements || []).slice(0,5).map(i=>i && i.id).filter(Boolean),
+              pumpSessions: (raw.snapshot ? raw.snapshot.pumpSessions : raw.pumpSessions || []).slice(0,5).map(i=>i && i.id).filter(Boolean)
             };
             console.debug('Server raw sample ids:', sampleIds);
           }
