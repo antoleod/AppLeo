@@ -2279,6 +2279,7 @@ function setBreastSide(side){
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 function normalizeBreastSideToken(currentSide = 'Gauche'){
   const value = (currentSide || '').toLowerCase();
   if(value.includes('deux') || value.includes('both')){
@@ -2365,6 +2366,8 @@ function setFloatingButtonState(mode, isActive){
 >>>>>>> parent of 55e6df3 (popup)
 =======
 >>>>>>> parent of 55e6df3 (popup)
+=======
+>>>>>>> parent of 55e6df3 (popup)
 function tickTimer(){
   if(!timerStart) return;
   timer = Math.max(0, Math.floor((Date.now() - timerStart) / 1000));
@@ -2445,6 +2448,7 @@ startStopBtn?.addEventListener('click', async () => {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 startStopBottleBtn?.addEventListener('click', async () => {
   if(!bottleTimerInterval){
     const tracker = window.appleoFloatingTracker;
@@ -2464,6 +2468,9 @@ startStopBottleBtn?.addEventListener('click', async () => {
     }
   }
 
+=======
+startStopBottleBtn?.addEventListener('click', () => {
+>>>>>>> parent of 55e6df3 (popup)
 =======
 startStopBottleBtn?.addEventListener('click', () => {
 >>>>>>> parent of 55e6df3 (popup)
