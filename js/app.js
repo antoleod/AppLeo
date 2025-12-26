@@ -1,4 +1,4 @@
-﻿// ===== Utilities =====
+﻿﻿// ===== Utilities =====
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const store = {
@@ -512,6 +512,8 @@ const startTimeDisplay = $('#start-time-display');
 const bottleStartTimeDisplay = $('#bottle-start-time-display');
 const bottleChrono = $('#bottle-chrono');
 const bottleForm = $('#bottle-form');
+const bottleStartInput = $('#bottle-start');
+const bottleEndInput = $('#bottle-end');
 const bottleAmountInput = $('#ml');
 const bottleAmountFeedback = $('#bottle-amount-feedback');
 const bottleDecreaseBtn = $('#bottle-decrease');
@@ -3024,6 +3026,10 @@ function hideBottlePrompt({ clearValue = false } = {}){
     bottleAmountInput.value = '';
     handleBottleAmountInputChange();
   }
+  if(clearValue){
+    if(bottleStartInput) bottleStartInput.value = '';
+    if(bottleEndInput) bottleEndInput.value = '';
+  }
 }
 hideBottlePrompt();
 
@@ -3637,6 +3643,8 @@ startStopBottleBtn?.addEventListener('click', async () => {
       const endLabel = new Date(endTs).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
       bottleStartTimeDisplay.textContent = `De ${startLabel} a ${endLabel} - ${h}:${m}:${s}`;
     }
+    if(bottleStartInput) bottleStartInput.value = toDateTimeInputValue(new Date(start));
+    if(bottleEndInput) bottleEndInput.value = toDateTimeInputValue(new Date(endTs));
     bottlePendingDuration = elapsed;
     store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
     const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '');
@@ -3702,16 +3710,38 @@ saveBottleBtn?.addEventListener('click', async () => {
   bottlePendingAmount = amount;
   store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
 
+  let startISO = bottleTimerStart ? new Date(bottleTimerStart).toISOString() : undefined;
+  let endISO = undefined;
+  let durationSec = bottlePendingDuration;
+
+  if (bottleStartInput && bottleStartInput.value) {
+    const s = parseDateTimeInput(bottleStartInput.value);
+    if (s) startISO = s.toISOString();
+  }
+  if (bottleEndInput && bottleEndInput.value) {
+    const e = parseDateTimeInput(bottleEndInput.value);
+    if (e) endISO = e.toISOString();
+  }
+
+  if (startISO && endISO) {
+    if (new Date(endISO) <= new Date(startISO)) {
+      alert('L\'heure de fin doit être postérieure au début.');
+      if(bottleEndInput) bottleEndInput.focus();
+      return;
+    }
+    durationSec = Math.round((new Date(endISO).getTime() - new Date(startISO).getTime()) / 1000);
+  } else if (startISO && durationSec > 0) {
+    endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
+  }
+
   const entry = {
     id: Date.now()+'',
-    dateISO: new Date().toISOString(),
+    dateISO: endISO || new Date().toISOString(),
     source: 'bottle',
     amountMl: bottlePendingAmount,
-    durationSec: bottlePendingDuration > 0 ? bottlePendingDuration : undefined,
-    bottleStartISO: bottleTimerStart ? new Date(bottleTimerStart).toISOString() : undefined,
-    bottleEndISO: bottleTimerStart && bottlePendingDuration > 0
-      ? new Date(bottleTimerStart + (bottlePendingDuration * 1000)).toISOString()
-      : undefined
+    durationSec: durationSec > 0 ? durationSec : null,
+    bottleStartISO: startISO || null,
+    bottleEndISO: endISO || null
   };
 
   await saveFeed(entry);
@@ -4651,8 +4681,3 @@ document.addEventListener('click', (e) => {
 });
 
 bootstrap();
-
-
-
-
-

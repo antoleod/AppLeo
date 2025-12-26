@@ -18,6 +18,15 @@
 <link rel="icon" href="img/icon/icon-square-180.png" type="image/png"> <!-- Ícono principal -->
 <link rel="apple-touch-icon" href="img/icon/icon-square-180.png"> <!-- Ícono para iOS -->
 
+<style>
+  html {
+    background-position: center center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    transition: background-image 0.8s ease-in-out;
+  }
+</style>
 </head>
 <body>
   <input type="file" id="bg-picker" accept="image/*" style="display:none" />
@@ -184,6 +193,16 @@
             <div class="time" id="bottle-chrono">00:00:00</div>
             <div id="bottle-start-time-display" class="muted"></div>
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="bottle-start">Début</label>
+              <input id="bottle-start" class="input" type="datetime-local" />
+            </div>
+            <div class="field">
+              <label for="bottle-end">Fin</label>
+              <input id="bottle-end" class="input" type="datetime-local" />
+            </div>
           </div>
           <div id="bottle-form" class="stack">
             <div class="field field-padded" id="bottle-amount-field">
@@ -587,12 +606,3 @@
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
