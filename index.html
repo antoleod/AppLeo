@@ -19,16 +19,89 @@
 <link rel="apple-touch-icon" href="img/icon/icon-square-180.png"> <!-- Ícono para iOS -->
 
 <style>
-  html {
-    background-position: center center !important;
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
-    transition: background-image 0.8s ease-in-out;
+  #app-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: var(--hero-image);
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    transform-origin: center center;
+    animation: ken-burns 30s ease-in-out infinite alternate;
+    transition: background-image 1.2s ease-in-out;
   }
+  @keyframes ken-burns {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.12); }
+  }
+
+  /* Stats & Milestones Styles */
+  .segmented-control {
+    display: flex;
+    background: rgba(118, 118, 128, 0.12);
+    padding: 2px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .segmented-control button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    color: inherit;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .segmented-control button.active {
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: #000;
+  }
+  .dark-mode .segmented-control button.active {
+    background: #636366;
+    color: #fff;
+  }
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .comparison-card {
+    background: rgba(255,255,255,0.5);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dark-mode .comparison-card { background: rgba(255,255,255,0.05); }
+  .comparison-card.primary { background: var(--bg-card, #fff); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .dark-mode .comparison-card.primary { background: #1c1c1e; }
+  .comp-label { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comp-value { font-size: 1.5rem; font-weight: 700; }
+  .comp-sub { font-size: 0.85rem; opacity: 0.8; display: flex; align-items: center; gap: 4px; }
+  .trend-up { color: #34c759; }
+  .trend-down { color: #ff3b30; }
+  .milestone-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card, #fff); border-radius: 12px; margin-bottom: 8px; }
+  .milestone-icon { font-size: 1.5rem; background: rgba(0,0,0,0.05); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .milestone-content { flex: 1; }
+  .milestone-date { font-size: 0.8rem; opacity: 0.6; }
+  .milestone-title { font-weight: 600; }
+  .custom-settings { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; margin-bottom: 16px; }
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .toggle-row:last-child { border-bottom: none; }
+  .chart-type-selector { display: flex; gap: 8px; margin-top: 8px; }
 </style>
 </head>
 <body>
+  <div id="app-background"></div>
   <input type="file" id="bg-picker" accept="image/*" style="display:none" />
   <div class="wrap stack" id="app-container">
     <div id="save-indicator" class="save-indicator" data-state="idle" aria-live="polite">
@@ -98,6 +171,9 @@
             <span class="icon-export" aria-hidden="true"></span>
             <span class="spinner" aria-hidden="true"></span>
           </button>
+          <button class="icon-btn icon-btn-secondary icon-only" id="export-csv" type="button" aria-label="Exporter en CSV" style="margin-left: 4px;">
+            <span style="font-size: 0.7rem; font-weight: 800; letter-spacing: -0.5px;">CSV</span>
+          </button>
           <div class="range-menu" id="history-range-menu" role="menu" aria-labelledby="history-range-btn">
             <button class="range-option active" type="button" data-range="day" role="menuitemradio" aria-checked="true">
               <span class="icon-calendar" aria-hidden="true"></span>
@@ -123,6 +199,7 @@
         <div class="history-actions">
           <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuel</button>
           <button class="btn btn-ghost btn-compact btn-stats" id="btn-stats" type="button"><span class="btn-icon">📈</span> Statistiques</button>
+          <button class="btn btn-ghost btn-compact" id="btn-milestones" type="button"><span class="btn-icon">🏆</span> Étapes</button>
         </div>
         <div class="selection-actions is-hidden" id="selection-actions">
           <button class="btn btn-ghost" id="cancel-select-btn" type="button">Annuler</button>
@@ -500,33 +577,33 @@
         <button class="btn btn-ghost btn-compact btn-danger" id="close-stats" type="button">Fermer</button>
       </div>
 
+      <!-- New Stats UX -->
+      <div class="segmented-control" id="stats-view-selector">
+        <button type="button" data-view="today" class="active">Aujourd'hui</button>
+        <button type="button" data-view="yesterday">Hier</button>
+        <button type="button" data-view="week">Semaine</button>
+        <button type="button" data-view="custom">Perso</button>
+      </div>
+
+      <div id="stats-custom-settings" class="custom-settings is-hidden">
+        <div class="form-grid">
+          <div class="field">
+            <label>Du</label>
+            <input type="date" id="stats-custom-start" class="input">
+          </div>
+          <div class="field">
+            <label>Au</label>
+            <input type="date" id="stats-custom-end" class="input">
+          </div>
+        </div>
+        <div class="toggle-row">
+          <span>Afficher graphiques</span>
+          <input type="checkbox" id="stats-toggle-charts" checked>
+        </div>
+      </div>
+
       <div class="stack stats-content">
-        <div class="stats-summary" id="stats-summary" aria-live="polite">
-          <div class="stat-placeholder">🎛️ Métricas listas al cargar tus datos.</div>
-        </div>
-        <div class="charts-grid">
-          <div class="chart-container">
-            <canvas id="chart-breast-by-hour"></canvas>
-          </div>
-          <div class="chart-container">
-            <canvas id="chart-bottle-by-day"></canvas>
-          </div>
-          <div class="chart-container">
-            <canvas id="chart-diaper-pie"></canvas>
-          </div>
-        </div>
-        <div class="chart-container">
-          <canvas id="chart-growth"></canvas>
-        </div>
-        <div class="stats-breakdown">
-          <div class="stats-breakdown-head">
-            <h3>Detalle diario</h3>
-            <span class="muted" id="stats-breakdown-label"></span>
-          </div>
-          <div class="stats-day-list" id="stats-day-list">
-            <div class="stat-placeholder">📆 Elige un rango para ver la actividad.</div>
-          </div>
-        </div>
+        <div id="stats-dynamic-content"></div>
       </div>
     </div>
   </div>
@@ -570,6 +647,45 @@
           <span class="icon-calendar"></span>
           <span>30 derniers jours</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MILESTONES -->
+  <div class="modal" id="modal-milestones" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="modal-header">
+        <h2>Étapes de développement</h2>
+        <button class="btn btn-ghost btn-compact btn-danger" id="close-milestones" type="button">Fermer</button>
+      </div>
+      
+      <div class="list" id="milestones-list">
+        <!-- Items go here -->
+      </div>
+
+      <div class="stack form-grid" style="margin-top: 16px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 16px;">
+        <h3>Ajouter une étape</h3>
+        <div class="field">
+          <label>Titre</label>
+          <input id="milestone-title" class="input" type="text" placeholder="ex. Premier sourire" />
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input id="milestone-date" class="input" type="date" />
+        </div>
+        <div class="field">
+          <label>Icône</label>
+          <select id="milestone-icon" class="input">
+            <option value="🏆">🏆 Trophée</option>
+            <option value="😃">😃 Sourire</option>
+            <option value="🗣️">🗣️ Areuh</option>
+            <option value="🦷">🦷 Dent</option>
+            <option value="👣">👣 Pas</option>
+            <option value="🧸">🧸 Jouet</option>
+            <option value="🌟">🌟 Autre</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="save-milestone" type="button">Ajouter</button>
       </div>
     </div>
   </div>

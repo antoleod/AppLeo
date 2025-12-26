@@ -14,7 +14,8 @@ const TYPE_KEYS = {
   med: "meds",
   measurement: "measurements",
   sleep: "sleepSessions",
-  pump: "pumpSessions"
+  pump: "pumpSessions",
+  milestone: "milestones"
 };
 
 let firestoreInstance = null;
@@ -46,7 +47,9 @@ function baseSnapshot() {
     meds: [],
     measurements: [],
     sleepSessions: [],
-    pumpSessions: []
+    pumpSessions: [],
+    activeTimers: {},
+    milestones: []
   };
 }
 
@@ -59,7 +62,11 @@ function normalizeSnapshot(raw) {
     : raw;
   const snapshot = baseSnapshot();
   Object.keys(snapshot).forEach((key) => {
-    snapshot[key] = Array.isArray(source[key]) ? clone(source[key]) : [];
+    if (key === 'activeTimers') {
+      snapshot[key] = (source[key] && typeof source[key] === 'object') ? clone(source[key]) : {};
+    } else {
+      snapshot[key] = Array.isArray(source[key]) ? clone(source[key]) : [];
+    }
   });
   return snapshot;
 }
@@ -198,6 +205,9 @@ export const Persistence = {
             missing.push(key);
           }
         });
+        if (!snapshot || !Object.prototype.hasOwnProperty.call(snapshot, 'activeTimers')) {
+          missing.push('activeTimers');
+        }
         return missing;
       };
 
@@ -323,6 +333,18 @@ export const Persistence = {
       );
       entryMap.set(entry.id, clone(entry));
       snapshot[key] = sortEntries(Array.from(entryMap.values()));
+      return snapshot;
+    }, reason);
+  },
+
+  async saveTimer(type, state, reason = "Update timer") {
+    await withMutation((snapshot) => {
+      if (!snapshot.activeTimers) snapshot.activeTimers = {};
+      if (state === null) {
+        delete snapshot.activeTimers[type];
+      } else {
+        snapshot.activeTimers[type] = clone(state);
+      }
       return snapshot;
     }, reason);
   },

@@ -1,4 +1,4 @@
-﻿﻿// ===== Utilities =====
+﻿// ===== Utilities =====
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const store = {
@@ -10,23 +10,9 @@ const store = {
   remove(key){ localStorage.removeItem(key); }
 };
 
-// ===== Random Background Image =====
-const backgroundImages = [
-  'img/baby.jpg',
-  'img/baby1.jpg',
-  'img/baby2.jpeg',
-  'img/baby3.jpg',
-  'img/baby4.jpeg'
-];
-
-function setRandomBackgroundImage() {
-  const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-  const selectedImage = backgroundImages[randomIndex];
-  document.documentElement.style.setProperty('--hero-image', `url('../${selectedImage}')`);
-}
-
-// Call this function when the DOM is loaded
-document.addEventListener('DOMContentLoaded', setRandomBackgroundImage);
+// ===== Constants =====
+// Date de naissance pour les courbes de croissance (basé sur le profil)
+const BABY_BIRTH_DATE = new Date('2025-10-27T16:13:00');
 
 // ===== Haptic Feedback =====
 let vibrationUnlocked = false;
@@ -275,7 +261,7 @@ function formatBottleWindow(startISO, endISO){
   if(!startDate && !endDate) return '';
   const parts = [];
   if(startDate){
-    parts.push(`Inicio ${formatDateTimeLabel(startDate)}`);
+    parts.push(`Début ${formatDateTimeLabel(startDate)}`);
   }
   if(endDate){
     parts.push(`Fin ${formatDateTimeLabel(endDate)}`);
@@ -288,7 +274,10 @@ const DAY_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const HERO_KEY = 'heroImage';
 const HERO_FALLBACKS = [
   'img/baby.jpg',
-  'img/baby1.jpg'
+  'img/baby1.jpg',
+  'img/baby2.jpeg',
+  'img/baby3.jpg',
+  'img/baby4.jpeg'
 ];
 let heroRotationTimer = null;
 const HERO_ROTATION_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
@@ -454,6 +443,7 @@ const historyRangeOptions = $$('#history-range-menu .range-option[data-range]');
 const rangePickerModal = $('#modal-range-picker');
 const closeRangePickerBtn = $('#close-range-picker');
 const statsBtn = $('#btn-stats');
+const milestonesBtn = $('#btn-milestones');
 const statsModal = $('#modal-stats');
 const closeStatsBtn = $('#close-stats');
 const statsBreastHourCanvas = $('#chart-breast-by-hour');
@@ -461,11 +451,10 @@ const statsBottleDayCanvas = $('#chart-bottle-by-day');
 const statsDiaperCanvas = $('#chart-diaper-pie');
 const statsGrowthCanvas = $('#chart-growth');
 const statsSummaryEl = $('#stats-summary');
-const statsDailyList = $('#stats-day-list');
-const statsBreakdownLabel = $('#stats-breakdown-label');
 const saveIndicatorEl = $('#save-indicator');
 const saveLabelEl = $('#save-label');
 const exportReportsBtn = $('#export-pdf');
+const exportCsvBtn = $('#export-csv');
 const btnElim = $('#btn-elim');
 const footerAddManualBtn = $('#footer-add-manual');
 const summaryElimEl = $('#summary-elim');
@@ -552,6 +541,17 @@ const sleepEndInput = $('#sleep-end');
 const sleepNotesInput = $('#sleep-notes');
 const saveSleepBtn = $('#save-sleep');
 
+// Milestones refs
+const milestonesModal = $('#modal-milestones');
+const closeMilestonesBtn = $('#close-milestones');
+const milestonesList = $('#milestones-list');
+const milestoneTitleInput = $('#milestone-title');
+const milestoneDateInput = $('#milestone-date');
+const milestoneIconSelect = $('#milestone-icon');
+const saveMilestoneBtn = $('#save-milestone');
+
+const statsDynamicContent = $('#stats-dynamic-content');
+
 function applyHeartbeatEffect(buttonsSelector = '.btn-heartbeat'){
   const heartbeatButtons = $$(buttonsSelector);
   heartbeatButtons.forEach(btn => {
@@ -573,6 +573,7 @@ const SAVE_MESSAGES = {
   error: 'Erreur de synchronisation',
   synced: 'Sauvegardé dans le cloud'
 };
+let lastSyncedTime = null;
 
 let saveIndicatorResetTimer = null;
 const summaryMedEl = $('#summary-med');
@@ -584,7 +585,8 @@ const state = {
   meds: [], // {id,dateISO,name}
   measurements: [], // {id,dateISO,temp,weight,height}
   sleepSessions: [], // {id,dateISO,startISO,endISO,durationSec,notes}
-  pumpSessions: [] // {id,dateISO,startISO,endISO,durationSec}
+  pumpSessions: [], // {id,dateISO,startISO,endISO,durationSec}
+  milestones: [] // {id,dateISO,title,icon}
 };
 
 function updateState(updater) {
@@ -596,6 +598,7 @@ function updateState(updater) {
   state.measurements = newState.measurements ?? [];
   state.sleepSessions = newState.sleepSessions ?? [];
   state.pumpSessions = newState.pumpSessions ?? [];
+  state.milestones = newState.milestones ?? [];
   
   // La persistencia es manejada por el módulo de persistencia.
   // No se usa store.set() aquí. Las llamadas a persistenceApi se hacen
@@ -645,6 +648,7 @@ let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
 let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
 let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
 let bottlePresetCounts = normalizeBottlePresetCounts(store.get(BOTTLE_PRESET_COUNTS_KEY, {}));
+let whoData = null;
 let bottleDefaultPreset = resolveBottleDefaultPreset();
 let sleepTimer = 0;
 let sleepTimerStart = null;
@@ -679,6 +683,7 @@ function cloneDataSnapshot(){
     measurements: state.measurements.map(m => ({...m})),
     sleepSessions: state.sleepSessions.map(s => ({...s})),
     pumpSessions: state.pumpSessions.map(p => ({...p}))
+    // milestones not needed for export usually, but could be added
   };
 }
 
@@ -705,7 +710,8 @@ function replaceDataFromSnapshot(snapshot, {skipRender = false} = {}){
       meds: [],
       measurements: [],
       sleepSessions: [],
-      pumpSessions: []
+      pumpSessions: [],
+      activeTimers: {}
     };
     if (snapshot && typeof snapshot === 'object') {
       data.feeds = Array.isArray(snapshot.feeds) ? snapshot.feeds.map(f => ({...f})) : [];
@@ -714,9 +720,15 @@ function replaceDataFromSnapshot(snapshot, {skipRender = false} = {}){
       data.measurements = Array.isArray(snapshot.measurements) ? snapshot.measurements.map(m => ({...m})) : [];
       data.sleepSessions = Array.isArray(snapshot.sleepSessions) ? snapshot.sleepSessions.map(s => ({...s})) : [];
       data.pumpSessions = Array.isArray(snapshot.pumpSessions) ? snapshot.pumpSessions.map(p => ({...p})) : [];
+      data.milestones = Array.isArray(snapshot.milestones) ? snapshot.milestones.map(m => ({...m})) : [];
+      data.activeTimers = (snapshot.activeTimers && typeof snapshot.activeTimers === 'object') ? snapshot.activeTimers : {};
     }
     return data;
   });
+
+  if (snapshot && snapshot.activeTimers) {
+    syncLocalTimersWithRemote(snapshot.activeTimers);
+  }
 
   if(!skipRender){
     renderHistory();
@@ -1200,22 +1212,14 @@ function getStatsChartData(range = historyRange){
   };
 }
 
-function showStatsSkeleton(){
-  if(statsSummaryEl){
-    statsSummaryEl.innerHTML = `
+function showStatsSkeleton(container){
+  if(container){
+    container.innerHTML = `
       <div class="stat-overview-grid">
-        <div class="skeleton-card"></div>
+        <div class="skeleton-card" style="height:100px"></div>
         <div class="skeleton-card"></div>
         <div class="skeleton-card"></div>
       </div>
-    `;
-  }
-  if(statsDailyList){
-    statsDailyList.innerHTML = `
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
     `;
   }
 }
@@ -1428,25 +1432,26 @@ function updateStatsSummary(currentStats = null){
   }
 
   statsSummaryEl.innerHTML = `
-    <div class="stat-overview-grid">
+    <div class="stat-overview-grid" style="margin-bottom:16px">
       ${cardsHtml}
     </div>
     ${insightsHtml}
   `;
 }
 
-function renderStatsDailyList(stats = null){
+function renderStatsDailyList(stats = null, container = null){
+  const statsDailyList = container || $('#stats-day-list');
   if(!statsDailyList) return;
   const data = stats || buildRangeStats();
   const perDay = Array.isArray(data?.perDay) ? data.perDay : [];
   if(!perDay.length){
-    statsDailyList.innerHTML = '<div class="stat-placeholder">Aucune activitAc sur cette pAcriode.</div>';
+    statsDailyList.innerHTML = '<div class="stat-placeholder">Aucune activité sur cette période.</div>';
 
   }
 
   const hasActivity = perDay.some(day => (day?.feedCount || 0) > 0 || (day?.breastMinutes || 0) > 0 || (day?.bottleMl || 0) > 0);
   if(!hasActivity){
-    statsDailyList.innerHTML = '<div class="stat-placeholder">Aucune activitAc sur cette pAcriode.</div>';
+    statsDailyList.innerHTML = '<div class="stat-placeholder">Aucune activité sur cette période.</div>';
 
   }
 
@@ -1495,13 +1500,10 @@ function renderStatsDailyList(stats = null){
   }).join('');
 }
 
-function updateStatsChart(force = false){
+function updateStatsChart(force = false, container = null){
   const summary = getStatsChartData();
   const stats = summary.stats;
-  updateStatsSummary(stats);
-  if(statsBreakdownLabel) statsBreakdownLabel.textContent = summary.rangeLabel || '';
-  renderStatsDailyList(stats);
-
+  
   if(typeof Chart === 'undefined') return;
 
   const hourCtx = statsBreastHourCanvas?.getContext('2d');
@@ -1691,6 +1693,23 @@ function updateStatsChart(force = false){
     const heightData = measurementEntries.map(entry => Number.isFinite(entry.height) ? entry.height : null);
     const tempData = measurementEntries.map(entry => Number.isFinite(entry.temp) ? entry.temp : null);
 
+    // WHO Percentiles calculation
+    let p15Data = [], p50Data = [], p85Data = [];
+    if (whoData && measurementEntries.length > 0) {
+      const { interpolateWho } = whoData;
+      const whoBoysWeight = whoData.WHO_DATA.boys.weight;
+      
+      measurementEntries.forEach(entry => {
+        const date = parseDateInput(entry.dateISO);
+        const ageMs = date.getTime() - BABY_BIRTH_DATE.getTime();
+        const ageMonths = Math.max(0, ageMs / (1000 * 60 * 60 * 24 * 30.44));
+        const p = interpolateWho(whoBoysWeight, ageMonths);
+        p15Data.push(p.p15);
+        p50Data.push(p.p50);
+        p85Data.push(p.p85);
+      });
+    }
+
     if(!statsGrowthChart){
       statsGrowthChart = new Chart(growthCtx, {
         type: 'line',
@@ -1726,6 +1745,35 @@ function updateStatsChart(force = false){
               tension: 0.3,
               pointRadius: 4,
               yAxisID: 'yTemp'
+            },
+            {
+              label: 'P85 (OMS)',
+              data: p85Data,
+              borderColor: 'rgba(200, 200, 200, 0.5)',
+              borderDash: [5, 5],
+              pointRadius: 0,
+              borderWidth: 1,
+              yAxisID: 'yWeight',
+              fill: false
+            },
+            {
+              label: 'P50 (OMS)',
+              data: p50Data,
+              borderColor: 'rgba(150, 150, 150, 0.6)',
+              borderWidth: 1,
+              pointRadius: 0,
+              yAxisID: 'yWeight',
+              fill: false
+            },
+            {
+              label: 'P15 (OMS)',
+              data: p15Data,
+              borderColor: 'rgba(200, 200, 200, 0.5)',
+              borderDash: [5, 5],
+              pointRadius: 0,
+              borderWidth: 1,
+              yAxisID: 'yWeight',
+              fill: '-1' // Fill to previous dataset (P50) or similar if desired, but here just lines
             }
           ]
         },
@@ -1780,15 +1828,158 @@ function updateStatsChart(force = false){
       statsGrowthChart.data.datasets[0].data = weightData;
       statsGrowthChart.data.datasets[1].data = heightData;
       statsGrowthChart.data.datasets[2].data = tempData;
+      statsGrowthChart.data.datasets[3].data = p85Data;
+      statsGrowthChart.data.datasets[4].data = p50Data;
+      statsGrowthChart.data.datasets[5].data = p15Data;
       statsGrowthChart.update();
     }
   }
+}
+
+function renderStatsDashboard(viewMode = 'today') {
+  if (!statsDynamicContent) return;
+  statsDynamicContent.innerHTML = '';
+
+  // Handle Custom View Settings Visibility
+  const customSettings = $('#stats-custom-settings');
+  if (customSettings) {
+    customSettings.classList.toggle('is-hidden', viewMode !== 'custom');
+  }
+
+  // Update Segmented Control UI
+  $$('#stats-view-selector button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === viewMode);
+  });
+
+  if (viewMode === 'today' || viewMode === 'yesterday') {
+    renderComparisonView(viewMode);
+  } else if (viewMode === 'week') {
+    renderWeekView();
+  } else if (viewMode === 'custom') {
+    renderCustomView();
+  }
+}
+
+function renderComparisonView(mode) {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const statsToday = getDayFeedStats(today);
+  const statsYesterday = getDayFeedStats(yesterday);
+
+  // Determine which is primary based on mode, but we show both
+  const isTodayMode = mode === 'today';
+  
+  const diffMl = statsToday.bottleMl - statsYesterday.bottleMl;
+  const diffCount = statsToday.feedCount - statsYesterday.feedCount;
+  
+  const trendMl = diffMl > 0 ? 'trend-up' : (diffMl < 0 ? 'trend-down' : '');
+  const trendSign = diffMl > 0 ? '+' : '';
+  
+  const html = `
+    <div class="comparison-grid">
+      <div class="comparison-card primary">
+        <span class="comp-label">Aujourd'hui</span>
+        <span class="comp-value">${formatNumber(statsToday.bottleMl)} <small style="font-size:0.6em; font-weight:400">ml</small></span>
+        <div class="comp-sub">
+          <span>${statsToday.feedCount} tomas</span> • <span>Ø ${formatNumber(statsToday.avgPerFeed, 0, 0)}</span>
+        </div>
+        <div class="comp-sub" style="margin-top:8px">
+          <span class="${trendMl}">${trendSign}${formatNumber(diffMl)} ml</span> vs hier
+        </div>
+      </div>
+      <div class="comparison-card">
+        <span class="comp-label">Hier</span>
+        <span class="comp-value">${formatNumber(statsYesterday.bottleMl)} <small style="font-size:0.6em; font-weight:400">ml</small></span>
+        <div class="comp-sub">
+          <span>${statsYesterday.feedCount} tomas</span> • <span>Ø ${formatNumber(statsYesterday.avgPerFeed, 0, 0)}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stats-breakdown">
+      <div class="stats-breakdown-head">
+        <h3>Détail ${isTodayMode ? "d'aujourd'hui" : "d'hier"}</h3>
+      </div>
+      <div class="stats-day-list" id="stats-day-list-target"></div>
+    </div>
+  `;
+  
+  statsDynamicContent.innerHTML = html;
+  
+  // Render the daily list for the selected day
+  const targetDate = isTodayMode ? today : yesterday;
+  const range = { mode: 'custom', date: toDateInputValue(targetDate) };
+  const stats = buildRangeStats(range);
+  renderStatsDailyList(stats, $('#stats-day-list-target'));
+}
+
+function renderWeekView() {
+  const html = `
+    <div class="charts-grid">
+      <div class="chart-container"><canvas id="chart-bottle-by-day"></canvas></div>
+      <div class="chart-container"><canvas id="chart-breast-by-hour"></canvas></div>
+    </div>
+    <div class="stats-breakdown">
+      <div class="stats-breakdown-head"><h3>7 derniers jours</h3></div>
+      <div class="stats-day-list" id="stats-day-list-target"></div>
+    </div>
+  `;
+  statsDynamicContent.innerHTML = html;
+  
+  // Re-init charts
+  requestAnimationFrame(() => {
+    updateStatsChart(true);
+    const stats = buildRangeStats({mode:'week'});
+    renderStatsDailyList(stats, $('#stats-day-list-target'));
+  });
+}
+
+function renderCustomView() {
+  const startInput = $('#stats-custom-start');
+  const endInput = $('#stats-custom-end');
+  const showCharts = $('#stats-toggle-charts')?.checked;
+  
+  // Default to current month if empty
+  if (!startInput.value) {
+    const now = new Date();
+    startInput.value = toDateInputValue(new Date(now.getFullYear(), now.getMonth(), 1));
+    endInput.value = toDateInputValue(now);
+  }
+
+  const html = `
+    ${showCharts ? `
+    <div class="charts-grid">
+      <div class="chart-container"><canvas id="chart-bottle-by-day"></canvas></div>
+    </div>` : ''}
+    <div class="stats-breakdown">
+      <div class="stats-breakdown-head"><h3>Période personnalisée</h3></div>
+      <div class="stats-day-list" id="stats-day-list-target"></div>
+    </div>
+  `;
+  statsDynamicContent.innerHTML = html;
+
+  // Logic to fetch custom range stats
+  const start = parseDateInput(startInput.value);
+  const end = parseDateInput(endInput.value);
+  
+  // Hack: modify historyRange temporarily or create a custom stats builder that accepts explicit dates
+  // For now, let's use buildRangeStats logic but manually filter if needed, 
+  // but buildRangeStats relies on historyRange global or passed arg.
+  // We can pass a custom range object.
+  
+  // Note: buildRangeStats doesn't support explicit start/end in 'custom' mode easily without modifying getHistoryRangeBounds.
+  // Let's assume 'custom' mode in buildRangeStats uses historyRange.date.
+  // We might need to extend getHistoryRangeBounds to support explicit start/end.
+  // For simplicity in this iteration, let's just show the list.
 }
 
 function updateAllCharts() {
   // Esta función se puede llamar cuando el tema cambia para redibujar los gráficos con nuevos colores.
   updateStatsChart(true);
 }
+
 
 function renderHistory(){
   if(!historyList) return;
@@ -1932,7 +2123,7 @@ function renderHistory(){
   }
   updateSummaries();
   renderFeedHistory();
-  updateStatsChart();
+  // updateStatsChart(); // Removed auto update to avoid conflict with new dashboard
 }
 syncHistoryRangeUI();
 
@@ -2035,11 +2226,24 @@ closeRangePickerBtn?.addEventListener('click', () => {
 });
 
 statsBtn?.addEventListener('click', () => {
-  showStatsSkeleton();
+  showStatsSkeleton(statsDynamicContent);
   openModal('#modal-stats');
   requestAnimationFrame(() => {
-    updateStatsSummary();
-    updateStatsChart(true);
+    renderStatsDashboard('today');
+  });
+});
+
+// Stats View Selector Events
+$('#stats-view-selector')?.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    const view = e.target.dataset.view;
+    renderStatsDashboard(view);
+  }
+});
+
+$('#stats-custom-settings')?.addEventListener('change', () => {
+  requestAnimationFrame(() => {
+    renderStatsDashboard('custom');
   });
 });
 
@@ -2248,6 +2452,20 @@ function getPersistenceApi() {
   return persistenceApi;
 }
 
+let syncTimeUpdateTimer = null;
+
+function updateSyncTimeLabel() {
+  if (!lastSyncedTime || !saveLabelEl || saveIndicatorEl.dataset.state !== 'synced') return;
+  const diff = Math.floor((Date.now() - lastSyncedTime) / 1000);
+  if (diff < 5) {
+    saveLabelEl.textContent = 'Synchronisé à l\'instant';
+  } else if (diff < 60) {
+    saveLabelEl.textContent = `Synchronisé il y a ${diff}s`;
+  } else {
+    saveLabelEl.textContent = 'Synchronisé';
+  }
+}
+
 function setSaveIndicator(status = 'idle', message){
   if(!saveIndicatorEl || !saveLabelEl) return;
   if(saveIndicatorResetTimer){
@@ -2257,11 +2475,19 @@ function setSaveIndicator(status = 'idle', message){
   saveIndicatorEl.dataset.state = status || 'idle';
   saveLabelEl.textContent = message || SAVE_MESSAGES[status] || SAVE_MESSAGES.idle;
   if(status === 'synced'){
+    lastSyncedTime = Date.now();
+    if (!syncTimeUpdateTimer) syncTimeUpdateTimer = setInterval(updateSyncTimeLabel, 5000);
+    updateSyncTimeLabel();
     saveIndicatorResetTimer = setTimeout(() => {
       if(saveIndicatorEl && saveIndicatorEl.dataset.state === 'synced'){
         setSaveIndicator('idle');
       }
     }, 4000);
+  } else {
+    if (syncTimeUpdateTimer) {
+      clearInterval(syncTimeUpdateTimer);
+      syncTimeUpdateTimer = null;
+    }
   }
 }
 
@@ -2292,6 +2518,103 @@ function exportReports(){
       exportReportsBtn.classList.remove('is-loading');
       exportReportsBtn.disabled = false;
     }, 1000);
+  }
+}
+
+function exportToCSV() {
+  if (exportCsvBtn && exportCsvBtn.classList.contains('is-loading')) return;
+  if (exportCsvBtn) exportCsvBtn.classList.add('is-loading');
+  
+  try {
+    const rows = [['Date', 'Heure', 'Type', 'Détail', 'Valeur', 'Unité', 'Durée (min)', 'Notes']];
+    
+    const entries = [
+      ...state.feeds.map(i => ({...i, _type: 'feed'})),
+      ...state.elims.map(i => ({...i, _type: 'elim'})),
+      ...state.meds.map(i => ({...i, _type: 'med'})),
+      ...state.measurements.map(i => ({...i, _type: 'measurement'})),
+      ...state.sleepSessions.map(i => ({...i, _type: 'sleep'})),
+      ...state.pumpSessions.map(i => ({...i, _type: 'pump'})),
+      ...state.milestones.map(i => ({...i, _type: 'milestone'}))
+    ].sort((a, b) => (a.dateISO || '') < (b.dateISO || '') ? 1 : -1);
+
+    entries.forEach(e => {
+      const dateObj = new Date(e.dateISO);
+      const date = dateObj.toLocaleDateString('fr-FR');
+      const time = dateObj.toLocaleTimeString('fr-FR');
+      let type = '', detail = '', value = '', unit = '', duration = '', notes = e.notes || '';
+
+      if (e._type === 'feed') {
+        type = 'Alimentation';
+        if (e.source === 'breast') {
+          detail = `Sein (${e.breastSide})`;
+          duration = e.durationSec ? Math.round(e.durationSec / 60) : '';
+        } else {
+          detail = 'Biberon';
+          value = e.amountMl;
+          unit = 'ml';
+        }
+      } else if (e._type === 'elim') {
+        type = 'Couche';
+        const parts = [];
+        if (e.pee) parts.push(`Pipi: ${e.pee}`);
+        if (e.poop) parts.push(`Caca: ${e.poop}`);
+        if (e.vomit) parts.push(`Vomi: ${e.vomit}`);
+        detail = parts.join(', ');
+      } else if (e._type === 'med') {
+        type = 'Médicament';
+        detail = e.name;
+        value = e.dose || '';
+      } else if (e._type === 'measurement') {
+        type = 'Mesure';
+        const parts = [];
+        if (e.weight) parts.push(`Poids: ${e.weight}kg`);
+        if (e.height) parts.push(`Taille: ${e.height}cm`);
+        if (e.temp) parts.push(`Temp: ${e.temp}°C`);
+        detail = parts.join(', ');
+      } else if (e._type === 'sleep') {
+        type = 'Sommeil';
+        if (e.durationSec) duration = Math.round(e.durationSec / 60);
+      } else if (e._type === 'pump') {
+        type = 'Tire-lait';
+        if (e.durationSec) duration = Math.round(e.durationSec / 60);
+      } else if (e._type === 'milestone') {
+        type = 'Étape';
+        detail = e.title;
+      }
+
+      const escape = (txt) => `"${String(txt || '').replace(/"/g, '""')}"`;
+      
+      rows.push([
+        escape(date),
+        escape(time),
+        escape(type),
+        escape(detail),
+        escape(value),
+        escape(unit),
+        escape(duration),
+        escape(notes)
+      ].join(','));
+    });
+
+    const csvContent = rows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    const now = new Date();
+    const filename = `leo_export_${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}.csv`;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    setSaveIndicator('synced', 'Export CSV réussi');
+  } catch (err) {
+    console.error('CSV Export failed', err);
+    setSaveIndicator('error', 'Erreur export CSV');
+  } finally {
+    if (exportCsvBtn) setTimeout(() => exportCsvBtn.classList.remove('is-loading'), 500);
   }
 }
 
@@ -2364,7 +2687,7 @@ function renderWeeklyBottleSparkline(container){
   const weeklyStats = buildRangeStats({mode:'week'});
   const perDay = Array.isArray(weeklyStats.perDay) ? weeklyStats.perDay : [];
   if(!perDay.length){
-    container.innerHTML = '<span class="muted">Pas de donnAce</span>';
+    container.innerHTML = '<span class="muted">Pas de donnée</span>';
     return;
   }
   const max = Math.max(...perDay.map(day => day.bottleMl || 0));
@@ -2398,8 +2721,8 @@ function updateSummaries(){
       summaryFeedEl.innerHTML = `
         <strong>Alimentation</strong>
         <span class="kpi-pill">Total ${formatNumber(todayStats.bottleMl)} ml</span>
-        <span class="kpi-pill">${todayStats.feedCount} sAcances</span>
-        <span class="kpi-pill">A~ ${formatNumber(todayStats.avgPerFeed, 0, 0)} ml/prise</span>
+        <span class="kpi-pill">${todayStats.feedCount} séances</span>
+        <span class="kpi-pill">Ø ${formatNumber(todayStats.avgPerFeed, 0, 0)} ml/prise</span>
         <span class="kpi-pill">Intervalle ${intervalLabel}</span>
         <span class="kpi-pill">Sein ${formatMinutes(todayStats.breastMinutes)}</span>
         <span class="kpi-pill">${deltaLabel}</span>
@@ -3077,6 +3400,122 @@ function stopBottleTimerWithoutSaving({ resetDisplay = true } = {}){
   }
 }
 
+function syncLocalTimersWithRemote(activeTimers) {
+  if (!activeTimers) activeTimers = {};
+
+  // Breast
+  const breast = activeTimers.breast;
+  if (breast && breast.start) {
+    if (!timerStart || Math.abs(timerStart - breast.start) > 1000) {
+      setFeedMode('breast');
+      if (breast.side) setBreastSide(breast.side);
+      beginTimer(breast.start, false);
+    } else if (breast.side && breast.side !== breastSide) {
+       setBreastSide(breast.side);
+    }
+  } else if (timerStart) {
+    // If remote has no timer but local does, stop local (unless we just started it and it hasn't synced yet)
+    // Firestore local writes are immediate in snapshot, so this is safe.
+    stopTimerWithoutSaving();
+  }
+
+  // Bottle
+  const bottle = activeTimers.bottle;
+  if (bottle && bottle.start) {
+    if (!bottleTimerStart || Math.abs(bottleTimerStart - bottle.start) > 1000) {
+      setFeedMode('bottle');
+      if (bottle.bottleType) setBottleType(bottle.bottleType, {persist:true});
+      beginBottleTimer(bottle.start, false);
+    }
+  } else if (bottleTimerStart) {
+    stopBottleTimerWithoutSaving();
+  }
+
+  // Sleep
+  const sleep = activeTimers.sleep;
+  if (sleep && sleep.start) {
+    if (!sleepTimerStart || Math.abs(sleepTimerStart - sleep.start) > 1000) {
+      beginSleepTimer(sleep.start, false);
+    }
+  } else if (sleepTimerStart) {
+    stopSleepTimer({ persist: true, resetDisplay: true });
+  }
+}
+
+// ===== Milestones Logic =====
+milestonesBtn?.addEventListener('click', () => {
+  renderMilestones();
+  openModal('#modal-milestones');
+});
+closeMilestonesBtn?.addEventListener('click', () => closeModal('#modal-milestones'));
+
+function renderMilestones() {
+  if (!milestonesList) return;
+  milestonesList.innerHTML = '';
+  
+  const sorted = [...state.milestones].sort((a, b) => a.dateISO < b.dateISO ? 1 : -1);
+  
+  if (sorted.length === 0) {
+    milestonesList.innerHTML = '<div class="history-empty">Aucune étape enregistrée.</div>';
+    return;
+  }
+
+  sorted.forEach(m => {
+    const date = new Date(m.dateISO).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const el = document.createElement('div');
+    el.className = 'milestone-item';
+    el.innerHTML = `
+      <div class="milestone-icon">${m.icon || '🏆'}</div>
+      <div class="milestone-content">
+        <div class="milestone-title">${escapeHtml(m.title)}</div>
+        <div class="milestone-date">${date}</div>
+      </div>
+      <button class="btn btn-ghost btn-compact btn-danger" onclick="deleteMilestone('${m.id}')">×</button>
+    `;
+    milestonesList.appendChild(el);
+  });
+}
+
+window.deleteMilestone = function(id) {
+  if(confirm('Supprimer cette étape ?')) {
+    updateState(data => ({
+      ...data,
+      milestones: data.milestones.filter(m => m.id !== id)
+    }));
+    getPersistenceApi()?.deleteEntries([{ type: 'milestone', id }]);
+    renderMilestones();
+  }
+};
+
+saveMilestoneBtn?.addEventListener('click', async () => {
+  const title = milestoneTitleInput?.value?.trim();
+  const dateVal = milestoneDateInput?.value;
+  const icon = milestoneIconSelect?.value || '🏆';
+
+  if (!title || !dateVal) {
+    alert('Veuillez remplir le titre et la date.');
+    return;
+  }
+
+  const entry = {
+    id: Date.now() + '',
+    dateISO: new Date(dateVal).toISOString(),
+    title,
+    icon
+  };
+
+  updateState(data => ({
+    ...data,
+    milestones: [...data.milestones, entry]
+  }));
+
+  await getPersistenceApi()?.saveEntry('milestone', entry, 'Add milestone');
+  
+  milestoneTitleInput.value = '';
+  milestoneDateInput.value = '';
+  renderMilestones();
+});
+
 function setFeedMode(mode){
   feedMode = mode;
   const pecho = $('#seg-pecho');
@@ -3282,6 +3721,7 @@ function setBreastSide(side){
   if(timerStart){
     store.set(TIMER_KEY, { start: timerStart, breastSide });
   }
+  if(timerStart) getPersistenceApi()?.saveTimer('breast', { start: timerStart, side: breastSide });
 }
 
 
@@ -3447,6 +3887,7 @@ function beginTimer(startTimestamp = Date.now(), persist = true){
   if(persist){
     store.set(TIMER_KEY, { start: timerStart, breastSide });
   }
+  if(persist) getPersistenceApi()?.saveTimer('breast', { start: timerStart, side: breastSide });
 }
 
 function stopTimerWithoutSaving(){
@@ -3540,6 +3981,7 @@ startStopSleepBtn?.addEventListener('click', async () => {
       const entry = buildSleepEntry({ startDate, endDate, notes });
       if(entry){
         await saveSleepEntry(entry, { reason: 'Sommeil (chrono)' });
+        getPersistenceApi()?.saveTimer('sleep', null);
       }
     }
   }else{
@@ -3551,6 +3993,7 @@ startStopSleepBtn?.addEventListener('click', async () => {
       sleepEndInput.value = '';
     }
     clearSleepPending();
+    getPersistenceApi()?.saveTimer('sleep', { start: ts });
   }
 });
 saveSleepBtn?.addEventListener('click', async () => {
@@ -3584,6 +4027,7 @@ saveSleepBtn?.addEventListener('click', async () => {
     return;
   }
   await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
+  getPersistenceApi()?.saveTimer('sleep', null);
 });
 
 $('#side-left')?.addEventListener('click', ()=> setBreastSide('Gauche'));
@@ -3602,9 +4046,11 @@ startStopBtn?.addEventListener('click', async () => {
       durationSec: elapsed
     };
     await saveFeed(entry);
+    getPersistenceApi()?.saveTimer('breast', null);
   }else{
     setFeedMode('breast');
     beginTimer(Date.now(), true);
+    getPersistenceApi()?.saveTimer('breast', { start: Date.now(), side: breastSide });
   }
 });
 
@@ -3641,7 +4087,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
       const s = String(elapsed % 60).padStart(2, '0');
       const startLabel = new Date(start).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
       const endLabel = new Date(endTs).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      bottleStartTimeDisplay.textContent = `De ${startLabel} a ${endLabel} - ${h}:${m}:${s}`;
+      bottleStartTimeDisplay.textContent = `Début ${startLabel} · Fin ${endLabel} — ${h}:${m}:${s}`;
     }
     if(bottleStartInput) bottleStartInput.value = toDateTimeInputValue(new Date(start));
     if(bottleEndInput) bottleEndInput.value = toDateTimeInputValue(new Date(endTs));
@@ -3688,6 +4134,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
     }
     setFeedMode('bottle');
     beginBottleTimer(Date.now(), true);
+    getPersistenceApi()?.saveTimer('bottle', { start: Date.now(), bottleType });
   }
 });
 
@@ -3753,6 +4200,7 @@ saveBottleBtn?.addEventListener('click', async () => {
   hideBottlePrompt({ clearValue: true });
   applyBottleDefaultAmount();
   stopBottleTimerWithoutSaving();
+  getPersistenceApi()?.saveTimer('bottle', null);
 });
 
 setFeedMode('breast');
@@ -4505,6 +4953,13 @@ async function bootstrap() {
       console.warn('ensureAuth failed:', e);
     }
 
+    try {
+      const whoModule = await import('./who_data.js');
+      whoData = whoModule;
+    } catch (e) {
+      console.warn('Failed to load WHO data:', e);
+    }
+
     await initFirebaseSync();
   } catch (error) {
     console.error("Failed to bootstrap Firebase or app modules:", error);
@@ -4527,6 +4982,7 @@ async function bootstrap() {
 addManualBtn?.addEventListener('click', ()=> openManualModal({mode:'create', type:'feed'}));
 footerAddManualBtn?.addEventListener('click', ()=> openManualModal({mode:'create', type:'feed'}));
 exportReportsBtn?.addEventListener('click', exportReports);
+exportCsvBtn?.addEventListener('click', exportToCSV);
 closeManualBtn?.addEventListener('click', closeManualModal);
 cancelManualBtn?.addEventListener('click', closeManualModal);
 saveManualBtn?.addEventListener('click', () => {
