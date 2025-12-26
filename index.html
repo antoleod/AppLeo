@@ -243,6 +243,14 @@
   }
   .history-item-foreground {
     padding: 10px 14px;
+    background: var(--bg-card, rgba(255,255,255,0.65));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+  }
+  .dark-mode .history-item-foreground {
+    background: rgba(40,40,40,0.6);
+    border-color: rgba(255,255,255,0.05);
   }
   .item-title {
     font-size: 0.95rem;
@@ -350,7 +358,7 @@
     overflow: hidden;
   }
   .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
-  .bottle-details-inner { min-height: 0; padding: 4px 2px; }
+  .bottle-details-inner { min-height: 0; padding: 4px 2px; display: none; }
   .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
 
   /* Timeline View Enhancements */
