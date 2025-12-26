@@ -2101,6 +2101,7 @@ function renderHistory(){
         const checkbox = itemContainer.querySelector('.history-item-checkbox');
         checkbox.dataset.id = row.item.id;
         checkbox.dataset.type = row.type;
+        itemContainer.classList.add(`type-${row.type}`);
 
         const editBtn = itemContainer.querySelector('.item-edit');
         if(editBtn){
@@ -3888,12 +3889,6 @@ function setFloatingButtonState(mode, isActive){
   if(!timerRunning){
     target.textContent = 'Démarrer';
   }
-}
-
-function tickTimer(){
-  if(!timerStart) return;
-  timer = Math.max(0, Math.floor((Date.now() - timerStart) / 1000));
-  updateChrono();
 }
 
 function beginTimer(startTimestamp = Date.now(), persist = true){

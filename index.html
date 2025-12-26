@@ -352,6 +352,82 @@
   .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
   .bottle-details-inner { min-height: 0; padding: 4px 2px; }
   .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+
+  /* Timeline View Enhancements */
+  .list {
+    position: relative;
+    padding-left: 0;
+  }
+  
+  /* Continuous vertical line */
+  .list::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: 20px;
+    left: 15px;
+    width: 2px;
+    background: rgba(0,0,0,0.08);
+    z-index: 0;
+  }
+  .dark-mode .list::before {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .history-day-header {
+    position: relative;
+    z-index: 1;
+    padding-left: 42px;
+    margin-bottom: 12px;
+  }
+
+  .history-item {
+    margin-left: 34px;
+    position: relative;
+    overflow: visible !important;
+  }
+
+  /* Timeline Dot */
+  .history-item::after {
+    content: '';
+    position: absolute;
+    left: -24px; /* Aligns with the line at left:15px relative to parent list */
+    top: 20px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg-card, #fff);
+    border: 3px solid #ccc;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Type Colors for Timeline Dots */
+  .history-item.type-feed::after { border-color: #0a84ff; }
+  .history-item.type-elim::after { border-color: #34c759; }
+  .history-item.type-med::after { border-color: #ff9f0a; }
+  .history-item.type-sleep::after { border-color: #5e5ce6; }
+  .history-item.type-pump::after { border-color: #af52de; }
+  .history-item.type-measurement::after { border-color: #ff3b30; }
+  .history-item.type-milestone::after { border-color: #ffd60a; }
+
+  /* Day Header Dot */
+  .history-day-header::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    opacity: 0.5;
+    box-shadow: 0 0 0 4px var(--bg-body, #f7fafd); /* Mask line */
+  }
+  .dark-mode .history-day-header::before {
+    box-shadow: 0 0 0 4px #000;
+  }
 </style>
 </head>
 <body>
