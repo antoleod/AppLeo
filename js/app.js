@@ -498,7 +498,6 @@ const cancelSelectBtn = $('#cancel-select-btn');
 const deleteSelectedBtn = $('#delete-selected-btn');
 const selectionActions = $('#selection-actions');
 const startTimeDisplay = $('#start-time-display');
-const bottleStartTimeDisplay = $('#bottle-start-time-display');
 const bottleChrono = $('#bottle-chrono');
 const bottleForm = $('#bottle-form');
 const bottleStartInput = $('#bottle-start');
@@ -507,6 +506,12 @@ const bottleAmountInput = $('#ml');
 const bottleAmountFeedback = $('#bottle-amount-feedback');
 const bottleDecreaseBtn = $('#bottle-decrease');
 const bottleIncreaseBtn = $('#bottle-increase');
+
+const bottleTimeSummary = $('#bottle-time-summary');
+const bottleTimeLabel = $('#bottle-time-label');
+const bottleDetailsWrapper = $('#bottle-details-wrapper');
+const cancelBottleTimeBtn = $('#cancel-bottle-time');
+const confirmBottleTimeBtn = $('#confirm-bottle-time');
 
 const bottleTypeButtons = $$('#bottle-type-toggle button');
 const bottlePresetButtons = $$('#bottle-preset-buttons button');
@@ -550,6 +555,14 @@ const milestoneDateInput = $('#milestone-date');
 const milestoneIconSelect = $('#milestone-icon');
 const saveMilestoneBtn = $('#save-milestone');
 
+// Focus Mode refs
+const focusOverlay = $('#focus-overlay');
+const focusMinimizeBtn = $('#focus-minimize-btn');
+const focusIcon = $('#focus-icon');
+const focusLabel = $('#focus-label');
+const focusTimerEl = $('#focus-timer');
+const focusMeta = $('#focus-meta');
+const focusActionBtn = $('#focus-action-btn');
 const statsDynamicContent = $('#stats-dynamic-content');
 
 function applyHeartbeatEffect(buttonsSelector = '.btn-heartbeat'){
@@ -665,6 +678,7 @@ let pumpMilestoneTwentyReached = false;
 let pumpMilestoneThirtyReached = false;
 let pumpSessionStart = null;
 let isDeleteMode = false;
+let activeFocusMode = null; // 'breast', 'bottle', 'sleep', 'pump'
 
 if(bottleAmountInput){
   if(bottlePendingAmount != null){
@@ -2622,22 +2636,22 @@ function updateMedSummary(){
   if(!summaryMedEl) return;
   const nowString = new Date().toLocaleString();
   if(!state.meds.length){
-    summaryMedEl.innerHTML = `<strong>Derniere prise</strong><span>Aucun medicament enregistre</span><span>Nouvelle prise ${escapeHtml(nowString)}</span>`;
+    summaryMedEl.innerHTML = `<strong>Derniere prise</strong><span class="kpi-pill">Aucun medicament enregistre</span><span class="kpi-pill">Nouvelle prise ${escapeHtml(nowString)}</span>`;
     return;
   }
   const latest = state.meds.reduce((acc, cur)=> acc && acc.dateISO > cur.dateISO ? acc : cur, state.meds[0]);
   const dateString = new Date(latest.dateISO).toLocaleString();
   const parts = [
     '<strong>Derniere prise</strong>',
-    `<span>${escapeHtml(latest.name)} - ${escapeHtml(dateString)}</span>`
+    `<span class="kpi-pill">${escapeHtml(latest.name)} - ${escapeHtml(dateString)}</span>`
   ];
   if(latest.dose){
-    parts.push(`<span>Dose ${escapeHtml(latest.dose)}</span>`);
+    parts.push(`<span class="kpi-pill">Dose ${escapeHtml(latest.dose)}</span>`);
   }
   if(latest.notes){
-    parts.push(`<span>Note ${escapeHtml(latest.notes)}</span>`);
+    parts.push(`<span class="kpi-pill">Note ${escapeHtml(latest.notes)}</span>`);
   }
-  parts.push(`<span>Nouvelle prise ${escapeHtml(nowString)}</span>`);
+  parts.push(`<span class="kpi-pill">Nouvelle prise ${escapeHtml(nowString)}</span>`);
   summaryMedEl.innerHTML = parts.join('');
 }
 
@@ -2741,7 +2755,7 @@ function updateSummaries(){
       })
       .sort((a,b)=> (a.dateISO || a.endISO || '') < (b.dateISO || b.endISO || '') ? 1 : -1);
     if(!todaySleep.length){
-      summarySleepEl.innerHTML = "<strong>Sommeil</strong><span>Aucune sieste enregistrée</span>";
+      summarySleepEl.innerHTML = "<strong>Sommeil</strong><span class=\"kpi-pill\">Aucune sieste enregistrée</span>";
     }else{
       const minutesTotal = todaySleep.reduce((sum, session) => {
         if(Number.isFinite(session.durationSec)){
@@ -2760,10 +2774,10 @@ function updateSummaries(){
       const avgLabel = formatSleepMinutesLabel(avgMinutes);
       summarySleepEl.innerHTML = `
         <strong>Sommeil</strong>
-        <span>${todaySleep.length} sieste(s)</span>
-        <span>Total ${totalLabel}</span>
-        <span>Ø ${avgLabel}</span>
-        ${lastEnd ? `<span>Dernier réveil ${lastEnd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>` : ''}
+        <span class="kpi-pill">${todaySleep.length} sieste(s)</span>
+        <span class="kpi-pill">Total ${totalLabel}</span>
+        <span class="kpi-pill">Ø ${avgLabel}</span>
+        ${lastEnd ? `<span class="kpi-pill">Dernier réveil ${lastEnd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>` : ''}
       `;
     }
   }
@@ -2771,8 +2785,8 @@ function updateSummaries(){
   if(summaryElimEl || dashboardElimEl){
     const todayElims = state.elims.filter(e => new Date(e.dateISO).getTime() >= start);
     if(!todayElims.length){
-      if(summaryElimEl) summaryElimEl.innerHTML = "<strong>Aujourd'hui</strong><span>Aucune donnée</span>";
-      if(dashboardElimEl) dashboardElimEl.innerHTML = "<strong>Pipi / Caca / Vomi</strong><span>Aucune donnée aujourd'hui</span>";
+      if(summaryElimEl) summaryElimEl.innerHTML = "<strong>Aujourd'hui</strong><span class=\"kpi-pill\">Aucune donnée</span>";
+      if(dashboardElimEl) dashboardElimEl.innerHTML = "<strong>Pipi / Caca / Vomi</strong><span class=\"kpi-pill\">Aucune donnée aujourd'hui</span>";
     }else{
       const totals = todayElims.reduce((acc, cur)=> ({
         pee: acc.pee + (cur.pee || 0),
@@ -2784,10 +2798,10 @@ function updateSummaries(){
       if(summaryElimEl){
         summaryElimEl.innerHTML = `
           <strong>Aujourd'hui</strong>
-          <span>Pipi ${totals.pee}</span>
-          <span>Caca ${totals.poop}</span>
-          <span>Vomi ${totals.vomit}</span>
-          <span>${todayElims.length} entrées</span>
+          <span class="kpi-pill">Pipi ${totals.pee}</span>
+          <span class="kpi-pill">Caca ${totals.poop}</span>
+          <span class="kpi-pill">Vomi ${totals.vomit}</span>
+          <span class="kpi-pill">${todayElims.length} entrées</span>
         `;
       }
       if(dashboardElimEl){
@@ -2936,6 +2950,7 @@ function updateBottleChrono(){
   const m = String(Math.floor((bottleTimer % 3600) / 60)).padStart(2, '0');
   const s = String(bottleTimer % 60).padStart(2, '0');
   bottleChrono.textContent = `${h}:${m}:${s}`;
+  if(activeFocusMode === 'bottle') updateFocusDisplay(bottleTimer);
 }
 updateBottleChrono();
 
@@ -3040,6 +3055,7 @@ function tickPumpTimer(){
   }
   pumpTimerSeconds = Math.max(0, Math.floor((Date.now() - pumpTimerStart) / 1000));
   updatePumpUI();
+  if(activeFocusMode === 'pump') updateFocusDisplay(pumpTimerSeconds);
   handlePumpMilestones(pumpTimerSeconds);
 }
 
@@ -3148,6 +3164,7 @@ function updateSleepChrono(){
   const m = String(Math.floor((sleepTimer % 3600) / 60)).padStart(2, '0');
   const s = String(sleepTimer % 60).padStart(2, '0');
   sleepChrono.textContent = `${h}:${m}:${s}`;
+  if(activeFocusMode === 'sleep') updateFocusDisplay(sleepTimer);
 }
 updateSleepChrono();
 
@@ -3155,6 +3172,7 @@ function tickSleepTimer(){
   if(!sleepTimerStart) return;
   sleepTimer = Math.max(0, Math.floor((Date.now() - sleepTimerStart) / 1000));
   updateSleepChrono();
+  if(activeFocusMode === 'sleep') updateFocusDisplay(sleepTimer);
 }
 
 function beginSleepTimer(startTimestamp = Date.now(), persist = true){
@@ -3352,6 +3370,7 @@ function hideBottlePrompt({ clearValue = false } = {}){
   if(clearValue){
     if(bottleStartInput) bottleStartInput.value = '';
     if(bottleEndInput) bottleEndInput.value = '';
+    updateBottleTimeSummary();
   }
 }
 hideBottlePrompt();
@@ -3374,8 +3393,9 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
   bottleTimer = Math.max(0, Math.floor((Date.now() - bottleTimerStart) / 1000));
   updateBottleChrono();
   bottleTimerInterval = setInterval(tickBottleTimer, 1000);
+  if(activeFocusMode === 'bottle') updateFocusDisplay(bottleTimer);
   const label = new Date(bottleTimerStart).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = `Debut ${label}`);
+  updateBottleTimeSummary();
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Stop');
   bottlePendingDuration = 0;
   store.remove(BOTTLE_PENDING_KEY);
@@ -3394,9 +3414,9 @@ function stopBottleTimerWithoutSaving({ resetDisplay = true } = {}){
   store.remove(BOTTLE_TIMER_KEY);
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
   if(resetDisplay){
-    bottleStartTimeDisplay && (bottleStartTimeDisplay.textContent = '');
     bottleTimer = 0;
     updateBottleChrono();
+    updateBottleTimeSummary();
   }
 }
 
@@ -3881,6 +3901,7 @@ function beginTimer(startTimestamp = Date.now(), persist = true){
   timerInterval && clearInterval(timerInterval);
   timerInterval = setInterval(tickTimer, 1000);
   tickTimer();
+  if(activeFocusMode === 'breast') updateFocusDisplay(timer);
   const label = new Date(timerStart).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
   startTimeDisplay && (startTimeDisplay.textContent = `Commencé à ${label}`);
   startStopBtn && (startStopBtn.textContent = 'Stop');
@@ -3902,6 +3923,13 @@ function stopTimerWithoutSaving(){
   startTimeDisplay && (startTimeDisplay.textContent = '');
   timer = 0;
   updateChrono();
+}
+
+function tickTimer(){
+  if(!timerStart) return;
+  timer = Math.max(0, Math.floor((Date.now() - timerStart) / 1000));
+  updateChrono();
+  if(activeFocusMode === 'breast') updateFocusDisplay(timer);
 }
 
 async function saveFeed(entry){
@@ -4054,6 +4082,56 @@ startStopBtn?.addEventListener('click', async () => {
   }
 });
 
+// ===== Bottle Time UX Logic =====
+function updateBottleTimeSummary() {
+  if (!bottleTimeLabel) return;
+  
+  // If timer is running
+  if (bottleTimerInterval && bottleTimerStart) {
+    const start = new Date(bottleTimerStart);
+    bottleTimeLabel.textContent = `En cours depuis ${start.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+    return;
+  }
+
+  // If manual inputs have values
+  const startVal = bottleStartInput?.value;
+  const endVal = bottleEndInput?.value;
+  
+  if (startVal) {
+    const s = new Date(startVal);
+    const e = endVal ? new Date(endVal) : null;
+    const sStr = s.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const eStr = e ? e.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...';
+    bottleTimeLabel.textContent = `${sStr} - ${eStr}`;
+  } else {
+    bottleTimeLabel.textContent = "Aujourd'hui (maintenant)";
+  }
+}
+
+function toggleBottleDetails(forceOpen) {
+  const isOpen = bottleDetailsWrapper.classList.contains('is-open');
+  const shouldOpen = forceOpen !== undefined ? forceOpen : !isOpen;
+  
+  bottleDetailsWrapper.classList.toggle('is-open', shouldOpen);
+  bottleTimeSummary.setAttribute('aria-expanded', shouldOpen);
+  
+  if (shouldOpen && bottleStartInput && !bottleStartInput.value) {
+    // Pre-fill with now if empty when opening
+    const now = new Date();
+    bottleStartInput.value = toDateTimeInputValue(now);
+    bottleEndInput.value = toDateTimeInputValue(now);
+  }
+}
+
+bottleTimeSummary?.addEventListener('click', () => toggleBottleDetails());
+confirmBottleTimeBtn?.addEventListener('click', () => {
+  updateBottleTimeSummary();
+  toggleBottleDetails(false);
+});
+cancelBottleTimeBtn?.addEventListener('click', () => {
+  // Logic to revert could go here, for now just close
+  toggleBottleDetails(false);
+});
 
 startStopBottleBtn?.addEventListener('click', async () => {
   if(!bottleTimerInterval){
@@ -4081,16 +4159,10 @@ startStopBottleBtn?.addEventListener('click', async () => {
     stopBottleTimerWithoutSaving({ resetDisplay: false });
     bottleTimer = elapsed;
     updateBottleChrono();
-    if(bottleStartTimeDisplay){
-      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-      const s = String(elapsed % 60).padStart(2, '0');
-      const startLabel = new Date(start).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      const endLabel = new Date(endTs).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-      bottleStartTimeDisplay.textContent = `Début ${startLabel} · Fin ${endLabel} — ${h}:${m}:${s}`;
-    }
+    
     if(bottleStartInput) bottleStartInput.value = toDateTimeInputValue(new Date(start));
     if(bottleEndInput) bottleEndInput.value = toDateTimeInputValue(new Date(endTs));
+    updateBottleTimeSummary();
     bottlePendingDuration = elapsed;
     store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
     const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '');
@@ -4135,6 +4207,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
     setFeedMode('bottle');
     beginBottleTimer(Date.now(), true);
     getPersistenceApi()?.saveTimer('bottle', { start: Date.now(), bottleType });
+    updateBottleTimeSummary();
   }
 });
 
@@ -4203,6 +4276,83 @@ saveBottleBtn?.addEventListener('click', async () => {
   getPersistenceApi()?.saveTimer('bottle', null);
 });
 
+// ===== Focus Mode Logic =====
+function enterFocusMode(type) {
+  activeFocusMode = type;
+  focusOverlay.classList.add('active');
+  focusOverlay.setAttribute('aria-hidden', 'false');
+  
+  let icon = '⏱️';
+  let label = 'Activité';
+  let meta = '';
+  let initialSeconds = 0;
+
+  if (type === 'breast') {
+    icon = '🤱';
+    label = 'Tétée';
+    meta = `Sein ${breastSide}`;
+    initialSeconds = timer;
+  } else if (type === 'bottle') {
+    icon = '🍼';
+    label = 'Biberon';
+    meta = bottleType === 'maternal' ? 'Lait maternel' : 'Lait artificiel';
+    initialSeconds = bottleTimer;
+  } else if (type === 'sleep') {
+    icon = '💤';
+    label = 'Sommeil';
+    meta = 'Dodo en cours';
+    initialSeconds = sleepTimer;
+  } else if (type === 'pump') {
+    icon = '🌀';
+    label = 'Tirage';
+    meta = 'Tire-lait';
+    initialSeconds = pumpTimerSeconds;
+  }
+
+  focusIcon.textContent = icon;
+  focusLabel.textContent = label;
+  focusMeta.textContent = meta;
+  updateFocusDisplay(initialSeconds);
+}
+
+function exitFocusMode() {
+  activeFocusMode = null;
+  focusOverlay.classList.remove('active');
+  focusOverlay.setAttribute('aria-hidden', 'true');
+}
+
+function updateFocusDisplay(seconds) {
+  if (!focusTimerEl) return;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  
+  const mStr = String(m).padStart(2, '0');
+  const sStr = String(s).padStart(2, '0');
+  
+  focusTimerEl.textContent = h > 0 ? `${h}:${mStr}:${sStr}` : `${mStr}:${sStr}`;
+}
+
+$$('.btn-focus-toggle').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const type = e.target.dataset.focus;
+    enterFocusMode(type);
+  });
+});
+
+focusMinimizeBtn?.addEventListener('click', exitFocusMode);
+
+focusActionBtn?.addEventListener('click', () => {
+  exitFocusMode();
+  if (activeFocusMode === 'breast') {
+    startStopBtn?.click();
+  } else if (activeFocusMode === 'bottle') {
+    startStopBottleBtn?.click();
+  } else if (activeFocusMode === 'sleep') {
+    startStopSleepBtn?.click();
+  }
+});
+
 setFeedMode('breast');
 setBreastSide(breastSide);
 const savedTimer = store.get(TIMER_KEY, null);
@@ -4221,12 +4371,7 @@ if(bottlePendingDuration > 0){
   showBottlePrompt();
   bottleTimer = bottlePendingDuration;
   updateBottleChrono();
-  if(bottleStartTimeDisplay){
-    const h = String(Math.floor(bottlePendingDuration / 3600)).padStart(2, '0');
-    const m = String(Math.floor((bottlePendingDuration % 3600) / 60)).padStart(2, '0');
-    const s = String(bottlePendingDuration % 60).padStart(2, '0');
-    bottleStartTimeDisplay.textContent = `Durée : ${h}:${m}:${s}`;
-  }
+  updateBottleTimeSummary();
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
   if(bottleAmountInput){
     bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';

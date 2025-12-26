@@ -98,6 +98,260 @@
   .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
   .toggle-row:last-child { border-bottom: none; }
   .chart-type-selector { display: flex; gap: 8px; margin-top: 8px; }
+
+  /* --- Mobile UX Optimizations --- */
+  :root {
+    --gap-stack: 12px;
+    --container-padding: 16px;
+    --safe-top: env(safe-area-inset-top, 20px);
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Prevent bounce on iOS if content fits */
+    overscroll-behavior-y: none; 
+  }
+
+  #app-container {
+    /* Use safe area for top padding, plus a bit of breathing room */
+    padding-top: max(var(--safe-top), 12px);
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+    padding-bottom: 80px; /* Space for potential bottom nav or just scroll clearance */
+    gap: var(--gap-stack);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  /* Compact Header */
+  .title-bar {
+    margin-bottom: 0;
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .title-bar h1 {
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+  }
+  .theme-toggle {
+    transform: scale(0.9);
+    transform-origin: right center;
+  }
+
+  /* Compact Profile Card */
+  #leo-card {
+    padding: 8px 12px;
+    border-radius: 16px;
+    min-height: auto;
+    margin-bottom: 4px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+  .dark-mode #leo-card {
+    background: rgba(30,30,30,0.6);
+  }
+  #avatar-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+  .leo-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  #leo-summary-info {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  /* Optimized Action Grid */
+  .primary-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .primary-actions .btn {
+    padding: 10px 12px;
+    height: auto;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .primary-actions .btn-icon {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  /* Compact Dashboard Summaries */
+  .report-line {
+    padding: 10px 14px;
+    margin: 0;
+    border-radius: 14px;
+    font-size: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    background: var(--bg-card, rgba(255,255,255,0.65));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .dark-mode .report-line {
+    background: rgba(40,40,40,0.6);
+    border-color: rgba(255,255,255,0.05);
+  }
+  .report-line strong {
+    font-size: 0.9rem;
+    margin-right: auto;
+    color: var(--text-main);
+  }
+  .report-line span, .kpi-pill {
+    background: rgba(0,0,0,0.04);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .dark-mode .report-line span, .dark-mode .kpi-pill {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* History Section Tweaks */
+  .section-head {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    padding: 0 2px;
+  }
+  .history-item {
+    margin-bottom: 8px;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .history-item-foreground {
+    padding: 10px 14px;
+  }
+  .item-title {
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+  }
+  .item-meta {
+    font-size: 0.8rem;
+  }
+
+  /* Focus Mode Overlay */
+  .focus-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    color: #fff;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 24px;
+  }
+  .focus-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .focus-minimize-btn {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top));
+    right: 20px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .focus-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    width: 100%;
+    max-width: 400px;
+  }
+  .focus-icon { font-size: 4rem; }
+  .focus-label { font-size: 1.5rem; font-weight: 600; opacity: 0.8; margin: 0; }
+  .focus-timer { font-size: 5rem; font-weight: 200; font-variant-numeric: tabular-nums; line-height: 1; }
+  .focus-meta { font-size: 1.2rem; opacity: 0.6; }
+  .focus-action-btn {
+    width: 100%;
+    padding: 20px;
+    font-size: 1.2rem;
+    border-radius: 20px;
+    background: #ff3b30;
+    color: white;
+    border: none;
+    font-weight: 600;
+  }
+  .btn-focus-toggle {
+    background: transparent;
+    border: 1px solid currentColor;
+    color: inherit;
+    opacity: 0.6;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* Bottle Panel UX Improvements */
+  .bottle-time-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 12px;
+    margin: 8px 0 16px;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .bottle-time-summary:active { background: rgba(0,0,0,0.06); }
+  .bottle-time-summary .icon-edit { opacity: 0.5; font-size: 1.1em; }
+  
+  .bottle-details-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
+  .bottle-details-inner { min-height: 0; padding: 4px 2px; }
+  .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -212,6 +466,18 @@
     </div>
   </div>
 
+  <!-- Focus Overlay -->
+  <div id="focus-overlay" class="focus-overlay" aria-hidden="true">
+    <button class="focus-minimize-btn" id="focus-minimize-btn" aria-label="Réduire">✕</button>
+    <div class="focus-content">
+      <div class="focus-icon" id="focus-icon">⏱️</div>
+      <h2 class="focus-label" id="focus-label">Activité</h2>
+      <div class="focus-timer" id="focus-timer">00:00</div>
+      <div class="focus-meta" id="focus-meta"></div>
+      <button class="focus-action-btn" id="focus-action-btn">Arrêter</button>
+    </div>
+  </div>
+
     <div class="modal" id="modal-pump" aria-hidden="true">
       <div class="sheet stack">
         <div class="modal-header">
@@ -258,7 +524,7 @@
             <button id="side-right">Droite</button>
           </div>
           <div class="text-center">
-            <div class="time" id="chrono">00:00:00</div>
+            <div class="time-row"><div class="time" id="chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="breast" aria-label="Mode focus">⛶</button></div>
             <div id="start-time-display" class="muted"></div>
             <button class="btn btn-primary" id="startStop">Démarrer</button>
           </div>
@@ -267,18 +533,26 @@
         <!-- Biberón -->
         <div id="pane-biberon" class="stack">
           <div class="text-center">
-            <div class="time" id="bottle-chrono">00:00:00</div>
-            <div id="bottle-start-time-display" class="muted"></div>
+            <div class="time-row"><div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle" aria-label="Mode focus">⛶</button></div>
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
           </div>
-          <div class="form-grid">
-            <div class="field">
-              <label for="bottle-start">Début</label>
-              <input id="bottle-start" class="input" type="datetime-local" />
-            </div>
-            <div class="field">
-              <label for="bottle-end">Fin</label>
-              <input id="bottle-end" class="input" type="datetime-local" />
+
+          <!-- Summary / Edit Toggle -->
+          <div id="bottle-time-summary" class="bottle-time-summary" role="button" aria-expanded="false" aria-label="Modifier l'heure">
+            <span id="bottle-time-label">Aujourd'hui</span>
+            <span class="icon-edit">✏️</span>
+          </div>
+
+          <div id="bottle-details-wrapper" class="bottle-details-wrapper">
+            <div class="bottle-details-inner">
+              <div class="form-grid">
+                <div class="field"><label for="bottle-start">Début</label><input id="bottle-start" class="input" type="datetime-local" /></div>
+                <div class="field"><label for="bottle-end">Fin</label><input id="bottle-end" class="input" type="datetime-local" /></div>
+              </div>
+              <div class="bottle-edit-actions">
+                <button type="button" class="btn btn-ghost btn-compact" id="cancel-bottle-time">Annuler</button>
+                <button type="button" class="btn btn-ghost btn-compact btn-primary" id="confirm-bottle-time">OK</button>
+              </div>
             </div>
           </div>
           <div id="bottle-form" class="stack">
@@ -322,7 +596,7 @@
       </div>
       <div class="stack">
         <div class="text-center">
-          <div class="time" id="sleep-chrono">00:00:00</div>
+          <div class="time-row"><div class="time" id="sleep-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="sleep" aria-label="Mode focus">⛶</button></div>
           <div class="muted" id="sleep-start-time-display"></div>
           <button class="btn btn-primary" id="startStopSleep" type="button">Démarrer</button>
         </div>
