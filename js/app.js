@@ -4358,13 +4358,16 @@ $$('.btn-focus-toggle').forEach(btn => {
 focusMinimizeBtn?.addEventListener('click', exitFocusMode);
 
 focusActionBtn?.addEventListener('click', () => {
+  const mode = activeFocusMode;
   exitFocusMode();
-  if (activeFocusMode === 'breast') {
+  if (mode === 'breast') {
     startStopBtn?.click();
-  } else if (activeFocusMode === 'bottle') {
+  } else if (mode === 'bottle') {
     startStopBottleBtn?.click();
-  } else if (activeFocusMode === 'sleep') {
+  } else if (mode === 'sleep') {
     startStopSleepBtn?.click();
+  } else if (mode === 'pump') {
+    pumpControlBtn?.click();
   }
 });
 

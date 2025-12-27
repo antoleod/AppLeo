@@ -264,7 +264,10 @@
   .focus-overlay {
     position: fixed;
     inset: 0;
-    background: #000;
+    background-color: #000;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--hero-image);
+    background-position: center;
+    background-size: cover;
     color: #fff;
     z-index: 2000;
     display: flex;
@@ -341,7 +344,7 @@
     padding: 10px 16px;
     background: rgba(0,0,0,0.03);
     border-radius: 12px;
-    margin: 8px 0 16px;
+    margin: 2px 0;
     font-size: 0.95rem;
     color: var(--text-main);
     cursor: pointer;
@@ -358,8 +361,19 @@
     overflow: hidden;
   }
   .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
-  .bottle-details-inner { min-height: 0; padding: 4px 2px; }
+  .bottle-details-inner { min-height: 0; padding: 4px 2px; display: none; }
   .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+
+  /* Botón Guardar Biberón Destacado */
+  #save-biberon {
+    background-color: #ff9f0a; /* Naranja vibrante */
+    font-size: 1.2rem;
+    font-weight: 800;
+    padding: 16px;
+    margin-top: 16px;
+    box-shadow: 0 4px 15px rgba(255, 159, 10, 0.4);
+    border: none;
+  }
 
   /* Timeline View Enhancements */
   .list {
@@ -617,7 +631,7 @@
         <!-- Biberón -->
         <div id="pane-biberon" class="stack">
           <div class="text-center">
-            <div class="time-row"><div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle" aria-label="Mode focus">⛶</button></div>
+            <div class="time-row"><div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle" aria-label="Mode focus" style="display: none;">⛶</button></div>
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
           </div>
 
