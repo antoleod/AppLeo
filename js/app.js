@@ -1,4 +1,4 @@
-﻿// ===== Utilities =====
+﻿﻿// ===== Utilities =====
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const store = {
@@ -2173,7 +2173,7 @@ if (mesureTailleInput) {
 }
 
 quickAddBottleBtn?.addEventListener('click', () => {
-    const amount = prompt('Quantité (ml) prise ?');
+    const amount = prompt('Quantité (ml) prise ?', '120');
 
     if (amount) {
         const amountMl = parseFloat(amount.replace(',', '.'));
@@ -3383,7 +3383,7 @@ function tickBottleTimer(){
 }
 
 function beginBottleTimer(startTimestamp = Date.now(), persist = true){
-  hideBottlePrompt();
+  showBottlePrompt();
   bottleTimerStart = startTimestamp;
   if(bottleTimerInterval){
     clearInterval(bottleTimerInterval);
@@ -4017,6 +4017,7 @@ startStopSleepBtn?.addEventListener('click', async () => {
     }
     clearSleepPending();
     getPersistenceApi()?.saveTimer('sleep', { start: ts });
+    enterFocusMode('sleep');
   }
 });
 saveSleepBtn?.addEventListener('click', async () => {
@@ -4074,6 +4075,7 @@ startStopBtn?.addEventListener('click', async () => {
     setFeedMode('breast');
     beginTimer(Date.now(), true);
     getPersistenceApi()?.saveTimer('breast', { start: Date.now(), side: breastSide });
+    enterFocusMode('breast');
   }
 });
 
@@ -4111,10 +4113,12 @@ function toggleBottleDetails(forceOpen) {
   bottleTimeSummary.setAttribute('aria-expanded', shouldOpen);
   
   if (shouldOpen && bottleStartInput && !bottleStartInput.value) {
-    // Pre-fill with now if empty when opening
-    const now = new Date();
-    bottleStartInput.value = toDateTimeInputValue(now);
-    bottleEndInput.value = toDateTimeInputValue(now);
+    // Usar la hora de inicio real si el temporizador está corriendo
+    const start = bottleTimerStart ? new Date(bottleTimerStart) : new Date();
+    bottleStartInput.value = toDateTimeInputValue(start);
+    // Si corre, fin es ahora. Si no, fin = inicio (para edición rápida)
+    const end = bottleTimerStart ? new Date() : start;
+    bottleEndInput.value = toDateTimeInputValue(end);
   }
 }
 
@@ -4160,7 +4164,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
     updateBottleTimeSummary();
     bottlePendingDuration = elapsed;
     store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
-    const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '');
+    const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '120');
     const promptValue = window.prompt('Quantité (ml) prise ?', defaultPromptValue);
     if(promptValue !== null){
       const normalized = promptValue.replace(',', '.').trim();
@@ -4203,6 +4207,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
     beginBottleTimer(Date.now(), true);
     getPersistenceApi()?.saveTimer('bottle', { start: Date.now(), bottleType });
     updateBottleTimeSummary();
+    enterFocusMode('bottle');
   }
 });
 
@@ -4225,6 +4230,11 @@ saveBottleBtn?.addEventListener('click', async () => {
   bottlePendingAmount = amount;
   store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
 
+  // Si el temporizador está corriendo y no hay duración pendiente, calcularla ahora
+  if (bottleTimerStart && (!bottlePendingDuration || bottlePendingDuration === 0)) {
+    bottlePendingDuration = Math.max(1, Math.floor((Date.now() - bottleTimerStart) / 1000));
+  }
+
   let startISO = bottleTimerStart ? new Date(bottleTimerStart).toISOString() : undefined;
   let endISO = undefined;
   let durationSec = bottlePendingDuration;
@@ -4239,12 +4249,22 @@ saveBottleBtn?.addEventListener('click', async () => {
   }
 
   if (startISO && endISO) {
-    if (new Date(endISO) <= new Date(startISO)) {
+    // Permitir guardar si las horas son iguales (duración < 1 min)
+    if (new Date(endISO) < new Date(startISO)) {
       alert('L\'heure de fin doit être postérieure au début.');
       if(bottleEndInput) bottleEndInput.focus();
       return;
     }
-    durationSec = Math.round((new Date(endISO).getTime() - new Date(startISO).getTime()) / 1000);
+    const calculatedDuration = Math.round((new Date(endISO).getTime() - new Date(startISO).getTime()) / 1000);
+    
+    // Si los inputs dan 0 (mismo minuto) pero tenemos duración real del timer, usar esa
+    if (calculatedDuration === 0 && bottlePendingDuration > 0) {
+      durationSec = bottlePendingDuration;
+      // Recalcular endISO para incluir los segundos precisos
+      endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
+    } else {
+      durationSec = calculatedDuration;
+    }
   } else if (startISO && durationSec > 0) {
     endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
   }

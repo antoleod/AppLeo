@@ -358,7 +358,7 @@
     overflow: hidden;
   }
   .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
-  .bottle-details-inner { min-height: 0; padding: 4px 2px; display: none; }
+  .bottle-details-inner { min-height: 0; padding: 4px 2px; }
   .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
 
   /* Timeline View Enhancements */
@@ -622,7 +622,7 @@
           </div>
 
           <!-- Summary / Edit Toggle -->
-          <div id="bottle-time-summary" class="bottle-time-summary" role="button" aria-expanded="false" aria-label="Modifier l'heure">
+          <div id="bottle-time-summary" class="bottle-time-summary" role="button" tabindex="0" aria-expanded="false" aria-label="Modifier l'heure">
             <span id="bottle-time-label">Aujourd'hui</span>
             <span class="icon-edit">✏️</span>
           </div>
