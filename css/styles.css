@@ -656,7 +656,7 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 }
 .range-option-item:hover { background: rgba(255,255,255,.08); }
 .range-option-item.active { background: rgba(10, 132, 255, 0.2); color: #fff; }
-.stack{display:grid;gap:clamp(18px,5vw,28px)}
+.stack{display:grid}
 .list{display:grid;gap:clamp(12px,4vw,18px)}
 .history-day-header {
   font-size: 14px;
