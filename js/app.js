@@ -4232,25 +4232,8 @@ startStopBottleBtn?.addEventListener('click', async () => {
     updateBottleTimeSummary();
     bottlePendingDuration = elapsed;
     store.set(BOTTLE_PENDING_KEY, bottlePendingDuration);
-    const defaultPromptValue = (bottleAmountInput?.value?.trim() || (bottlePendingAmount != null ? String(bottlePendingAmount) : '') || '120');
-    const promptValue = window.prompt('Quantité (ml) prise ?', defaultPromptValue);
-    if(promptValue !== null){
-      const normalized = promptValue.replace(',', '.').trim();
-      if(normalized === ''){
-        bottlePendingAmount = null;
-        store.remove(BOTTLE_AMOUNT_KEY);
-      }else{
-        const parsed = parseFloat(normalized);
-        if(Number.isFinite(parsed) && parsed > 0){
-          bottlePendingAmount = parsed;
-          store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
-        }else{
-          alert('Veuillez saisir une quantité valide en ml.');
-          bottlePendingAmount = null;
-          store.remove(BOTTLE_AMOUNT_KEY);
-        }
-      }
-    }
+    // UX Improvement: Removed blocking window.prompt.
+    // The user can now adjust the amount in the inline form which is already visible or will be shown below.
     showBottlePrompt();
     if (saveBottleBtn) {
         saveBottleBtn.classList.add('save-biberon');
@@ -4262,6 +4245,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
       bottleAmountInput.value = bottlePendingAmount != null ? String(bottlePendingAmount) : '';
       bottleAmountInput.placeholder = 'ex. 120';
       handleBottleAmountInputChange();
+      // Auto-focus amount for immediate entry if needed, but prevent scroll jump if possible
       bottleAmountInput.focus({ preventScroll: false });
     }
   }else{
@@ -4971,7 +4955,11 @@ function saveManualEntry() {
   updateState(currentData => {
     if (targetType === 'feed') {
       const sourceValue = (manualSource?.value || 'breast') === 'bottle' ? 'bottle' : 'breast';
-      entry = { id: isEdit ? editingEntry.id : Date.now()+'', dateISO: date.toISOString(), source: sourceValue };
+      // UX Fix: Merge with existing entry to preserve duration/start times if not editing them directly
+      entry = isEdit ? { ...editingEntry } : { id: Date.now()+'', source: sourceValue };
+      entry.dateISO = date.toISOString();
+      entry.source = sourceValue;
+
       if (sourceValue === 'breast') {
         const mins = Math.max(0, Number(manualDuration?.value || 0));
         entry.durationSec = Math.round(mins * 60);
@@ -4995,13 +4983,12 @@ function saveManualEntry() {
         reason = 'Manual feed entry';
       }
     } else if (targetType === 'elim') {
-      entry = {
-        id: isEdit ? editingEntry.id : Date.now()+'',
-        dateISO: date.toISOString(),
-        pee: clamp(Number(manualPee?.value || 0), 0, 3),
-        poop: clamp(Number(manualPoop?.value || 0), 0, 3),
-        vomit: clamp(Number(manualVomit?.value || 0), 0, 3)
-      };
+      entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
+      entry.dateISO = date.toISOString();
+      entry.pee = clamp(Number(manualPee?.value || 0), 0, 3);
+      entry.poop = clamp(Number(manualPoop?.value || 0), 0, 3);
+      entry.vomit = clamp(Number(manualVomit?.value || 0), 0, 3);
+
       const notes = manualElimNotes?.value?.trim();
       if (notes) entry.notes = notes;
 
@@ -5028,7 +5015,10 @@ function saveManualEntry() {
     }
     const dose = (manualMedDose?.value || '').trim();
     const notes = (manualMedNotes?.value || '').trim();
-    entry = { id: isEdit ? editingEntry.id : Date.now()+'', dateISO: date.toISOString(), name, medKey: selection };
+    entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
+    entry.dateISO = date.toISOString();
+    entry.name = name;
+    entry.medKey = selection;
     if (dose) entry.dose = dose;
     if (notes) entry.notes = notes;
 
@@ -5050,7 +5040,8 @@ function saveManualEntry() {
         throw new Error("At least one measurement is required");
       }
 
-      entry = { id: isEdit ? editingEntry.id : Date.now() + '', dateISO: date.toISOString() };
+      entry = isEdit ? { ...editingEntry } : { id: Date.now() + '' };
+      entry.dateISO = date.toISOString();
       if (temp !== null) entry.temp = temp;
       if (weight !== null) entry.weight = weight;
       if (height !== null) entry.height = height;
@@ -5070,13 +5061,12 @@ function saveManualEntry() {
       const endTs = date.getTime();
       const startTs = endTs - (durationSec * 1000);
 
-      entry = {
-        id: isEdit ? editingEntry.id : Date.now()+'',
-        dateISO: date.toISOString(),
-        startISO: new Date(startTs).toISOString(),
-        endISO: date.toISOString(),
-        durationSec
-      };
+      entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
+      entry.dateISO = date.toISOString();
+      entry.startISO = new Date(startTs).toISOString();
+      entry.endISO = date.toISOString();
+      entry.durationSec = durationSec;
+
       if(amount > 0) entry.amountMl = amount;
       const notes = manualPumpNotes?.value?.trim();
       if(notes) entry.notes = notes;
