@@ -3575,6 +3575,7 @@ async function handleStartStopSleepAction() {
     const startedAt = sleepTimerStart;
     const elapsed = Math.max(1, Math.floor((Date.now() - sleepTimerStart) / 1000));
     stopSleepTimer({ resetDisplay: false });
+    getPersistenceApi()?.saveTimer('sleep', null);
     
     renderSleepUI('manual');
     
@@ -4496,6 +4497,7 @@ startStopBottleBtn?.addEventListener('click', async () => {
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
     const endTs = Date.now();
     stopBottleTimerWithoutSaving({ resetDisplay: false });
+    getPersistenceApi()?.saveTimer('bottle', null);
     bottleTimer = elapsed;
     updateBottleChrono();
     
