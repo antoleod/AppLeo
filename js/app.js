@@ -4823,6 +4823,54 @@ $('#save-elim')?.addEventListener('click', async () => {
 
 
 // ===== Medications modal logic =====
+const KNOWN_MEDS_KEY = 'knownMeds';
+const DEFAULT_MEDS = ['Ibufrone', 'Dalfalgan'];
+
+function getKnownMeds() {
+  return store.get(KNOWN_MEDS_KEY, DEFAULT_MEDS);
+}
+
+function learnNewMed(name) {
+  if (!name) return;
+  const list = getKnownMeds();
+  const normalized = name.trim();
+  // Evitar duplicados (case-insensitive)
+  if (!list.some(m => m.toLowerCase() === normalized.toLowerCase())) {
+    list.push(normalized);
+    store.set(KNOWN_MEDS_KEY, list);
+  }
+}
+
+function renderMedicationOptions(selectEl, selectedValue = null) {
+  if (!selectEl) return;
+  const list = getKnownMeds();
+  selectEl.innerHTML = '';
+  
+  // Opción por defecto si no hay selección
+  if (!selectedValue) {
+    const def = document.createElement('option');
+    def.text = '-- Choisir --';
+    def.value = '';
+    selectEl.appendChild(def);
+  }
+
+  list.forEach(med => {
+    const opt = document.createElement('option');
+    opt.value = med;
+    opt.textContent = med;
+    if (selectedValue && med.toLowerCase() === selectedValue.toLowerCase()) {
+      opt.selected = true;
+    }
+    selectEl.appendChild(opt);
+  });
+
+  const other = document.createElement('option');
+  other.value = 'other';
+  other.textContent = 'Autre / Nouveau...';
+  if (selectedValue === 'other') other.selected = true;
+  selectEl.appendChild(other);
+}
+
 function setupMedicationModal(){
   const medsBtn = $('#btn-med');
   const medSelect = $('#medication-select');
@@ -4845,7 +4893,6 @@ function setupMedicationModal(){
   };
 
   const resetMedForm = () => {
-    if(medSelect) medSelect.value = 'ibufrone';
     updateMedOtherField();
     if(medOtherInput) medOtherInput.value = '';
   };
@@ -4854,12 +4901,8 @@ function setupMedicationModal(){
 
   const saveMedication = () => { triggerVibration();
     if(!medSelect) return;
-    const selection = medSelect.value || 'ibufrone';
-    const labels = {
-      ibufrone: 'Ibufrone',
-      dalfalgan: 'Dalfalgan'
-    };
-    let name = labels[selection] || selection;
+    const selection = medSelect.value;
+    let name = selection;
     if(selection === 'other'){
       name = (medOtherInput?.value || '').trim();
       if(!name){
@@ -4867,12 +4910,13 @@ function setupMedicationModal(){
         medOtherInput?.focus();
         return;
       }
+      learnNewMed(name); // FASE 3: Aprender nuevo medicamento
     }
     const entry = {
       id: Date.now()+'',
       dateISO: new Date().toISOString(),
       name,
-      medKey: selection
+      medKey: selection === 'other' ? 'other' : name // Usar nombre como key para los conocidos
     };
     updateState(currentData => {
       currentData.meds.push(entry);
@@ -4891,6 +4935,12 @@ function setupMedicationModal(){
 
   const openMedModal = () => {
     resetMedForm();
+    // FASE 3: Sugerir automáticamente el último usado
+    const lastMed = state.meds.length > 0 ? state.meds[state.meds.length - 1] : null;
+    const suggestion = lastMed ? (lastMed.medKey === 'other' ? 'other' : lastMed.name) : null;
+    
+    renderMedicationOptions(medSelect, suggestion);
+    updateMedOtherField(); // Actualizar visibilidad del campo 'otro' basado en la sugerencia
     updateMedSummary();
     openModal('#modal-med');
   };
@@ -5206,22 +5256,15 @@ function populateManualForm(type, entry){
     if(manualElimNotes) manualElimNotes.value = entry.notes || '';
   }else if(type === 'med'){
     let selection = entry.medKey || 'other';
-    const allowed = new Set(['ibufrone','dalfalgan','other']);
-    if(!allowed.has(selection)){
-      selection = 'other';
-    }
-    if(manualMedSelect){
-      manualMedSelect.value = selection;
+    // Renderizar opciones antes de asignar valor para asegurar que el medicamento existe en la lista
+    if(manualMedSelect) {
+      renderMedicationOptions(manualMedSelect, selection);
     }
     updateManualMedFields();
     if(selection === 'other'){
       if(manualMedOtherInput) manualMedOtherInput.value = entry.name || '';
     }else if(manualMedOtherInput){
       manualMedOtherInput.value = '';
-    }
-    if(selection !== 'other' && !entry.name){
-      const labels = {ibufrone:'Ibufrone', dalfalgan:'Dalfalgan'};
-      entry.name = labels[selection];
     }
     if(manualMedDose) manualMedDose.value = entry.dose || '';
     if(manualMedNotes) manualMedNotes.value = entry.notes || '';
@@ -5245,6 +5288,12 @@ function openManualModal({mode='create', type='feed', entry=null} = {}){
   setManualType(effectiveType);
   if(isEdit && entry){
     populateManualForm(type, entry);
+  } else if (effectiveType === 'med') {
+    // FASE 3: Sugerir también en modo manual si es creación
+    const lastMed = state.meds.length > 0 ? state.meds[state.meds.length - 1] : null;
+    const suggestion = lastMed ? (lastMed.medKey === 'other' ? 'other' : lastMed.name) : null;
+    if(manualMedSelect) renderMedicationOptions(manualMedSelect, suggestion);
+    updateManualMedFields();
   }
   if(!isEdit && manualDatetime){
     manualDatetime.value = formatDateInput(new Date());
@@ -5376,23 +5425,22 @@ function saveManualEntry() {
         reason = 'Manual elimination entry';
       }
     } else if (targetType === 'med') {
-    let selection = manualMedSelect?.value || 'ibufrone';
-    const labels = {ibufrone:'Ibufrone', dalfalgan:'Dalfalgan', other:''};
-    if(!labels[selection]) selection = 'other';
-    let name = labels[selection] || selection;
+    let selection = manualMedSelect?.value;
+    let name = selection;
     if(selection === 'other'){
       name = (manualMedOtherInput?.value || '').trim();
       if(!name){
         manualMedOtherInput?.focus();
         throw new Error("Veuillez indiquer le nom du médicament.");
       }
+      learnNewMed(name); // FASE 3: Aprender nuevo medicamento en modo manual
     }
     const dose = (manualMedDose?.value || '').trim();
     const notes = (manualMedNotes?.value || '').trim();
     entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
     entry.dateISO = dateISO;
     entry.name = name;
-    entry.medKey = selection;
+    entry.medKey = selection === 'other' ? 'other' : name;
     if (dose) entry.dose = dose;
     if (notes) entry.notes = notes;
 
