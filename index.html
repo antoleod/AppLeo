@@ -464,6 +464,10 @@
   .dark-mode .history-day-header::before {
     box-shadow: 0 0 0 4px #000;
   }
+
+  .pump-confirm-panel {
+    box-shadow: 0 16px 48px -4px rgba(0, 0, 0, 0.25);
+  }
 </style>
 </head>
 <body>
@@ -597,19 +601,50 @@
           <button class="btn btn-ghost btn-compact btn-danger" id="close-pump" type="button">Fermer</button>
         </div>
         <section class="pump-card" id="pump-card" aria-labelledby="pump-card-title">
-          <div class="pump-card-head">
-            <div>
-              <p class="pump-label" id="pump-card-title">Tirage du lait</p>
-              <p class="pump-hint">Appuyez pour démarrer ou mettre en pause · Maintenez pour réinitialiser</p>
-            </div>
-            <span class="pump-icon" id="pump-icon" aria-hidden="true">🌀</span>
-          </div>
-          <div class="pump-display" aria-live="polite">
-            <span class="pump-timer" id="pump-timer">00:00</span>
-            <span class="pump-status" id="pump-status">Prête</span>
-          </div>
-          <button class="btn btn-pump btn-heartbeat" id="pump-control" type="button">Commencer le tirage</button>
-        </section>
+  <div class="pump-card-head">
+    <div>
+      <p class="pump-label" id="pump-card-title">Tirer mon lait</p>
+    </div>
+    <span class="pump-icon" id="pump-icon" aria-hidden="true">Léo</span>
+  </div>
+
+  <div class="pump-display" aria-live="polite">
+    <span class="pump-timer" id="pump-timer">00:00</span>
+  </div>
+
+  <button class="btn btn-pump btn-heartbeat" id="pump-control" type="button">Démarrer</button>
+
+  <div class="pump-confirm-panel" id="pump-confirm-panel" aria-live="polite">
+    <div class="pump-confirm-row">
+      <span class="pump-confirm-label">Durée</span>
+      <span class="pump-confirm-value" id="pump-confirm-duration">00:00</span>
+    </div>
+    <div class="pump-confirm-row">
+      <span class="pump-confirm-label">Lait</span>
+      <div class="pump-stepper" role="group" aria-label="Quantité en ml">
+        <button type="button" class="pump-step-btn" id="pump-amount-down" aria-label="Moins">-</button>
+        <span class="pump-amount-value" id="pump-amount-value">160 ml</span>
+        <button type="button" class="pump-step-btn" id="pump-amount-up" aria-label="Plus">+</button>
+      </div>
+    </div>
+    <div class="pump-confirm-actions">
+      <button class="btn btn-primary pump-save" id="pump-save-intent" type="button">Enregistrer</button>
+      <button class="btn btn-ghost pump-cancel" id="pump-cancel-intent" type="button">Annuler</button>
+    </div>
+  </div>
+</section>
+    </div>
+  </div>
+
+    <div class="micro-modal" id="pump-confirm-modal" aria-hidden="true">
+      <div class="micro-modal-sheet">
+        <p class="micro-modal-title" id="pump-confirm-title">Enregistrer ?</p>
+        <p class="micro-modal-line" id="pump-confirm-amount">Lait : 160 ml</p>
+        <p class="micro-modal-line" id="pump-confirm-time">Durée : 00:00</p>
+        <div class="micro-modal-actions">
+          <button class="btn btn-primary" id="pump-confirm-yes" type="button">Oui, enregistrer</button>
+          <button class="btn btn-ghost" id="pump-confirm-adjust" type="button">Ajuster</button>
+        </div>
       </div>
     </div>
 
@@ -840,6 +875,7 @@
         <button data-type="elim" type="button"><span class="btn-icon">🚼</span> Couche</button>
         <button data-type="med" type="button"><span class="btn-icon">💊</span> Médicaments</button>
         <button data-type="measurement" type="button"><span class="btn-icon">🌡️</span> Mesures</button>
+        <button data-type="pump" type="button"><span class="btn-icon">🌀</span> Tire-lait</button>
       </div>
 
       <div class="stack form-grid" id="manual-feed-fields">
@@ -940,6 +976,21 @@
         <div class="field">
           <label for="manual-mesure-taille">Taille (cm)</label>
           <input id="manual-mesure-taille" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 55.5" />
+        </div>
+      </div>
+
+      <div class="stack form-grid is-hidden" id="manual-pump-fields">
+        <div class="field">
+          <label for="manual-pump-duration">Durée (minutes)</label>
+          <input id="manual-pump-duration" class="input" type="text" inputmode="numeric" min="0" step="1" placeholder="ex. 15" />
+        </div>
+        <div class="field">
+          <label for="manual-pump-amount">Quantité (ml)</label>
+          <input id="manual-pump-amount" class="input" type="number" inputmode="decimal" min="0" step="10" placeholder="ex. 120" />
+        </div>
+        <div class="field span-2">
+          <label for="manual-pump-notes">Notes</label>
+          <textarea id="manual-pump-notes" class="input textarea" rows="2" placeholder="Observations..."></textarea>
         </div>
       </div>
 

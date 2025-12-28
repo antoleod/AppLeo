@@ -1,4 +1,4 @@
-﻿﻿// ===== Utilities =====
+﻿// ===== Utilities =====
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 const store = {
@@ -526,12 +526,28 @@ const manualMesuresFields = $('#manual-mesures-fields');
 const manualMesureTemp = $('#manual-mesure-temp');
 const manualMesurePoids = $('#manual-mesure-poids');
 const manualMesureTaille = $('#manual-mesure-taille');
+const manualPumpFields = $('#manual-pump-fields');
+const manualPumpDuration = $('#manual-pump-duration');
+const manualPumpAmount = $('#manual-pump-amount');
+const manualPumpNotes = $('#manual-pump-notes');
 const quickAddBottleBtn = $('#quick-add-bottle');
 const pumpCard = $('#pump-card');
 const pumpTimerEl = $('#pump-timer');
 const pumpStatusEl = $('#pump-status');
 const pumpControlBtn = $('#pump-control');
 const pumpIcon = $('#pump-icon');
+const pumpConfirmPanel = $('#pump-confirm-panel');
+const pumpConfirmDuration = $('#pump-confirm-duration');
+const pumpAmountValueEl = $('#pump-amount-value');
+const pumpAmountDownBtn = $('#pump-amount-down');
+const pumpAmountUpBtn = $('#pump-amount-up');
+const pumpSaveIntentBtn = $('#pump-save-intent');
+const pumpCancelIntentBtn = $('#pump-cancel-intent');
+const pumpConfirmModal = $('#pump-confirm-modal');
+const pumpConfirmAmount = $('#pump-confirm-amount');
+const pumpConfirmTime = $('#pump-confirm-time');
+const pumpConfirmYesBtn = $('#pump-confirm-yes');
+const pumpConfirmAdjustBtn = $('#pump-confirm-adjust');
 const btnPump = $('#btn-pump');
 const closePumpBtn = $('#close-pump');
 const btnSleep = $('#btn-sleep');
@@ -634,6 +650,10 @@ const TIMER_KEY = 'timerState';
 const BOTTLE_TIMER_KEY = 'bottleTimerState';
 const BOTTLE_PENDING_KEY = 'bottlePendingDuration';
 const BOTTLE_AMOUNT_KEY = 'bottlePendingAmount';
+const PUMP_AMOUNT_PREF_KEY = 'pumpAmountPref';
+const PUMP_AMOUNT_STEP = 10;
+const PUMP_AMOUNT_MIN = 0;
+const PUMP_AMOUNT_MAX = 600;
 
 const BOTTLE_TYPE_PREF_KEY = 'bottleTypePreference';
 const BOTTLE_PENDING_START_KEY = 'bottlePendingStart';
@@ -672,11 +692,10 @@ let pumpTimerSeconds = 0;
 let pumpTimerStart = null;
 let pumpTimerInterval = null;
 let pumpState = 'idle';
-let pumpLongPressTimer = null;
-let pumpLongPressHandled = false;
 let pumpMilestoneTwentyReached = false;
 let pumpMilestoneThirtyReached = false;
 let pumpSessionStart = null;
+let pumpAmountValue = clamp(Number(store.get(PUMP_AMOUNT_PREF_KEY, '160')) || 160, PUMP_AMOUNT_MIN, PUMP_AMOUNT_MAX);
 let isDeleteMode = false;
 let activeFocusMode = null; // 'breast', 'bottle', 'sleep', 'pump'
 
@@ -2065,7 +2084,8 @@ function renderHistory(){
           const durationSeconds = Number.isFinite(row.item.durationSec)
             ? row.item.durationSec
             : Math.max(0, ((Date.parse(row.item.endISO) || 0) - (Date.parse(row.item.startISO) || 0)) / 1000);
-          title = `🌀 Tirage ${formatDuration(durationSeconds)}`;
+          const amountLabel = row.item.amountMl ? ` · ${row.item.amountMl} ml` : '';
+          title = `🌀 Tirage ${formatDuration(durationSeconds)}${amountLabel}`;
         }
         const metaHtml = [`<span class="item-meta-time">${escapeHtml(dateString)}</span>`];
         if(row.type === 'med' && row.item.medKey){
@@ -2105,19 +2125,11 @@ function renderHistory(){
 
         const editBtn = itemContainer.querySelector('.item-edit');
         if(editBtn){
-          if(row.type === 'pump'){
-            editBtn.dataset.id = '';
-            editBtn.dataset.type = '';
-            editBtn.style.display = 'none';
-            editBtn.setAttribute('aria-hidden','true');
-            editBtn.tabIndex = -1;
-          }else{
-            editBtn.style.display = '';
-            editBtn.removeAttribute('aria-hidden');
-            editBtn.tabIndex = 0;
-            editBtn.dataset.id = row.item.id;
-            editBtn.dataset.type = row.type;
-          }
+          editBtn.style.display = '';
+          editBtn.removeAttribute('aria-hidden');
+          editBtn.tabIndex = 0;
+          editBtn.dataset.id = row.item.id;
+          editBtn.dataset.type = row.type;
         }
         itemContainer.querySelector('.item-delete').dataset.id = row.item.id;
         itemContainer.querySelector('.item-delete').dataset.type = row.type;
@@ -2955,6 +2967,22 @@ function updateBottleChrono(){
 }
 updateBottleChrono();
 
+function updatePumpAmountDisplay(){
+  if(pumpAmountValueEl){
+    pumpAmountValueEl.textContent = `${pumpAmountValue} ml`;
+  }
+}
+
+function setPumpAmount(value){
+  pumpAmountValue = clamp(Math.round(value), PUMP_AMOUNT_MIN, PUMP_AMOUNT_MAX);
+  store.set(PUMP_AMOUNT_PREF_KEY, pumpAmountValue);
+  updatePumpAmountDisplay();
+}
+
+function adjustPumpAmount(delta){
+  setPumpAmount(pumpAmountValue + delta);
+}
+
 function formatPumpTimer(seconds){
   const total = Math.max(0, Math.floor(Number(seconds) || 0));
   const minutes = Math.floor(total / 60);
@@ -2972,23 +3000,68 @@ function updatePumpUI(){
   if(pumpTimerEl){
     pumpTimerEl.textContent = formatPumpTimer(pumpTimerSeconds);
   }
+  const isRunning = pumpState === 'running';
+  const isPaused = pumpState === 'paused' && pumpTimerSeconds > 0;
   if(pumpControlBtn){
-    let label = 'Commencer le tirage';
-    if(pumpState === 'running'){
-      label = 'Mettre en pause';
-    }else if(pumpState === 'paused' && pumpTimerSeconds > 0){
+    let label = 'Démarrer';
+    if(isRunning){
+      label = 'Pause';
+    }else if(isPaused){
       label = 'Reprendre';
     }
     pumpControlBtn.textContent = label;
+    pumpControlBtn.classList.toggle('state-stop', isRunning);
+    pumpControlBtn.classList.toggle('state-resume', isPaused);
+    pumpControlBtn.classList.toggle('state-start', !isRunning && !isPaused);
+  }
+  if(pumpIcon){
+    pumpIcon.classList.toggle('is-running', isRunning);
+    pumpIcon.classList.toggle('is-paused', isPaused);
+    if(isPaused){
+      if(pumpIcon.textContent !== 'Leo'){
+        pumpIcon.dataset.og = pumpIcon.textContent;
+        pumpIcon.textContent = 'Leo';
+      }
+    } else if(pumpIcon.dataset.og && pumpIcon.textContent === 'Leo'){
+      pumpIcon.textContent = pumpIcon.dataset.og;
+    }
   }
   if(pumpCard){
-    pumpCard.classList.toggle('is-running', pumpState === 'running');
-    pumpCard.classList.toggle('is-paused', pumpState === 'paused');
+    pumpCard.classList.toggle('is-running', isRunning);
+    pumpCard.classList.toggle('is-paused', isPaused);
     pumpCard.classList.toggle('is-alert-20', pumpMilestoneTwentyReached);
     pumpCard.classList.toggle('is-alert-30', pumpMilestoneThirtyReached);
   }
+  if(pumpConfirmPanel){
+    const shouldShow = isPaused;
+    pumpConfirmPanel.classList.toggle('is-visible', shouldShow);
+    if(shouldShow && pumpConfirmDuration){
+      pumpConfirmDuration.textContent = formatPumpTimer(pumpTimerSeconds);
+    }
+  }
 }
 updatePumpUI();
+updatePumpAmountDisplay();
+
+function openPumpConfirmModal(){
+  if(pumpConfirmAmount){
+    pumpConfirmAmount.textContent = `Lait : ${pumpAmountValue} ml`;
+  }
+  if(pumpConfirmTime){
+    pumpConfirmTime.textContent = `Durée : ${formatPumpTimer(pumpTimerSeconds)}`;
+  }
+  if(pumpConfirmModal){
+    pumpConfirmModal.classList.add('open');
+    pumpConfirmModal.setAttribute('aria-hidden', 'false');
+  }
+}
+
+function closePumpConfirmModal(){
+  if(pumpConfirmModal){
+    pumpConfirmModal.classList.remove('open');
+    pumpConfirmModal.setAttribute('aria-hidden', 'true');
+  }
+}
 
 function handlePumpMilestones(seconds){
   if(seconds >= 1200 && !pumpMilestoneTwentyReached){
@@ -3007,7 +3080,7 @@ function handlePumpMilestones(seconds){
 
 function startPumpSession(){
   pumpState = 'running';
-  setPumpStatus('Tirage en cours');
+  closePumpConfirmModal();
   if(!Number.isFinite(pumpSessionStart)){
     pumpSessionStart = Date.now() - pumpTimerSeconds * 1000;
   }
@@ -3029,7 +3102,6 @@ function pausePumpSession(){
   }
   pumpTimerStart = null;
   pumpState = 'paused';
-  setPumpStatus('En pause — appuyez pour reprendre');
   updatePumpUI();
 }
 
@@ -3047,6 +3119,11 @@ function resetPumpSession({ silentStatus = false } = {}){
   if(!silentStatus){
     setPumpStatus('Prête');
   }
+  closePumpConfirmModal();
+  if(pumpConfirmPanel){
+    pumpConfirmPanel.classList.remove('is-visible');
+  }
+  updatePumpAmountDisplay();
   updatePumpUI();
 }
 
@@ -3063,9 +3140,6 @@ function tickPumpTimer(){
 function togglePumpSession(){
   if(pumpState === 'running'){
     pausePumpSession();
-    if(pumpTimerSeconds > 0){
-      completePumpSession({ reason: 'Tirage (chrono)' });
-    }
   }else{
     startPumpSession();
   }
@@ -3110,7 +3184,7 @@ async function persistPumpEntry(entry, reason){
   }
 }
 
-async function completePumpSession({ reason = 'Tirage auto' } = {}){
+async function completePumpSession({ reason = 'Tirage confirmé' } = {}){
   const duration = pumpTimerSeconds;
   if(!Number.isFinite(duration) || duration <= 0){
     resetPumpSession();
@@ -3120,41 +3194,23 @@ async function completePumpSession({ reason = 'Tirage auto' } = {}){
     ? pumpSessionStart
     : (Number.isFinite(pumpTimerStart) ? pumpTimerStart : Date.now() - duration * 1000);
   const entry = buildPumpEntry(startTs, duration);
+
+  if(entry){
+    entry.amountMl = pumpAmountValue;
+    store.set(PUMP_AMOUNT_PREF_KEY, pumpAmountValue);
+  }
+
   resetPumpSession({ silentStatus: true });
+  closePumpConfirmModal();
   if(!entry){
     setPumpStatus('Prête');
     return;
   }
   upsertPumpEntry(entry);
   await persistPumpEntry(entry, reason);
-  setPumpStatus('Tirage enregistré');
-  setTimeout(() => setPumpStatus('Prête'), 1800);
-}
-
-function beginPumpLongPress(event){
-  if(event && event.pointerType === 'mouse' && event.button !== 0){
-    return;
-  }
-  pumpLongPressHandled = false;
-  if(pumpLongPressTimer){
-    clearTimeout(pumpLongPressTimer);
-  }
-  pumpLongPressTimer = setTimeout(() => {
-    pumpLongPressHandled = true;
-    pumpLongPressTimer = null;
-    completePumpSession({ reason: 'Tirage réinitialisé' }).finally(() => {
-      triggerVibration(80);
-      pumpCard?.classList.add('just-reset');
-      setTimeout(() => pumpCard?.classList.remove('just-reset'), 600);
-    });
-  }, 1100);
-}
-
-function cancelPumpLongPress(){
-  if(pumpLongPressTimer){
-    clearTimeout(pumpLongPressTimer);
-    pumpLongPressTimer = null;
-  }
+  triggerVibration(60);
+  setPumpStatus('Enregistré');
+  setTimeout(() => setPumpStatus('Prête'), 1500);
 }
 
 // Pump card is shown inside modal, no inline toggling.
@@ -3971,20 +4027,32 @@ bottleIncreaseBtn?.addEventListener('click', () => {
   adjustBottleAmount(BOTTLE_STEP_ML);
   triggerVibration(30);
 });
-pumpControlBtn?.addEventListener('pointerdown', beginPumpLongPress);
-pumpControlBtn?.addEventListener('pointerup', cancelPumpLongPress);
-pumpControlBtn?.addEventListener('pointerleave', cancelPumpLongPress);
-pumpControlBtn?.addEventListener('pointercancel', cancelPumpLongPress);
-pumpControlBtn?.addEventListener('click', event => {
-  if(pumpLongPressHandled){
-    pumpLongPressHandled = false;
-    event?.preventDefault();
-    return;
-  }
-  togglePumpSession();
+pumpControlBtn?.addEventListener('click', () => togglePumpSession());
+pumpAmountDownBtn?.addEventListener('click', () => {
+  adjustPumpAmount(-PUMP_AMOUNT_STEP);
+  triggerVibration(20);
+});
+pumpAmountUpBtn?.addEventListener('click', () => {
+  adjustPumpAmount(PUMP_AMOUNT_STEP);
+  triggerVibration(20);
+});
+pumpSaveIntentBtn?.addEventListener('click', () => {
+  openPumpConfirmModal();
+});
+pumpCancelIntentBtn?.addEventListener('click', () => {
+  resetPumpSession();
+});
+pumpConfirmYesBtn?.addEventListener('click', async () => {
+  await completePumpSession({ reason: 'Tirage confirmé' });
+});
+pumpConfirmAdjustBtn?.addEventListener('click', () => {
+  closePumpConfirmModal();
 });
 btnPump?.addEventListener('click', () => openModal('#modal-pump'));
-closePumpBtn?.addEventListener('click', () => closeModal('#modal-pump'));
+closePumpBtn?.addEventListener('click', () => {
+  resetPumpSession();
+  closeModal('#modal-pump');
+});
 btnSleep?.addEventListener('click', () => openSleepModal());
 closeSleepBtn?.addEventListener('click', () => closeSleepModal());
 cancelSleepBtn?.addEventListener('click', () => {
@@ -4648,6 +4716,7 @@ function setManualType(type){
   manualElimFields?.classList?.toggle('is-hidden', type !== 'elim');
   manualMedFields?.classList?.toggle('is-hidden', type !== 'med');
   manualMesuresFields?.classList?.toggle('is-hidden', type !== 'measurement');
+  manualPumpFields?.classList?.toggle('is-hidden', type !== 'pump');
   if(type === 'feed') updateManualSourceFields();
   if(type === 'med') updateManualMedFields();
 }
@@ -4751,6 +4820,9 @@ function resetManualFields(){
   if(manualMesureTemp) manualMesureTemp.value = '';
   if(manualMesurePoids) manualMesurePoids.value = '';
   if(manualMesureTaille) manualMesureTaille.value = '';
+  if(manualPumpDuration) manualPumpDuration.value = '';
+  if(manualPumpAmount) manualPumpAmount.value = '';
+  if(manualPumpNotes) manualPumpNotes.value = '';
   updateManualMedFields();
   if(manualDatetime) manualDatetime.value = formatDateInput(new Date());
 }
@@ -4805,6 +4877,10 @@ function populateManualForm(type, entry){
     if(manualMesureTemp) manualMesureTemp.value = entry.temp ?? '';
     if(manualMesurePoids) manualMesurePoids.value = entry.weight ?? '';
     if(manualMesureTaille) manualMesureTaille.value = entry.height ?? '';
+  }else if(type === 'pump'){
+    if(manualPumpDuration) manualPumpDuration.value = Math.round((entry.durationSec || 0) / 60);
+    if(manualPumpAmount) manualPumpAmount.value = entry.amountMl || '';
+    if(manualPumpNotes) manualPumpNotes.value = entry.notes || '';
   }
 }
 
@@ -4986,6 +5062,32 @@ function saveManualEntry() {
       } else {
         currentData.measurements.push(entry);
         reason = 'Manual measurement entry';
+      }
+    } else if (targetType === 'pump') {
+      const durationMins = Math.max(0, Number(manualPumpDuration?.value || 0));
+      const amount = Number(manualPumpAmount?.value || 0);
+      const durationSec = Math.round(durationMins * 60);
+      const endTs = date.getTime();
+      const startTs = endTs - (durationSec * 1000);
+
+      entry = {
+        id: isEdit ? editingEntry.id : Date.now()+'',
+        dateISO: date.toISOString(),
+        startISO: new Date(startTs).toISOString(),
+        endISO: date.toISOString(),
+        durationSec
+      };
+      if(amount > 0) entry.amountMl = amount;
+      const notes = manualPumpNotes?.value?.trim();
+      if(notes) entry.notes = notes;
+
+      if (isEdit) {
+        const idx = currentData.pumpSessions.findIndex(item => String(item.id) === String(entry.id));
+        if (idx > -1) currentData.pumpSessions[idx] = entry; else currentData.pumpSessions.push(entry);
+        reason = `Edit pump entry ${entry.id}`;
+      } else {
+        currentData.pumpSessions.push(entry);
+        reason = 'Manual pump entry';
       }
     }
     return currentData;
