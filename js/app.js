@@ -3216,11 +3216,12 @@ async function completePumpSession({ reason = 'Tirage confirmé' } = {}){
 // Pump card is shown inside modal, no inline toggling.
 
 function updateSleepChrono(){
-  if(!sleepChrono) return;
+  const el = document.getElementById('sleep-chrono');
+  if(!el) return;
   const h = String(Math.floor(sleepTimer / 3600)).padStart(2, '0');
   const m = String(Math.floor((sleepTimer % 3600) / 60)).padStart(2, '0');
   const s = String(sleepTimer % 60).padStart(2, '0');
-  sleepChrono.textContent = `${h}:${m}:${s}`;
+  el.textContent = `${h}:${m}:${s}`;
   if(activeFocusMode === 'sleep') updateFocusDisplay(sleepTimer);
 }
 updateSleepChrono();
@@ -3242,14 +3243,19 @@ function beginSleepTimer(startTimestamp = Date.now(), persist = true){
   }
   tickSleepTimer();
   sleepTimerInterval = setInterval(tickSleepTimer, 1000);
-  const label = new Date(startTimestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  if(sleepStartTimeDisplay){
-    sleepStartTimeDisplay.textContent = `Commencé à ${label}`;
+  
+  const display = document.getElementById('sleep-start-time-display');
+  if(display){
+    const label = new Date(startTimestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    display.textContent = `Commencé à ${label}`;
   }
-  startStopSleepBtn && (startStopSleepBtn.textContent = 'Arrêter');
-  if(sleepStartInput){
-    sleepStartInput.value = toDateTimeInputValue(new Date(startTimestamp));
+  
+  const btn = document.getElementById('startStopSleep');
+  if(btn) {
+    btn.innerHTML = '⏹ Arrêter';
+    btn.classList.add('running');
   }
+  
   if(persist){
     store.set(SLEEP_TIMER_KEY, { start: startTimestamp });
   }
@@ -3269,9 +3275,16 @@ function stopSleepTimer({ persist = true, resetDisplay = false } = {}){
   }
   const finishedStart = sleepTimerStart;
   sleepTimerStart = null;
-  startStopSleepBtn && (startStopSleepBtn.textContent = 'Commencer');
-  if(resetDisplay && sleepStartTimeDisplay){
-    sleepStartTimeDisplay.textContent = '';
+  
+  const btn = document.getElementById('startStopSleep');
+  if(btn) {
+    btn.innerHTML = '▶ Démarrer';
+    btn.classList.remove('running');
+  }
+  
+  const display = document.getElementById('sleep-start-time-display');
+  if(resetDisplay && display){
+    display.textContent = '';
   }
   return finishedStart;
 }
@@ -3284,18 +3297,22 @@ function clearSleepPending(){
 }
 
 function applySleepPendingToInputs(){
-  if(!sleepStartInput || sleepPendingStart == null || !Number.isFinite(sleepPendingDuration) || sleepPendingDuration <= 0){
+  const startInput = document.getElementById('sleep-start');
+  const endInput = document.getElementById('sleep-end');
+  const display = document.getElementById('sleep-start-time-display');
+  
+  if(!startInput || sleepPendingStart == null || !Number.isFinite(sleepPendingDuration) || sleepPendingDuration <= 0){
     return false;
   }
   const startDate = new Date(sleepPendingStart);
   const endDate = new Date(sleepPendingStart + sleepPendingDuration * 1000);
-  sleepStartInput.value = toDateTimeInputValue(startDate);
-  if(sleepEndInput){
-    sleepEndInput.value = toDateTimeInputValue(endDate);
+  startInput.value = toDateTimeInputValue(startDate);
+  if(endInput){
+    endInput.value = toDateTimeInputValue(endDate);
   }
-  if(sleepStartTimeDisplay){
+  if(display){
     const windowLabel = formatBottleWindow(startDate.toISOString(), endDate.toISOString());
-    sleepStartTimeDisplay.textContent = windowLabel || '';
+    display.textContent = windowLabel || '';
   }
   return true;
 }
@@ -3363,53 +3380,234 @@ async function saveSleepEntry(entry, { reason, autoClose = true } = {}){
 }
 
 function resetSleepForm(){
-  if(sleepStartInput){
-    sleepStartInput.value = '';
-  }
-  if(sleepEndInput){
-    sleepEndInput.value = '';
-  }
-  if(sleepNotesInput){
-    sleepNotesInput.value = '';
-  }
-  if(sleepStartTimeDisplay){
-    sleepStartTimeDisplay.textContent = '';
-  }
   stopSleepTimer({ persist: false, resetDisplay: true });
   sleepTimer = 0;
   updateSleepChrono();
 }
 
-function openSleepModal(entry = null){
-  resetSleepForm();
-  editingSleepEntry = entry ? {...entry} : null;
-  if(entry){
-    const startDate = parseDateTimeInput(entry.startISO || entry.dateISO);
-    const endDate = parseDateTimeInput(entry.endISO || entry.dateISO);
-    if(startDate && sleepStartInput){
-      sleepStartInput.value = toDateTimeInputValue(startDate);
+function injectSleepStyles() {
+  if (document.getElementById('sleep-ui-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'sleep-ui-styles';
+  style.textContent = `
+    .sleep-minimal-ui { padding: 24px 20px; display: flex; flex-direction: column; height: 100%; color: var(--text-main); }
+    .sleep-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .sleep-header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+    .sleep-close { background: transparent; border: none; font-size: 2rem; line-height: 1; color: var(--text-muted); padding: 10px; margin: -10px; cursor: pointer; }
+    
+    .sleep-timer-view { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; gap: 30px; animation: fadeIn 0.3s ease; }
+    .sleep-chrono-big { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; line-height: 1; }
+    .sleep-timer-label { font-size: 1rem; color: var(--text-muted); margin-top: -20px; min-height: 20px; }
+    
+    .sleep-btn-main { width: 100%; max-width: 280px; height: 80px; border-radius: 40px; font-size: 1.3rem; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 20px 40px -10px rgba(10, 132, 255, 0.3); background: #0a84ff; color: white; }
+    .sleep-btn-main.running { background: #ff3b30; box-shadow: 0 20px 40px -10px rgba(255, 59, 48, 0.3); }
+    .sleep-btn-main:active { transform: scale(0.95); }
+    
+    .sleep-btn-manual { background: transparent; border: none; color: var(--text-muted); font-weight: 600; padding: 15px; margin-top: 10px; }
+    
+    .sleep-manual-view { display: flex; flex-direction: column; gap: 24px; flex: 1; animation: slideUp 0.3s ease; }
+    .sleep-inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .sleep-input-group { display: flex; flex-direction: column; gap: 8px; }
+    .sleep-input-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .sleep-input { background: rgba(120, 120, 128, 0.1); border: none; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-family: inherit; color: inherit; width: 100%; }
+    
+    .sleep-tags { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sleep-tag { padding: 16px; border-radius: 16px; border: 2px solid rgba(120, 120, 128, 0.1); background: transparent; font-weight: 700; font-size: 1rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .sleep-tag.selected { border-color: #0a84ff; background: rgba(10, 132, 255, 0.1); color: #0a84ff; }
+    
+    .sleep-note-input { width: 100%; border: none; border-bottom: 2px solid rgba(120, 120, 128, 0.1); padding: 12px 0; font-size: 1rem; background: transparent; border-radius: 0; color: inherit; }
+    .sleep-note-input:focus { border-color: #0a84ff; outline: none; }
+    
+    .sleep-actions { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
+    .sleep-btn-save { width: 100%; padding: 20px; border-radius: 20px; background: #0a84ff; color: white; font-weight: 700; font-size: 1.1rem; border: none; }
+    .sleep-btn-cancel { width: 100%; padding: 15px; background: transparent; color: var(--text-muted); font-weight: 600; border: none; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  `;
+  document.head.appendChild(style);
+}
+
+function renderSleepUI(mode = 'timer', entry = null) {
+  const modal = document.getElementById('modal-sleep');
+  if (!modal) return;
+  injectSleepStyles();
+
+  const isRunning = !!sleepTimerInterval;
+  const isManual = mode === 'manual' || (entry !== null && !isRunning);
+  
+  let startVal = '', endVal = '', notesVal = '', tagVal = '';
+  if (entry) {
+    startVal = toDateTimeInputValue(parseDateTimeInput(entry.startISO || entry.dateISO));
+    endVal = toDateTimeInputValue(parseDateTimeInput(entry.endISO || entry.dateISO));
+    notesVal = entry.notes || '';
+    if (notesVal.includes('Sieste')) tagVal = 'Sieste';
+    if (notesVal.includes('Nuit')) tagVal = 'Nuit';
+    notesVal = notesVal.replace('Sieste', '').replace('Nuit', '').trim();
+  } else if (sleepPendingStart) {
+    startVal = toDateTimeInputValue(new Date(sleepPendingStart));
+    if (sleepPendingDuration) {
+      endVal = toDateTimeInputValue(new Date(sleepPendingStart + sleepPendingDuration * 1000));
     }
-    if(endDate && sleepEndInput){
-      sleepEndInput.value = toDateTimeInputValue(endDate);
-    }
-    if(sleepNotesInput){
-      sleepNotesInput.value = entry.notes || '';
-    }
-    if(sleepStartTimeDisplay){
-      const label = formatBottleWindow(entry.startISO, entry.endISO);
-      sleepStartTimeDisplay.textContent = label || '';
-    }
-  }else{
-    applySleepPendingToInputs();
+  } else {
+    startVal = toDateTimeInputValue(new Date());
   }
+
+  const html = `
+    <div class="sleep-minimal-ui">
+      <div class="sleep-header">
+        <h2>${isManual ? (entry ? 'Modifier' : 'Ajouter') : 'Sommeil'}</h2>
+        <button class="sleep-close" id="sleep-ui-close">×</button>
+      </div>
+
+      ${!isManual ? `
+        <div class="sleep-timer-view">
+          <div class="sleep-chrono-big" id="sleep-chrono">00:00:00</div>
+          <div class="sleep-timer-label" id="sleep-start-time-display"></div>
+          <div class="sleep-controls">
+            <button id="startStopSleep" class="sleep-btn-main ${isRunning ? 'running' : ''}">
+              ${isRunning ? '⏹ Arrêter' : '▶ Démarrer'}
+            </button>
+            ${!isRunning ? `<button id="sleep-go-manual" class="sleep-btn-manual">✍️ Saisie manuelle</button>` : ''}
+          </div>
+        </div>
+      ` : `
+        <div class="sleep-manual-view">
+          <div class="sleep-inputs-row">
+            <div class="sleep-input-group">
+              <label class="sleep-input-label">Début</label>
+              <input type="datetime-local" id="sleep-start" class="sleep-input" value="${startVal}">
+            </div>
+            <div class="sleep-input-group">
+              <label class="sleep-input-label">Fin</label>
+              <input type="datetime-local" id="sleep-end" class="sleep-input" value="${endVal}">
+            </div>
+          </div>
+          
+          <div class="sleep-tags" id="sleep-tags-container">
+            <button type="button" class="sleep-tag ${tagVal === 'Sieste' ? 'selected' : ''}" data-tag="Sieste">😴 Sieste</button>
+            <button type="button" class="sleep-tag ${tagVal === 'Nuit' ? 'selected' : ''}" data-tag="Nuit">🌙 Nuit</button>
+          </div>
+          
+          <input type="text" id="sleep-notes" class="sleep-note-input" placeholder="Note optionnelle..." value="${escapeHtml(notesVal)}">
+          
+          <div class="sleep-actions">
+            <button id="save-sleep" class="sleep-btn-save">Enregistrer</button>
+            <button id="cancel-sleep" class="sleep-btn-cancel">Annuler</button>
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+  
+  modal.innerHTML = html;
+  
+  document.getElementById('sleep-ui-close')?.addEventListener('click', closeSleepModal);
+  document.getElementById('sleep-go-manual')?.addEventListener('click', () => renderSleepUI('manual'));
+  document.getElementById('cancel-sleep')?.addEventListener('click', () => {
+    if (entry) closeSleepModal();
+    else renderSleepUI('timer');
+  });
+  
+  const tagsContainer = document.getElementById('sleep-tags-container');
+  if (tagsContainer) {
+    tagsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sleep-tag');
+      if (btn) {
+        const wasSelected = btn.classList.contains('selected');
+        tagsContainer.querySelectorAll('.sleep-tag').forEach(b => b.classList.remove('selected'));
+        if (!wasSelected) btn.classList.add('selected');
+      }
+    });
+  }
+
+  document.getElementById('startStopSleep')?.addEventListener('click', handleStartStopSleepAction);
+  document.getElementById('save-sleep')?.addEventListener('click', handleSaveSleepAction);
+  
+  if (!isManual) updateSleepChrono();
+}
+
+function openSleepModal(entry = null){
+  editingSleepEntry = entry ? {...entry} : null;
   openModal('#modal-sleep');
-  requestAnimationFrame(() => sleepStartInput?.focus());
+  renderSleepUI(entry ? 'manual' : 'timer', entry);
 }
 
 function closeSleepModal(){
   editingSleepEntry = null;
   resetSleepForm();
   closeModal('#modal-sleep');
+}
+
+async function handleStartStopSleepAction() {
+  if(sleepTimerInterval){
+    triggerVibration();
+    const startedAt = sleepTimerStart;
+    const elapsed = Math.max(1, Math.floor((Date.now() - sleepTimerStart) / 1000));
+    stopSleepTimer({ resetDisplay: false });
+    
+    renderSleepUI('manual');
+    
+    const startInput = document.getElementById('sleep-start');
+    const endInput = document.getElementById('sleep-end');
+    
+    if(Number.isFinite(startedAt)){
+      const startDate = new Date(startedAt);
+      const endDate = new Date(startedAt + elapsed * 1000);
+      if(startInput) startInput.value = toDateTimeInputValue(startDate);
+      if(endInput) endInput.value = toDateTimeInputValue(endDate);
+    }
+  }else{
+    const ts = Date.now();
+    beginSleepTimer(ts, true);
+    clearSleepPending();
+    getPersistenceApi()?.saveTimer('sleep', { start: ts });
+    enterFocusMode('sleep');
+  }
+}
+
+async function handleSaveSleepAction() {
+  triggerVibration();
+  const startInput = document.getElementById('sleep-start');
+  const endInput = document.getElementById('sleep-end');
+  const notesInput = document.getElementById('sleep-notes');
+  const tagsContainer = document.getElementById('sleep-tags-container');
+  
+  const startDate = parseDateTimeInput(startInput?.value);
+  if(!startDate){
+    alert('Veuillez indiquer l\'heure de début.');
+    return;
+  }
+  const endDate = parseDateTimeInput(endInput?.value);
+  if(!endDate){
+    alert('Veuillez indiquer l\'heure de fin.');
+    return;
+  }
+  if(endDate.getTime() <= startDate.getTime()){
+    alert('L\'heure de fin doit être postérieure au début.');
+    return;
+  }
+  
+  let notes = notesInput?.value?.trim() || '';
+  const selectedTag = tagsContainer?.querySelector('.selected')?.dataset.tag;
+  if(selectedTag){
+    notes = `${selectedTag} ${notes}`.trim();
+  }
+  
+  const entry = buildSleepEntry({
+    startDate,
+    endDate,
+    notes,
+    entryId: editingSleepEntry ? editingSleepEntry.id : undefined
+  });
+  
+  if(!entry){
+    alert('Impossible d\'enregistrer cette session.');
+    return;
+  }
+  
+  await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
+  getPersistenceApi()?.saveTimer('sleep', null);
 }
 
 function showBottlePrompt(){
