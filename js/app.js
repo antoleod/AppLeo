@@ -3792,6 +3792,22 @@ function syncLocalTimersWithRemote(activeTimers) {
   }
 }
 
+function syncRemoteTimersFromLocal(activeTimers) {
+  const timers = activeTimers || {};
+  const api = getPersistenceApi();
+  if (!api) return;
+
+  if (timerStart && !timers?.breast?.start) {
+    api.saveTimer('breast', { start: timerStart, side: breastSide });
+  }
+  if (bottleTimerStart && !timers?.bottle?.start) {
+    api.saveTimer('bottle', { start: bottleTimerStart, bottleType });
+  }
+  if (sleepTimerStart && !timers?.sleep?.start) {
+    api.saveTimer('sleep', { start: sleepTimerStart });
+  }
+}
+
 // ===== Milestones Logic =====
 milestonesBtn?.addEventListener('click', () => {
   renderMilestones();
@@ -5563,6 +5579,7 @@ async function initFirebaseSync() {
       console.debug('Could not summarize initialData', e);
     }
     replaceDataFromSnapshot(initialData, { skipRender: false });
+    syncRemoteTimersFromLocal(initialData?.activeTimers);
 
     persistenceApi.on((event, payload) => {
       // Ahora, cualquier 'data-changed' se trata como la fuente de la verdad.
