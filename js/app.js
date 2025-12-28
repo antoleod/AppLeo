@@ -702,6 +702,7 @@ let manualType = 'feed';
 let timer = 0;
 let timerStart = null;
 let timerInterval = null;
+let lastStoppedTimerStart = null;
 let bottleTimer = 0;
 let bottleTimerStart = null;
 let bottleTimerInterval = null;
@@ -709,6 +710,7 @@ let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
 
 let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
+let lastStoppedBottleStart = null;
 let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
 let bottlePresetCounts = normalizeBottlePresetCounts(store.get(BOTTLE_PRESET_COUNTS_KEY, {}));
 let whoData = null;
@@ -716,6 +718,7 @@ let bottleDefaultPreset = resolveBottleDefaultPreset();
 let sleepTimer = 0;
 let sleepTimerStart = null;
 let sleepTimerInterval = null;
+let lastStoppedSleepStart = null;
 let sleepPendingDuration = store.get(SLEEP_PENDING_DURATION_KEY, 0) || 0;
 let sleepPendingStart = store.get(SLEEP_PENDING_START_KEY, null);
 let pumpTimerSeconds = 0;
@@ -3303,6 +3306,7 @@ function stopSleepTimer({ persist = true, resetDisplay = false } = {}){
     sleepTimer = Math.max(0, Math.floor((Date.now() - sleepTimerStart) / 1000));
     updateSleepChrono();
   }
+  if (sleepTimerStart) lastStoppedSleepStart = sleepTimerStart;
   const finishedStart = sleepTimerStart;
   sleepTimerStart = null;
   
@@ -3422,38 +3426,64 @@ function injectSleepStyles() {
   style.textContent = `
     .sleep-minimal-ui { padding: 24px 20px; display: flex; flex-direction: column; height: 100%; color: var(--text-main); }
     .sleep-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .sleep-minimal-ui { padding: 24px 20px; display: flex; flex-direction: column; height: 100%; color: var(--text-main); overflow-y: auto; box-sizing: border-box; }
+    .sleep-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
     .sleep-header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
     .sleep-close { background: transparent; border: none; font-size: 2rem; line-height: 1; color: var(--text-muted); padding: 10px; margin: -10px; cursor: pointer; }
     
     .sleep-timer-view { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; gap: 30px; animation: fadeIn 0.3s ease; }
     .sleep-chrono-big { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; line-height: 1; }
     .sleep-timer-label { font-size: 1rem; color: var(--text-muted); margin-top: -20px; min-height: 20px; }
+    .sleep-timer-view { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; gap: 30px; animation: fadeIn 0.3s ease; min-height: 300px; }
+    .sleep-chrono-big { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; line-height: 1; text-align: center; }
+    .sleep-timer-label { font-size: 1rem; color: var(--text-muted); margin-top: -20px; min-height: 20px; text-align: center; }
     
     .sleep-btn-main { width: 100%; max-width: 280px; height: 80px; border-radius: 40px; font-size: 1.3rem; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 20px 40px -10px rgba(10, 132, 255, 0.3); background: #0a84ff; color: white; }
+    .sleep-btn-main { width: 100%; max-width: 280px; height: 80px; border-radius: 40px; font-size: 1.3rem; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 20px 40px -10px rgba(10, 132, 255, 0.3); background: #0a84ff; color: white; flex-shrink: 0; }
     .sleep-btn-main.running { background: #ff3b30; box-shadow: 0 20px 40px -10px rgba(255, 59, 48, 0.3); }
     .sleep-btn-main:active { transform: scale(0.95); }
     
     .sleep-btn-manual { background: transparent; border: none; color: var(--text-muted); font-weight: 600; padding: 15px; margin-top: 10px; }
+    .sleep-btn-manual { background: transparent; border: none; color: var(--text-muted); font-weight: 600; padding: 15px; margin-top: 10px; flex-shrink: 0; }
     
     .sleep-manual-view { display: flex; flex-direction: column; gap: 24px; flex: 1; animation: slideUp 0.3s ease; }
     .sleep-inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .sleep-manual-view { display: flex; flex-direction: column; gap: 20px; flex: 1; animation: slideUp 0.3s ease; }
+    .sleep-inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex-shrink: 0; }
     .sleep-input-group { display: flex; flex-direction: column; gap: 8px; }
     .sleep-input-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .sleep-input { background: rgba(120, 120, 128, 0.1); border: none; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-family: inherit; color: inherit; width: 100%; }
+    .sleep-input { background: rgba(120, 120, 128, 0.1); border: none; padding: 16px; border-radius: 16px; font-size: 1.1rem; font-family: inherit; color: inherit; width: 100%; box-sizing: border-box; }
     
     .sleep-tags { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sleep-tags { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-shrink: 0; }
     .sleep-tag { padding: 16px; border-radius: 16px; border: 2px solid rgba(120, 120, 128, 0.1); background: transparent; font-weight: 700; font-size: 1rem; color: var(--text-muted); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .sleep-tag.selected { border-color: #0a84ff; background: rgba(10, 132, 255, 0.1); color: #0a84ff; }
     
     .sleep-note-input { width: 100%; border: none; border-bottom: 2px solid rgba(120, 120, 128, 0.1); padding: 12px 0; font-size: 1rem; background: transparent; border-radius: 0; color: inherit; }
+    .sleep-note-input { width: 100%; border: none; border-bottom: 2px solid rgba(120, 120, 128, 0.1); padding: 12px 0; font-size: 1rem; background: transparent; border-radius: 0; color: inherit; flex-shrink: 0; }
     .sleep-note-input:focus { border-color: #0a84ff; outline: none; }
     
     .sleep-actions { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
     .sleep-btn-save { width: 100%; padding: 20px; border-radius: 20px; background: #0a84ff; color: white; font-weight: 700; font-size: 1.1rem; border: none; }
     .sleep-btn-cancel { width: 100%; padding: 15px; background: transparent; color: var(--text-muted); font-weight: 600; border: none; }
+    .sleep-actions { margin-top: auto; display: flex; flex-direction: column; gap: 12px; padding-top: 20px; flex-shrink: 0; }
+    .sleep-btn-save { width: 100%; padding: 20px; border-radius: 20px; background: #0a84ff; color: white; font-weight: 700; font-size: 1.1rem; border: none; cursor: pointer; }
+    .sleep-btn-cancel { width: 100%; padding: 15px; background: transparent; color: var(--text-muted); font-weight: 600; border: none; cursor: pointer; }
     
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media (max-height: 700px) {
+      .sleep-minimal-ui { padding: 16px; }
+      .sleep-header { margin-bottom: 10px; }
+      .sleep-chrono-big { font-size: 3.5rem; }
+      .sleep-timer-view { gap: 20px; }
+      .sleep-btn-main { height: 64px; font-size: 1.1rem; }
+      .sleep-manual-view { gap: 16px; }
+      .sleep-input { padding: 12px; font-size: 1rem; }
+      .sleep-tag { padding: 12px; font-size: 0.9rem; }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -3742,6 +3772,7 @@ function stopBottleTimerWithoutSaving({ resetDisplay = true } = {}){
     clearInterval(bottleTimerInterval);
     bottleTimerInterval = null;
   }
+  if (bottleTimerStart) lastStoppedBottleStart = bottleTimerStart;
   bottleTimerStart = null;
   store.remove(BOTTLE_TIMER_KEY);
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
@@ -3758,7 +3789,8 @@ function syncLocalTimersWithRemote(activeTimers) {
   // Breast
   const breast = activeTimers.breast;
   if (breast && breast.start) {
-    if (!timerStart || Math.abs(timerStart - breast.start) > 1000) {
+    const isJustStopped = lastStoppedTimerStart && Math.abs(lastStoppedTimerStart - breast.start) < 1000;
+    if (!isJustStopped && (!timerStart || Math.abs(timerStart - breast.start) > 1000)) {
       setFeedMode('breast');
       if (breast.side) setBreastSide(breast.side);
       beginTimer(breast.start, false);
@@ -3769,28 +3801,36 @@ function syncLocalTimersWithRemote(activeTimers) {
     // If remote has no timer but local does, stop local (unless we just started it and it hasn't synced yet)
     // Firestore local writes are immediate in snapshot, so this is safe.
     stopTimerWithoutSaving();
+  } else {
+    lastStoppedTimerStart = null;
   }
 
   // Bottle
   const bottle = activeTimers.bottle;
   if (bottle && bottle.start) {
-    if (!bottleTimerStart || Math.abs(bottleTimerStart - bottle.start) > 1000) {
+    const isJustStopped = lastStoppedBottleStart && Math.abs(lastStoppedBottleStart - bottle.start) < 1000;
+    if (!isJustStopped && (!bottleTimerStart || Math.abs(bottleTimerStart - bottle.start) > 1000)) {
       setFeedMode('bottle');
       if (bottle.bottleType) setBottleType(bottle.bottleType, {persist:true});
       beginBottleTimer(bottle.start, false);
     }
   } else if (bottleTimerStart) {
     stopBottleTimerWithoutSaving();
+  } else {
+    lastStoppedBottleStart = null;
   }
 
   // Sleep
   const sleep = activeTimers.sleep;
   if (sleep && sleep.start) {
-    if (!sleepTimerStart || Math.abs(sleepTimerStart - sleep.start) > 1000) {
+    const isJustStopped = lastStoppedSleepStart && Math.abs(lastStoppedSleepStart - sleep.start) < 1000;
+    if (!isJustStopped && (!sleepTimerStart || Math.abs(sleepTimerStart - sleep.start) > 1000)) {
       beginSleepTimer(sleep.start, false);
     }
   } else if (sleepTimerStart) {
     stopSleepTimer({ persist: true, resetDisplay: true });
+  } else {
+    lastStoppedSleepStart = null;
   }
 }
 
@@ -4259,6 +4299,7 @@ function stopTimerWithoutSaving(){
   clearInterval(timerInterval);
     timerInterval = null;
   }
+  if (timerStart) lastStoppedTimerStart = timerStart;
   timerStart = null;
   store.remove(TIMER_KEY);
   startStopBtn && (startStopBtn.textContent = 'Démarrer');
@@ -4671,6 +4712,9 @@ function enterFocusMode(type) {
 }
 
 function exitFocusMode() {
+  if (focusOverlay.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
   activeFocusMode = null;
   focusOverlay.classList.remove('active');
   focusOverlay.setAttribute('aria-hidden', 'true');
@@ -5550,6 +5594,17 @@ async function initFirebaseSync() {
     console.error("Firebase authentication failed:", authError);
     setSaveIndicator('error', 'Error de autenticación.');
     return; // Detener si la autenticación falla.
+  }
+
+  if (firebaseAuth && !firebaseAuth.currentUser) {
+    await new Promise(resolve => {
+      const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
+        if (user) {
+          unsubscribe();
+          resolve();
+        }
+      });
+    });
   }
 
   try {
