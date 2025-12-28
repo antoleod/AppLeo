@@ -10,6 +10,36 @@ const store = {
   remove(key){ localStorage.removeItem(key); }
 };
 
+// ===== Action Guards & UX Helpers (Phase 3-A) =====
+async function safeAction(btn, actionFn) {
+  if (!btn || btn.disabled || btn.getAttribute('aria-busy') === 'true') return;
+  
+  const originalText = btn.textContent;
+  const originalOpacity = btn.style.opacity;
+  
+  btn.disabled = true;
+  btn.setAttribute('aria-busy', 'true');
+  btn.style.opacity = '0.6';
+  btn.style.cursor = 'wait';
+
+  try {
+    await actionFn();
+  } catch (e) {
+    console.error("Action failed:", e);
+    alert(e.message || "Une erreur est survenue");
+  } finally {
+    // Debounce unlock to prevent accidental double-taps immediately after
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.setAttribute('aria-busy', 'false');
+      btn.style.opacity = originalOpacity;
+      btn.style.cursor = '';
+    }, 500);
+  }
+}
+
+const confirmAction = (msg) => new Promise(resolve => resolve(window.confirm(msg)));
+
 // ===== Constants =====
 // Date de naissance pour les courbes de croissance (basé sur le profil)
 const BABY_BIRTH_DATE = new Date('2025-10-27T16:13:00');
@@ -3565,7 +3595,7 @@ async function handleStartStopSleepAction() {
     enterFocusMode('sleep');
   }
 }
-
+/*
 async function handleSaveSleepAction() {
   triggerVibration();
   const startInput = document.getElementById('sleep-start');
@@ -3608,6 +3638,50 @@ async function handleSaveSleepAction() {
   
   await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
   getPersistenceApi()?.saveTimer('sleep', null);
+}
+*/
+
+async function handleSaveSleepAction() {
+  const btn = document.getElementById('save-sleep');
+  await safeAction(btn, async () => {
+    triggerVibration();
+    const startInput = document.getElementById('sleep-start');
+    const endInput = document.getElementById('sleep-end');
+    const notesInput = document.getElementById('sleep-notes');
+    const tagsContainer = document.getElementById('sleep-tags-container');
+    
+    const startDate = parseDateTimeInput(startInput?.value);
+    if(!startDate) throw new Error('Veuillez indiquer l\'heure de début.');
+    
+    const endDate = parseDateTimeInput(endInput?.value);
+    if(!endDate) throw new Error('Veuillez indiquer l\'heure de fin.');
+    
+    if(endDate.getTime() <= startDate.getTime()) throw new Error('L\'heure de fin doit être postérieure au début.');
+    
+    let notes = notesInput?.value?.trim() || '';
+    const selectedTag = tagsContainer?.querySelector('.selected')?.dataset.tag;
+    if(selectedTag){
+      notes = `${selectedTag} ${notes}`.trim();
+    }
+    
+    // Phase 3-B: Confirmation
+    const durationMin = Math.round((endDate - startDate) / 60000);
+    const confirmMsg = `Enregistrer sommeil de ${formatMinutes(durationMin)} ?\nDe ${startDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} à ${endDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+    
+    if (!(await confirmAction(confirmMsg))) return;
+
+    const entry = buildSleepEntry({
+      startDate,
+      endDate,
+      notes,
+      entryId: editingSleepEntry ? editingSleepEntry.id : undefined
+    });
+    
+    if(!entry) throw new Error('Impossible d\'enregistrer cette session.');
+    
+    await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
+    getPersistenceApi()?.saveTimer('sleep', null);
+  });
 }
 
 function showBottlePrompt(){
@@ -4462,83 +4536,79 @@ startStopBottleBtn?.addEventListener('click', async () => {
 });
 
 saveBottleBtn?.addEventListener('click', async () => {
-  triggerVibration();
-  saveBottleBtn.classList.add('save-biberon');
-  setTimeout(() => {
-    saveBottleBtn.classList.remove('save-biberon');
-  }, 1000);
-
-  const rawValue = bottleAmountInput?.value ?? '';
-  const normalizedValue = rawValue.replace(',', '.').trim();
-  const amount = clampBottleValue(parseFloat(normalizedValue));
-  if(!Number.isFinite(amount) || amount <= 0){
-    alert('Veuillez saisir une quantité valide en ml.');
-    bottleAmountInput?.focus({ preventScroll: false });
-    return;
-  }
-
-  bottlePendingAmount = amount;
-  store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
-
-  // Si el temporizador está corriendo y no hay duración pendiente, calcularla ahora
-  if (bottleTimerStart && (!bottlePendingDuration || bottlePendingDuration === 0)) {
-    bottlePendingDuration = Math.max(1, Math.floor((Date.now() - bottleTimerStart) / 1000));
-  }
-
-  let startISO = bottleTimerStart ? new Date(bottleTimerStart).toISOString() : undefined;
-  let endISO = undefined;
-  let durationSec = bottlePendingDuration;
-
-  if (bottleStartInput && bottleStartInput.value) {
-    const s = parseDateTimeInput(bottleStartInput.value);
-    if (s) startISO = s.toISOString();
-  }
-  if (bottleEndInput && bottleEndInput.value) {
-    const e = parseDateTimeInput(bottleEndInput.value);
-    if (e) endISO = e.toISOString();
-  }
-
-  if (startISO && endISO) {
-    // Permitir guardar si las horas son iguales (duración < 1 min)
-    if (new Date(endISO) < new Date(startISO)) {
-      alert('L\'heure de fin doit être postérieure au début.');
-      if(bottleEndInput) bottleEndInput.focus();
-      return;
-    }
-    const calculatedDuration = Math.round((new Date(endISO).getTime() - new Date(startISO).getTime()) / 1000);
+  await safeAction(saveBottleBtn, async () => {
+    triggerVibration();
     
-    // Si los inputs dan 0 (mismo minuto) pero tenemos duración real del timer, usar esa
-    if (calculatedDuration === 0 && bottlePendingDuration > 0) {
-      durationSec = bottlePendingDuration;
-      // Recalcular endISO para incluir los segundos precisos
-      endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
-    } else {
-      durationSec = calculatedDuration;
+    const rawValue = bottleAmountInput?.value ?? '';
+    const normalizedValue = rawValue.replace(',', '.').trim();
+    const amount = clampBottleValue(parseFloat(normalizedValue));
+    
+    if(!Number.isFinite(amount) || amount <= 0){
+      bottleAmountInput?.focus({ preventScroll: false });
+      throw new Error('Veuillez saisir une quantité valide en ml.');
     }
-  } else if (startISO && durationSec > 0) {
-    endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
-  }
 
-  const entry = {
-    id: Date.now()+'',
-    dateISO: endISO || new Date().toISOString(),
-    source: 'bottle',
-    amountMl: bottlePendingAmount,
-    durationSec: durationSec > 0 ? durationSec : null,
-    bottleStartISO: startISO || null,
-    bottleEndISO: endISO || null
-  };
+    // Phase 3-B: Confirmation
+    if (!(await confirmAction(`Confirmer le biberon de ${amount} ml ?`))) return;
 
-  await saveFeed(entry);
+    bottlePendingAmount = amount;
+    store.set(BOTTLE_AMOUNT_KEY, bottlePendingAmount);
 
-  bottlePendingDuration = 0;
-  store.remove(BOTTLE_PENDING_KEY);
-  bottlePendingAmount = null;
-  store.remove(BOTTLE_AMOUNT_KEY);
-  hideBottlePrompt({ clearValue: true });
-  applyBottleDefaultAmount();
-  stopBottleTimerWithoutSaving();
-  getPersistenceApi()?.saveTimer('bottle', null);
+    // Si el temporizador está corriendo y no hay duración pendiente, calcularla ahora
+    if (bottleTimerStart && (!bottlePendingDuration || bottlePendingDuration === 0)) {
+      bottlePendingDuration = Math.max(1, Math.floor((Date.now() - bottleTimerStart) / 1000));
+    }
+
+    let startISO = bottleTimerStart ? new Date(bottleTimerStart).toISOString() : undefined;
+    let endISO = undefined;
+    let durationSec = bottlePendingDuration;
+
+    if (bottleStartInput && bottleStartInput.value) {
+      const s = parseDateTimeInput(bottleStartInput.value);
+      if (s) startISO = s.toISOString();
+    }
+    if (bottleEndInput && bottleEndInput.value) {
+      const e = parseDateTimeInput(bottleEndInput.value);
+      if (e) endISO = e.toISOString();
+    }
+
+    if (startISO && endISO) {
+      if (new Date(endISO) < new Date(startISO)) {
+        if(bottleEndInput) bottleEndInput.focus();
+        throw new Error('L\'heure de fin doit être postérieure au début.');
+      }
+      const calculatedDuration = Math.round((new Date(endISO).getTime() - new Date(startISO).getTime()) / 1000);
+      if (calculatedDuration === 0 && bottlePendingDuration > 0) {
+        durationSec = bottlePendingDuration;
+        endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
+      } else {
+        durationSec = calculatedDuration;
+      }
+    } else if (startISO && durationSec > 0) {
+      endISO = new Date(new Date(startISO).getTime() + durationSec * 1000).toISOString();
+    }
+
+    const entry = {
+      id: Date.now()+'',
+      dateISO: endISO || new Date().toISOString(),
+      source: 'bottle',
+      amountMl: bottlePendingAmount,
+      durationSec: durationSec > 0 ? durationSec : null,
+      bottleStartISO: startISO || null,
+      bottleEndISO: endISO || null
+    };
+
+    await saveFeed(entry);
+
+    bottlePendingDuration = 0;
+    store.remove(BOTTLE_PENDING_KEY);
+    bottlePendingAmount = null;
+    store.remove(BOTTLE_AMOUNT_KEY);
+    hideBottlePrompt({ clearValue: true });
+    applyBottleDefaultAmount();
+    stopBottleTimerWithoutSaving();
+    getPersistenceApi()?.saveTimer('bottle', null);
+  });
 });
 
 // ===== Focus Mode Logic =====
@@ -4657,42 +4727,100 @@ if(sleepPendingDuration > 0 && sleepPendingStart != null){
 }
 
 // ===== Eliminations modal logic =====
-btnElim?.addEventListener('click', ()=>{ renderElimHistory(); openModal('#modal-elim'); });
-$('#close-elim')?.addEventListener('click', ()=> closeModal('#modal-elim'));
-$('#cancel-elim')?.addEventListener('click', ()=> closeModal('#modal-elim'));
+let elimState = {
+  scales: { pee: 0, poop: 0, vomit: 0 },
+  isDirty: false
+};
 
-const scales = { pee:0, poop:0, vomit:0 };
+function updateElimSaveButtonState() {
+  const saveBtn = $('#save-elim');
+  if (!saveBtn) return;
+  
+  const hasValues = elimState.scales.pee > 0 || elimState.scales.poop > 0 || elimState.scales.vomit > 0;
+  saveBtn.disabled = !hasValues;
+}
 
-function renderScale(root){
+async function closeElimModal() {
+  const hasValues = elimState.scales.pee > 0 || elimState.scales.poop > 0 || elimState.scales.vomit > 0;
+  if (elimState.isDirty && hasValues) {
+    if (!(await confirmAction("Vous avez des modifications non enregistrées. Voulez-vous les annuler ?"))) {
+      return;
+    }
+  }
+  closeModal('#modal-elim');
+}
+
+btnElim?.addEventListener('click', () => {
+  elimState = {
+    scales: { pee: 0, poop: 0, vomit: 0 },
+    isDirty: false
+  };
+  $$('.scale').forEach(renderScale);
+  updateElimSaveButtonState();
+  renderElimHistory(); 
+  openModal('#modal-elim');
+});
+
+$('#close-elim')?.addEventListener('click', closeElimModal);
+$('#cancel-elim')?.addEventListener('click', closeElimModal);
+
+function renderScale(root) {
   root.innerHTML = '';
   const key = root.dataset.scale;
-  for(let n=0; n<=3; n++){
+  const currentValue = elimState.scales[key];
+
+  // Fase 2: No renderizar el botón "0". La interacción es solo para añadir.
+  for (let n = 1; n <= 3; n++) {
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.textContent = n;
-    if(scales[key] === n) btn.classList.add('active');
-    btn.addEventListener('click', ()=>{ scales[key] = n; renderScale(root); });
+    const isActive = currentValue === n;
+    if(isActive) btn.classList.add('active');
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    
+    btn.addEventListener('click', () => {
+      // Fase 3: Tocar de nuevo deselecciona (vuelve a 0)
+      const newValue = isActive ? 0 : n;
+      elimState.scales[key] = newValue;
+      elimState.isDirty = true;
+      
+      triggerVibration(isActive ? 20 : 40);
+      renderScale(root); // Re-render this specific scale
+      updateElimSaveButtonState(); // Update save button state
+    });
     root.appendChild(btn);
   }
 }
 $$('.scale').forEach(renderScale);
 
-$('#save-elim')?.addEventListener('click', ()=>{
-  triggerVibration();
-  updateState(currentData => {
-    currentData.elims.push({
-      id: Date.now()+'',
+
+$('#save-elim')?.addEventListener('click', async () => {
+  const btn = $('#save-elim');
+  await safeAction(btn, async () => {
+    triggerVibration();
+    if (elimState.scales.pee === 0 && elimState.scales.poop === 0 && elimState.scales.vomit === 0) {
+      if (!(await confirmAction("Enregistrer une couche vide ?"))) return;
+    }
+    
+    const entry = {
+      id: Date.now() + '',
       dateISO: new Date().toISOString(),
-      pee: scales.pee,
-      poop: scales.poop,
-      vomit: scales.vomit
+      ...elimState.scales
+    };
+    
+    updateState(currentData => {
+      currentData.elims.push(entry);
+      return currentData;
     });
-    return currentData;
+    
+    const api = getPersistenceApi();
+    await api?.saveEntry?.('elim', entry, 'Add elimination entry');
+    
+    closeModal('#modal-elim');
+    renderHistory();
   });
-  const api = getPersistenceApi();
-  api?.saveEntry?.('elim', { id: Date.now()+'', dateISO: new Date().toISOString(), ...scales }, 'Add elimination entry');
-  closeModal('#modal-elim');
-  renderHistory();
 });
+
 
 // ===== Medications modal logic =====
 function setupMedicationModal(){
@@ -4787,17 +4915,51 @@ const tempInput = $('#mesure-temp');
 const poidsInput = $('#mesure-poids');
 const tailleInput = $('#mesure-taille');
 
+let mesuresState = {
+  temp: null,
+  weight: null,
+  height: null,
+  isDirty: false
+};
+
+function updateMesuresSaveButtonState() {
+  if (!saveMesuresBtn) return;
+  const hasValues = mesuresState.temp !== null || mesuresState.weight !== null || mesuresState.height !== null;
+  saveMesuresBtn.disabled = !hasValues;
+}
+
+async function closeMesuresModal() {
+  const hasValues = mesuresState.temp !== null || mesuresState.weight !== null || mesuresState.height !== null;
+  if (mesuresState.isDirty && hasValues) {
+    if (!(await confirmAction("Vous avez des modifications non enregistrées. Voulez-vous les annuler ?"))) {
+      return;
+    }
+  }
+  closeModal('#modal-mesures');
+}
+
 function resetMesuresForm() {
   if (tempInput) tempInput.value = '';
   if (poidsInput) poidsInput.value = '';
   if (tailleInput) tailleInput.value = '';
 }
 
-function saveMesures() {
-    triggerVibration();
-  const temp = tempInput.value ? parseFloat(tempInput.value) : null;
-  const weight = poidsInput.value ? parseFloat(poidsInput.value) : null;
-  const height = tailleInput.value ? parseFloat(tailleInput.value) : null;
+function handleMesureInput() {
+  const tempVal = tempInput.value ? parseFloat(tempInput.value.replace(',', '.')) : null;
+  const poidsVal = poidsInput.value ? parseFloat(poidsInput.value.replace(',', '.')) : null;
+  const tailleVal = tailleInput.value ? parseFloat(tailleInput.value.replace(',', '.')) : null;
+
+  mesuresState.temp = (Number.isFinite(tempVal) && tempVal > 0) ? tempVal : null;
+  mesuresState.weight = (Number.isFinite(poidsVal) && poidsVal > 0) ? poidsVal : null;
+  mesuresState.height = (Number.isFinite(tailleVal) && tailleVal > 0) ? tailleVal : null;
+  mesuresState.isDirty = true;
+  
+  updateMesuresSaveButtonState();
+}
+
+async function saveMesures() {
+  triggerVibration();
+  const { temp, weight, height } = mesuresState;
 
   if (temp === null && weight === null && height === null) {
     alert("Veuillez entrer au moins une mesure.");
@@ -4813,19 +4975,27 @@ function saveMesures() {
     currentData.measurements.push(entry);
     return currentData;
   });
-  const api = getPersistenceApi();
-  api?.saveEntry?.('measurement', entry, 'Add measurement entry');
+  
+  await getPersistenceApi()?.saveEntry?.('measurement', entry, 'Add measurement entry');
+  
   closeModal('#modal-mesures');
   renderHistory();
 }
 
 mesuresBtn?.addEventListener('click', () => {
+  mesuresState = { temp: null, weight: null, height: null, isDirty: false };
   resetMesuresForm();
+  updateMesuresSaveButtonState();
   openModal('#modal-mesures');
 });
-closeMesuresBtn?.addEventListener('click', () => closeModal('#modal-mesures'));
-cancelMesuresBtn?.addEventListener('click', () => closeModal('#modal-mesures'));
-saveMesuresBtn?.addEventListener('click', saveMesures);
+
+closeMesuresBtn?.addEventListener('click', closeMesuresModal);
+cancelMesuresBtn?.addEventListener('click', closeMesuresModal);
+saveMesuresBtn?.addEventListener('click', () => safeAction(saveMesuresBtn, saveMesures));
+
+tempInput?.addEventListener('input', handleMesureInput);
+poidsInput?.addEventListener('input', handleMesureInput);
+tailleInput?.addEventListener('input', handleMesureInput);
 
 // ===== Avatar & info actions =====
 if(bgPicker){
@@ -5145,8 +5315,18 @@ function saveManualEntry() {
   triggerVibration();
   const isEdit = Boolean(editingEntry);
   const targetType = isEdit && editingEntry ? editingEntry.type : manualType;
-  let date = manualDatetime && manualDatetime.value ? new Date(manualDatetime.value) : new Date();
-  if(Number.isNaN(date.getTime())) date = new Date();
+  
+  // Phase 3-E: Preserve Date Precision
+  let dateISO;
+  if (isEdit && editingEntry && editingEntry.dateISO && manualDatetime) {
+    const inputVal = manualDatetime.value;
+    const originalVal = formatDateInput(new Date(editingEntry.dateISO));
+    // If user didn't change the datetime input, keep the original ISO string (with seconds)
+    dateISO = (inputVal === originalVal) ? editingEntry.dateISO : new Date(inputVal).toISOString();
+  } else {
+    dateISO = manualDatetime && manualDatetime.value ? new Date(manualDatetime.value).toISOString() : new Date().toISOString();
+  }
+
   let reason = null;
   let entry = null;
 
@@ -5155,7 +5335,7 @@ function saveManualEntry() {
       const sourceValue = (manualSource?.value || 'breast') === 'bottle' ? 'bottle' : 'breast';
       // UX Fix: Merge with existing entry to preserve duration/start times if not editing them directly
       entry = isEdit ? { ...editingEntry } : { id: Date.now()+'', source: sourceValue };
-      entry.dateISO = date.toISOString();
+      entry.dateISO = dateISO;
       entry.source = sourceValue;
 
       if (sourceValue === 'breast') {
@@ -5164,10 +5344,7 @@ function saveManualEntry() {
         entry.breastSide = manualBreast?.value || 'Gauche';
       } else {
         entry.amountMl = clampBottleValue(Number(manualAmount?.value || 0));
-        if(entry.amountMl <= 0){
-          alert('Ajoutez la quantitAc totale en ml.');
-          throw new Error('Invalid manual bottle amount');
-        }
+        if(entry.amountMl <= 0) throw new Error('Ajoutez la quantité totale en ml.');
       }
       const notes = manualNotes?.value?.trim();
       if (notes) entry.notes = notes;
@@ -5182,7 +5359,7 @@ function saveManualEntry() {
       }
     } else if (targetType === 'elim') {
       entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
-      entry.dateISO = date.toISOString();
+      entry.dateISO = dateISO;
       entry.pee = clamp(Number(manualPee?.value || 0), 0, 3);
       entry.poop = clamp(Number(manualPoop?.value || 0), 0, 3);
       entry.vomit = clamp(Number(manualVomit?.value || 0), 0, 3);
@@ -5206,15 +5383,14 @@ function saveManualEntry() {
     if(selection === 'other'){
       name = (manualMedOtherInput?.value || '').trim();
       if(!name){
-        alert('Veuillez indiquer le nom du medicament.');
         manualMedOtherInput?.focus();
-        throw new Error("Medication name required"); // Throw to stop execution
+        throw new Error("Veuillez indiquer le nom du médicament.");
       }
     }
     const dose = (manualMedDose?.value || '').trim();
     const notes = (manualMedNotes?.value || '').trim();
     entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
-    entry.dateISO = date.toISOString();
+    entry.dateISO = dateISO;
     entry.name = name;
     entry.medKey = selection;
     if (dose) entry.dose = dose;
@@ -5234,12 +5410,11 @@ function saveManualEntry() {
       const height = manualMesureTaille.value ? parseFloat(manualMesureTaille.value) : null;
 
       if (temp === null && weight === null && height === null) {
-        alert("Veuillez entrer au moins une mesure.");
-        throw new Error("At least one measurement is required");
+        throw new Error("Veuillez entrer au moins une mesure.");
       }
 
       entry = isEdit ? { ...editingEntry } : { id: Date.now() + '' };
-      entry.dateISO = date.toISOString();
+      entry.dateISO = dateISO;
       if (temp !== null) entry.temp = temp;
       if (weight !== null) entry.weight = weight;
       if (height !== null) entry.height = height;
@@ -5256,13 +5431,13 @@ function saveManualEntry() {
       const durationMins = Math.max(0, Number(manualPumpDuration?.value || 0));
       const amount = Number(manualPumpAmount?.value || 0);
       const durationSec = Math.round(durationMins * 60);
-      const endTs = date.getTime();
+      const endTs = new Date(dateISO).getTime();
       const startTs = endTs - (durationSec * 1000);
 
       entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
-      entry.dateISO = date.toISOString();
+      entry.dateISO = dateISO;
       entry.startISO = new Date(startTs).toISOString();
-      entry.endISO = date.toISOString();
+      entry.endISO = dateISO;
       entry.durationSec = durationSec;
 
       if(amount > 0) entry.amountMl = amount;
@@ -5282,9 +5457,10 @@ function saveManualEntry() {
   });
 
   if(reason && entry){
-    const api = getPersistenceApi();
-    api?.saveEntry?.(targetType, entry, reason);
+    // Return promise for safeAction
+    return getPersistenceApi()?.saveEntry?.(targetType, entry, reason);
   }
+  // If no entry created (e.g. error), safeAction catches the error or we return resolved
   closeManualModal();
   renderHistory();
 }
@@ -5438,13 +5614,8 @@ exportReportsBtn?.addEventListener('click', exportReports);
 exportCsvBtn?.addEventListener('click', exportToCSV);
 closeManualBtn?.addEventListener('click', closeManualModal);
 cancelManualBtn?.addEventListener('click', closeManualModal);
-saveManualBtn?.addEventListener('click', () => {
-  try {
-    saveManualEntry();
-  } catch (e) {
-    console.warn("Save manual entry failed:", e.message);
-    // Alert the user that something went wrong, as the function might have bailed early.
-  }
+saveManualBtn?.addEventListener('click', async () => {
+  await safeAction(saveManualBtn, async () => saveManualEntry());
 });
 manualTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setManualType(btn.dataset.type)));
 manualSource?.addEventListener('change', updateManualSourceFields);
