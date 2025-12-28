@@ -57,6 +57,7 @@
     border-radius: 6px;
     color: inherit;
     transition: background 0.2s, box-shadow 0.2s;
+    margin: 0;
   }
   .segmented-control button.active {
     background: #fff;
@@ -98,6 +99,51 @@
   .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
   .toggle-row:last-child { border-bottom: none; }
   .chart-type-selector { display: flex; gap: 8px; margin-top: 8px; }
+
+  button {
+    margin: 2px;
+  }
+
+  .preset-amounts {
+    padding: 4px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.6);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  }
+  .dark-mode .preset-amounts {
+    background: rgba(30,30,30,0.6);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+  }
+  .preset-btn {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+  .btn,
+  .icon-btn,
+  .circle-btn,
+  .pump-step-btn,
+  .range-option,
+  .range-option-item,
+  .sleep-tag {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  .dark-mode .btn,
+  .dark-mode .icon-btn,
+  .dark-mode .circle-btn,
+  .dark-mode .pump-step-btn,
+  .dark-mode .range-option,
+  .dark-mode .range-option-item,
+  .dark-mode .sleep-tag {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  @media (max-width: 600px) {
+    #modal-sleep .sheet {
+      margin: 12px;
+    }
+    #modal-sleep .sheet .stack {
+      gap: 12px;
+    }
+  }
 
   /* --- Mobile UX Optimizations --- */
   :root {

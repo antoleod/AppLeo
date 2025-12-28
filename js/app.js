@@ -694,7 +694,7 @@ const BOTTLE_PRESET_DEFAULT_KEY = 'bottlePresetDefault';
 const BOTTLE_PRESET_COUNTS_KEY = 'bottlePresetCounts';
 const BOTTLE_PRESET_VALUES = [90, 120, 130, 140, 150];
 const BOTTLE_PRESET_PROMOTION_THRESHOLD = 3;
-const BOTTLE_BASE_DEFAULT_PRESET = 120;
+const BOTTLE_BASE_DEFAULT_PRESET = 130;
 const BOTTLE_STEP_ML = 10;
 const BOTTLE_MAX_ML = 260;
 const BOTTLE_MIN_ML = 0;
@@ -3638,6 +3638,7 @@ async function handleSaveSleepAction() {
   }
   
   await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
+  stopSleepTimer({ persist: true, resetDisplay: true });
   getPersistenceApi()?.saveTimer('sleep', null);
 }
 */
@@ -3681,6 +3682,7 @@ async function handleSaveSleepAction() {
     if(!entry) throw new Error('Impossible d\'enregistrer cette session.');
     
     await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
+    stopSleepTimer({ persist: true, resetDisplay: true });
     getPersistenceApi()?.saveTimer('sleep', null);
   });
 }
