@@ -711,6 +711,7 @@ let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
 
 let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
 let lastStoppedBottleStart = null;
+let lastBottleStopRequestedAt = null;
 let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
 let bottlePresetCounts = normalizeBottlePresetCounts(store.get(BOTTLE_PRESET_COUNTS_KEY, {}));
 let whoData = null;
@@ -3605,7 +3606,6 @@ async function handleStartStopSleepAction() {
     const startedAt = sleepTimerStart;
     const elapsed = Math.max(1, Math.floor((Date.now() - sleepTimerStart) / 1000));
     stopSleepTimer({ resetDisplay: false });
-    getPersistenceApi()?.saveTimer('sleep', null);
     
     renderSleepUI('manual');
     
@@ -3622,7 +3622,6 @@ async function handleStartStopSleepAction() {
     const ts = Date.now();
     beginSleepTimer(ts, true);
     clearSleepPending();
-    getPersistenceApi()?.saveTimer('sleep', { start: ts });
     enterFocusMode('sleep');
   }
 }
@@ -3713,7 +3712,6 @@ async function handleSaveSleepAction() {
     
     await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
     stopSleepTimer({ persist: true, resetDisplay: true });
-    getPersistenceApi()?.saveTimer('sleep', null);
   });
 }
 
@@ -3766,15 +3764,19 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
   }
 }
 
-function stopBottleTimerWithoutSaving({ resetDisplay = true } = {}){
+function stopBottleTimerWithoutSaving({ resetDisplay = true, persist = true } = {}){
   if(bottleTimerInterval){
     triggerVibration();
     clearInterval(bottleTimerInterval);
     bottleTimerInterval = null;
   }
   if (bottleTimerStart) lastStoppedBottleStart = bottleTimerStart;
+  lastBottleStopRequestedAt = Date.now();
   bottleTimerStart = null;
   store.remove(BOTTLE_TIMER_KEY);
+  if(persist){
+    getPersistenceApi()?.saveTimer('bottle', null);
+  }
   startStopBottleBtn && (startStopBottleBtn.textContent = 'Démarrer');
   if(resetDisplay){
     bottleTimer = 0;
@@ -3808,16 +3810,23 @@ function syncLocalTimersWithRemote(activeTimers) {
   // Bottle
   const bottle = activeTimers.bottle;
   if (bottle && bottle.start) {
-    const isJustStopped = lastStoppedBottleStart && Math.abs(lastStoppedBottleStart - bottle.start) < 1000;
-    if (!isJustStopped && (!bottleTimerStart || Math.abs(bottleTimerStart - bottle.start) > 1000)) {
-      setFeedMode('bottle');
-      if (bottle.bottleType) setBottleType(bottle.bottleType, {persist:true});
-      beginBottleTimer(bottle.start, false);
+    if(bottlePendingDuration > 0 || bottlePendingAmount != null){
+      getPersistenceApi()?.saveTimer('bottle', null);
+    } else if(lastBottleStopRequestedAt && Date.now() - lastBottleStopRequestedAt < 10000){
+      getPersistenceApi()?.saveTimer('bottle', null);
+    } else {
+      const isJustStopped = lastStoppedBottleStart && Math.abs(lastStoppedBottleStart - bottle.start) < 1000;
+      if (!isJustStopped && (!bottleTimerStart || Math.abs(bottleTimerStart - bottle.start) > 1000)) {
+        setFeedMode('bottle');
+        if (bottle.bottleType) setBottleType(bottle.bottleType, {persist:true});
+        beginBottleTimer(bottle.start, false);
+      }
     }
   } else if (bottleTimerStart) {
-    stopBottleTimerWithoutSaving();
+    stopBottleTimerWithoutSaving({ persist: false });
   } else {
     lastStoppedBottleStart = null;
+    lastBottleStopRequestedAt = null;
   }
 
   // Sleep
@@ -4290,7 +4299,6 @@ function beginTimer(startTimestamp = Date.now(), persist = true){
   if(persist){
     store.set(TIMER_KEY, { start: timerStart, breastSide });
   }
-  if(persist) getPersistenceApi()?.saveTimer('breast', { start: timerStart, side: breastSide });
 }
 
 function stopTimerWithoutSaving(){
@@ -4404,7 +4412,6 @@ startStopSleepBtn?.addEventListener('click', async () => {
       const entry = buildSleepEntry({ startDate, endDate, notes });
       if(entry){
         await saveSleepEntry(entry, { reason: 'Sommeil (chrono)' });
-        getPersistenceApi()?.saveTimer('sleep', null);
       }
     }
   }else{
@@ -4416,7 +4423,6 @@ startStopSleepBtn?.addEventListener('click', async () => {
       sleepEndInput.value = '';
     }
     clearSleepPending();
-    getPersistenceApi()?.saveTimer('sleep', { start: ts });
     enterFocusMode('sleep');
   }
 });
@@ -4451,7 +4457,6 @@ saveSleepBtn?.addEventListener('click', async () => {
     return;
   }
   await saveSleepEntry(entry, { reason: editingSleepEntry ? 'Modifier le sommeil' : 'Ajouter sommeil' });
-  getPersistenceApi()?.saveTimer('sleep', null);
 });
 
 $('#side-left')?.addEventListener('click', ()=> setBreastSide('Gauche'));
@@ -4556,7 +4561,6 @@ startStopBottleBtn?.addEventListener('click', async () => {
     const elapsed = Math.max(1, Math.floor((Date.now() - start) / 1000));
     const endTs = Date.now();
     stopBottleTimerWithoutSaving({ resetDisplay: false });
-    getPersistenceApi()?.saveTimer('bottle', null);
     bottleTimer = elapsed;
     updateBottleChrono();
     
@@ -4590,7 +4594,6 @@ startStopBottleBtn?.addEventListener('click', async () => {
     }
     setFeedMode('bottle');
     beginBottleTimer(Date.now(), true);
-    getPersistenceApi()?.saveTimer('bottle', { start: Date.now(), bottleType });
     updateBottleTimeSummary();
     enterFocusMode('bottle');
   }
@@ -4668,7 +4671,6 @@ saveBottleBtn?.addEventListener('click', async () => {
     hideBottlePrompt({ clearValue: true });
     applyBottleDefaultAmount();
     stopBottleTimerWithoutSaving();
-    getPersistenceApi()?.saveTimer('bottle', null);
   });
 });
 
