@@ -5375,7 +5375,7 @@ function closeManualModal(){
 
 }
 
-const DEFAULT_FIRESTORE_DOC_ID = 'family-shared';
+const DEFAULT_FIRESTORE_DOC_ID = '1m2m3';
 const DOC_STORAGE_KEY = 'lo.sharedDocId';
 
 function resolveSharedDocumentId() {
@@ -5585,16 +5585,17 @@ async function initFirebaseSync() {
   firebaseDbInstance = firebaseDb;
   if (!firebaseDbInstance || !firebaseDocId) {
     console.warn("Firebase dependencies not ready.");
-    setSaveIndicator('error', 'Dependencias no listas.');
+    setSaveIndicator('error', 'Dépendances manquantes');
     return;
   }
 
   // Asegurarse de que la autenticación anónima se complete antes de continuar.
   try {
+    setSaveIndicator('saving', 'Authentification...');
     await ensureAuth();
   } catch (authError) {
     console.error("Firebase authentication failed:", authError);
-    setSaveIndicator('error', 'Error de autenticación.');
+    setSaveIndicator('error', 'Erreur auth.');
     return; // Detener si la autenticación falla.
   }
 
@@ -5614,9 +5615,12 @@ async function initFirebaseSync() {
   persistenceApi.init(firebaseDbInstance, firebaseDocId, firebaseAuth);
     firebaseInitialized = true;
 
+    setSaveIndicator('saving', 'Connexion...');
+
     // Esperamos a que lleguen los primeros datos y los renderizamos.
     const initialData = await persistenceApi.connect();
     console.log(`Firebase sync connected for document ${firebaseDocId}. Initial data received.`);
+    setSaveIndicator('synced', 'Connecté');
     // Debug: log counts & sample ids so we can compare what's in Firestore vs what's rendered
     try {
       const counts = {
@@ -5695,6 +5699,17 @@ async function bootstrap() {
     firebaseStorageInstance = storage;
     firebaseStorageFns = storageFns;
     firebaseDocId = resolveSharedDocumentId();
+
+    if (saveIndicatorEl) {
+      saveIndicatorEl.style.cursor = 'pointer';
+      saveIndicatorEl.title = "Vérifier la connexion";
+      saveIndicatorEl.addEventListener('click', () => {
+        const fbStatus = firebaseInitialized ? '✅ Initialisé' : '❌ Non initialisé';
+        const netStatus = isOnline() ? '✅ En ligne' : '⚠️ Hors ligne';
+        const docStatus = firebaseDocId ? `📄 ${firebaseDocId}` : '❌ Manquant';
+        alert(`État de la connexion :\n\nFirebase : ${fbStatus}\nRéseau : ${netStatus}\nDocument : ${docStatus}`);
+      });
+    }
 
     setSaveIndicator('idle', isOnline() ? SAVE_MESSAGES.idle : SAVE_MESSAGES.offline);
     updateOfflineIndicator();
