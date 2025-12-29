@@ -5877,6 +5877,25 @@ function closeSwipedItem(itemContainer) {
 //     });
 //   });
 // }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.getRegistrations()
+      .then(registrations => {
+        registrations.forEach(registration => registration.unregister());
+      })
+      .catch(err => {
+        console.warn('Service worker cleanup failed:', err);
+      });
+
+    if ('caches' in window) {
+      caches.keys()
+        .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+        .catch(err => {
+          console.warn('Cache cleanup failed:', err);
+        });
+    }
+  });
+}
 
 historyList?.addEventListener('pointerdown', handleSwipeStart);
 document.addEventListener('click', (e) => {
