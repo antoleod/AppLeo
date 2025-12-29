@@ -1,0 +1,5533 @@
+{
+  "feeds": [
+    {
+      "dateISO": "2025-12-29T08:55:00.000Z",
+      "type": "feed",
+      "amountMl": 40,
+      "id": "1767007057307",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 9,
+      "bottleEndISO": "2025-12-29T08:05:09.000Z",
+      "amountMl": 110,
+      "id": "1766995564173",
+      "bottleStartISO": "2025-12-29T08:05:00.000Z",
+      "source": "bottle",
+      "dateISO": "2025-12-29T08:05:09.000Z"
+    },
+    {
+      "id": "1766984008698",
+      "durationSec": 540,
+      "amountMl": 90,
+      "bottleStartISO": "2025-12-29T04:43:00.000Z",
+      "dateISO": "2025-12-29T04:52:00.000Z",
+      "bottleEndISO": "2025-12-29T04:52:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "id": "1766976070618",
+      "durationSec": 177,
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-29T02:41:10.618Z"
+    },
+    {
+      "amountMl": 120,
+      "bottleEndISO": "2025-12-29T02:37:00.000Z",
+      "bottleStartISO": "2025-12-29T02:28:00.000Z",
+      "source": "bottle",
+      "id": "1766975838024",
+      "durationSec": 540,
+      "dateISO": "2025-12-29T02:37:00.000Z"
+    },
+    {
+      "type": "feed",
+      "source": "bottle",
+      "amountMl": 130,
+      "dateISO": "2025-12-28T20:44:00.000Z",
+      "id": "1766956426828"
+    },
+    {
+      "dateISO": "2025-12-28T18:34:01.000Z",
+      "id": "1766946886720",
+      "bottleStartISO": "2025-12-28T18:34:00.000Z",
+      "bottleEndISO": "2025-12-28T18:34:01.000Z",
+      "durationSec": 1,
+      "amountMl": 110,
+      "source": "bottle"
+    },
+    {
+      "bottleEndISO": "2025-12-28T17:07:00.000Z",
+      "id": "1766941685156",
+      "dateISO": "2025-12-28T17:07:00.000Z",
+      "amountMl": 80,
+      "bottleStartISO": "2025-12-28T16:55:00.000Z",
+      "durationSec": 720,
+      "source": "bottle"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 780,
+      "id": "1766932994982",
+      "dateISO": "2025-12-28T14:43:14.982Z"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-28T13:25:01.000Z",
+      "amountMl": 120,
+      "durationSec": 1,
+      "bottleStartISO": "2025-12-28T13:25:00.000Z",
+      "id": "1766928767109",
+      "bottleEndISO": "2025-12-28T13:25:01.000Z"
+    },
+    {
+      "dateISO": "2025-12-28T11:21:00.000Z",
+      "amountMl": 30,
+      "source": "bottle",
+      "bottleStartISO": "2025-12-28T11:13:00.000Z",
+      "id": "1766920884777",
+      "bottleEndISO": "2025-12-28T11:21:00.000Z",
+      "durationSec": 480
+    },
+    {
+      "bottleStartISO": "2025-12-28T10:20:00.000Z",
+      "source": "bottle",
+      "durationSec": 720,
+      "dateISO": "2025-12-28T10:32:00.000Z",
+      "id": "1766917967856",
+      "amountMl": 90,
+      "bottleEndISO": "2025-12-28T10:32:00.000Z"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 540,
+      "id": "1766913788270",
+      "amountMl": 80,
+      "bottleStartISO": "2025-12-28T09:14:00.000Z",
+      "bottleEndISO": "2025-12-28T09:23:00.000Z",
+      "dateISO": "2025-12-28T09:23:00.000Z"
+    },
+    {
+      "dateISO": "2025-12-28T07:34:00.000Z",
+      "id": "1766907260303",
+      "bottleEndISO": "2025-12-28T07:34:00.000Z",
+      "durationSec": 840,
+      "amountMl": 120,
+      "bottleStartISO": "2025-12-28T07:20:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 60,
+      "id": "1766897307350",
+      "dateISO": "2025-12-28T04:47:00.000Z"
+    },
+    {
+      "id": "1766892740279",
+      "durationSec": 845,
+      "breastSide": "Droite",
+      "dateISO": "2025-12-28T03:32:20.279Z",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-12-27T22:21:55.377Z",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 1011,
+      "id": "1766874115377"
+    },
+    {
+      "durationSec": 600,
+      "bottleStartISO": "2025-12-27T20:08:00.000Z",
+      "source": "bottle",
+      "dateISO": "2025-12-27T20:18:00.000Z",
+      "bottleEndISO": "2025-12-27T20:18:00.000Z",
+      "amountMl": 120,
+      "id": "1766866745109"
+    },
+    {
+      "amountMl": 110,
+      "bottleEndISO": "2025-12-27T18:27:00.000Z",
+      "dateISO": "2025-12-27T18:27:00.000Z",
+      "id": "1766860086997",
+      "source": "bottle",
+      "durationSec": 240,
+      "bottleStartISO": "2025-12-27T18:23:00.000Z"
+    },
+    {
+      "bottleStartISO": "2025-12-27T16:23:00.000Z",
+      "bottleEndISO": "2025-12-27T16:24:00.000Z",
+      "durationSec": 60,
+      "dateISO": "2025-12-27T16:24:00.000Z",
+      "amountMl": 130,
+      "source": "bottle",
+      "id": "1766852649451"
+    },
+    {
+      "amountMl": 70,
+      "source": "bottle",
+      "dateISO": "2025-12-27T13:22:00.000Z",
+      "id": "1766842840565"
+    },
+    {
+      "bottleStartISO": "2025-12-27T12:28:00.000Z",
+      "durationSec": 840,
+      "id": "1766839359210",
+      "bottleEndISO": "2025-12-27T12:42:00.000Z",
+      "dateISO": "2025-12-27T12:42:00.000Z",
+      "source": "bottle",
+      "amountMl": 50
+    },
+    {
+      "id": "1766831752669",
+      "source": "bottle",
+      "dateISO": "2025-12-27T10:35:00.000Z",
+      "bottleEndISO": "2025-12-27T10:35:00.000Z",
+      "durationSec": 720,
+      "amountMl": 120,
+      "bottleStartISO": "2025-12-27T10:23:00.000Z"
+    },
+    {
+      "amountMl": 130,
+      "dateISO": "2025-12-27T07:24:00.000Z",
+      "id": "1766819842438",
+      "source": "bottle"
+    },
+    {
+      "bottleStartISO": "2025-12-27T04:48:00.000Z",
+      "dateISO": "2025-12-27T04:59:00.000Z",
+      "amountMl": 130,
+      "durationSec": 660,
+      "bottleEndISO": "2025-12-27T04:59:00.000Z",
+      "id": "1766811612691",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-27T01:50:00.000Z",
+      "bottleStartISO": "2025-12-27T01:49:00.000Z",
+      "durationSec": 60,
+      "bottleEndISO": "2025-12-27T01:50:00.000Z",
+      "source": "bottle",
+      "id": "1766800255751",
+      "amountMl": 120
+    },
+    {
+      "id": "1766785753356",
+      "amountMl": 130,
+      "dateISO": "2025-12-26T21:49:00.000Z",
+      "durationSec": 60,
+      "bottleEndISO": "2025-12-26T21:49:00.000Z",
+      "source": "bottle",
+      "bottleStartISO": "2025-12-26T21:48:00.000Z"
+    },
+    {
+      "source": "breast",
+      "durationSec": 79,
+      "dateISO": "2025-12-26T19:39:21.611Z",
+      "id": "1766777961611",
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-12-26T19:20:55.857Z",
+      "breastSide": "Gauche",
+      "id": "1766776855857",
+      "durationSec": 290
+    },
+    {
+      "id": "1766775064965",
+      "dateISO": "2025-12-26T18:21:00.000Z",
+      "source": "bottle",
+      "amountMl": 110
+    },
+    {
+      "id": "1766766610129",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-26T16:30:10.129Z",
+      "durationSec": 315
+    },
+    {
+      "id": "1766761779938",
+      "durationSec": 953,
+      "source": "breast",
+      "dateISO": "2025-12-26T15:09:39.938Z",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-26T13:04:00.000Z",
+      "id": "1766763541777",
+      "amountMl": 120
+    },
+    {
+      "id": "1766746015942",
+      "dateISO": "2025-12-26T10:46:55.942Z",
+      "durationSec": 1,
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1766736828666",
+      "dateISO": "2025-12-26T07:38:00.000Z",
+      "amountMl": 90
+    },
+    {
+      "durationSec": 3,
+      "dateISO": "2025-12-26T04:27:09.599Z",
+      "amountMl": 90,
+      "source": "bottle",
+      "id": "1766723229599"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-26T02:14:21.299Z",
+      "amountMl": 125,
+      "durationSec": 1,
+      "id": "1766715261299"
+    },
+    {
+      "id": "1766697089353",
+      "durationSec": 1,
+      "source": "bottle",
+      "amountMl": 130,
+      "dateISO": "2025-12-25T21:11:29.353Z"
+    },
+    {
+      "id": "1766687924498",
+      "durationSec": 2,
+      "dateISO": "2025-12-25T18:38:44.498Z",
+      "amountMl": 90,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-25T17:23:19.998Z",
+      "id": "1766683399998",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 479
+    },
+    {
+      "dateISO": "2025-12-25T16:02:00.000Z",
+      "id": "1766680336033",
+      "source": "bottle",
+      "amountMl": 70
+    },
+    {
+      "durationSec": 281,
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1766672712223",
+      "dateISO": "2025-12-25T14:25:12.223Z"
+    },
+    {
+      "durationSec": 807,
+      "dateISO": "2025-12-25T13:14:32.818Z",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1766668472818"
+    },
+    {
+      "id": "1766666810535",
+      "durationSec": 1784,
+      "source": "breast",
+      "dateISO": "2025-12-25T12:46:50.535Z",
+      "breastSide": "Droite"
+    },
+    {
+      "durationSec": 4,
+      "amountMl": 70,
+      "source": "bottle",
+      "id": "1766654279208",
+      "dateISO": "2025-12-25T09:17:59.209Z"
+    },
+    {
+      "source": "bottle",
+      "id": "1766650851393",
+      "dateISO": "2025-12-25T08:13:00.000Z",
+      "amountMl": 80
+    },
+    {
+      "dateISO": "2025-12-25T06:09:40.652Z",
+      "durationSec": 1,
+      "id": "1766642980652",
+      "amountMl": 100,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-25T03:23:44.738Z",
+      "durationSec": 1,
+      "id": "1766633024738",
+      "amountMl": 130,
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1766609530507",
+      "source": "breast",
+      "durationSec": 87,
+      "dateISO": "2025-12-24T20:52:10.507Z"
+    },
+    {
+      "durationSec": 2,
+      "dateISO": "2025-12-24T19:58:16.056Z",
+      "amountMl": 110,
+      "id": "1766606296056",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 2,
+      "amountMl": 70,
+      "id": "1766597451787",
+      "dateISO": "2025-12-24T17:30:51.787Z",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-24T14:49:48.341Z",
+      "durationSec": 2,
+      "amountMl": 120,
+      "source": "bottle",
+      "id": "1766587788341"
+    },
+    {
+      "id": "1766576869860",
+      "source": "bottle",
+      "durationSec": 2,
+      "dateISO": "2025-12-24T11:47:49.860Z",
+      "amountMl": 120
+    },
+    {
+      "amountMl": 100,
+      "id": "1766570259987",
+      "durationSec": 2,
+      "dateISO": "2025-12-24T09:57:39.987Z",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1766561734424",
+      "dateISO": "2025-12-24T07:35:34.424Z",
+      "amountMl": 120,
+      "durationSec": 3
+    },
+    {
+      "durationSec": 605,
+      "id": "1766550843972",
+      "amountMl": 110,
+      "source": "bottle",
+      "dateISO": "2025-12-24T04:34:03.972Z"
+    },
+    {
+      "dateISO": "2025-12-24T01:13:29.055Z",
+      "source": "bottle",
+      "durationSec": 649,
+      "id": "1766538809055",
+      "amountMl": 130
+    },
+    {
+      "source": "bottle",
+      "amountMl": 100,
+      "dateISO": "2025-12-23T20:46:00.971Z",
+      "id": "1766522760971",
+      "durationSec": 667
+    },
+    {
+      "dateISO": "2025-12-23T18:31:00.000Z",
+      "amountMl": 110,
+      "source": "bottle",
+      "id": "1766514690216"
+    },
+    {
+      "id": "1766508494480",
+      "durationSec": 456,
+      "amountMl": 80,
+      "dateISO": "2025-12-23T16:48:14.480Z",
+      "source": "bottle"
+    },
+    {
+      "id": "1766498990017",
+      "amountMl": 80,
+      "durationSec": 2,
+      "source": "bottle",
+      "dateISO": "2025-12-23T14:09:50.017Z"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-23T12:38:48.959Z",
+      "durationSec": 921,
+      "id": "1766493528959"
+    },
+    {
+      "amountMl": 120,
+      "id": "1766485513099",
+      "durationSec": 949,
+      "source": "bottle",
+      "dateISO": "2025-12-23T10:25:13.099Z"
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-23T08:15:06.143Z",
+      "durationSec": 640,
+      "source": "bottle",
+      "id": "1766477706143"
+    },
+    {
+      "amountMl": 130,
+      "dateISO": "2025-12-23T04:35:14.883Z",
+      "durationSec": 3,
+      "id": "1766464514883",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-23T01:21:30.468Z",
+      "id": "1766452890468",
+      "amountMl": 130,
+      "durationSec": 2
+    },
+    {
+      "id": "1766431031380",
+      "amountMl": 60,
+      "source": "bottle",
+      "dateISO": "2025-12-22T19:17:11.380Z",
+      "durationSec": 2
+    },
+    {
+      "id": "1766422074920",
+      "source": "bottle",
+      "amountMl": 120,
+      "dateISO": "2025-12-22T16:14:00.000Z"
+    },
+    {
+      "dateISO": "2025-12-22T12:05:12.092Z",
+      "amountMl": 130,
+      "id": "1766405112092",
+      "source": "bottle",
+      "durationSec": 2
+    },
+    {
+      "dateISO": "2025-12-22T09:31:03.494Z",
+      "id": "1766395863494",
+      "source": "bottle",
+      "amountMl": 140,
+      "durationSec": 3
+    },
+    {
+      "durationSec": 537,
+      "id": "1766382447467",
+      "source": "bottle",
+      "dateISO": "2025-12-22T05:47:27.467Z",
+      "amountMl": 110
+    },
+    {
+      "amountMl": 130,
+      "source": "bottle",
+      "id": "1766369739172",
+      "dateISO": "2025-12-22T02:02:00.000Z"
+    },
+    {
+      "durationSec": 3,
+      "dateISO": "2025-12-21T19:56:22.750Z",
+      "source": "bottle",
+      "amountMl": 50,
+      "id": "1766346982750"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 602,
+      "dateISO": "2025-12-21T19:15:27.639Z",
+      "amountMl": 90,
+      "id": "1766344527639"
+    },
+    {
+      "id": "1766336945847",
+      "source": "bottle",
+      "dateISO": "2025-12-21T17:09:05.847Z",
+      "amountMl": 130,
+      "durationSec": 727
+    },
+    {
+      "dateISO": "2025-12-21T14:50:00.000Z",
+      "id": "1766332241410",
+      "source": "bottle",
+      "amountMl": 40
+    },
+    {
+      "amountMl": 90,
+      "id": "1766326670318",
+      "durationSec": 494,
+      "dateISO": "2025-12-21T14:17:50.318Z",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 130,
+      "dateISO": "2025-12-21T11:45:00.000Z",
+      "id": "1766318069132",
+      "source": "bottle"
+    },
+    {
+      "id": "1766307467660",
+      "source": "bottle",
+      "durationSec": 492,
+      "amountMl": 80,
+      "dateISO": "2025-12-21T08:57:47.660Z"
+    },
+    {
+      "amountMl": 50,
+      "dateISO": "2025-12-21T06:53:24.012Z",
+      "source": "bottle",
+      "durationSec": 3,
+      "id": "1766300004012"
+    },
+    {
+      "source": "bottle",
+      "id": "1766293952584",
+      "amountMl": 70,
+      "durationSec": 4,
+      "dateISO": "2025-12-21T05:12:32.584Z"
+    },
+    {
+      "durationSec": 2,
+      "dateISO": "2025-12-21T02:57:33.426Z",
+      "amountMl": 110,
+      "id": "1766285853426",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1766274155501",
+      "dateISO": "2025-12-20T23:03:00.000Z",
+      "amountMl": 130
+    },
+    {
+      "amountMl": 80,
+      "source": "bottle",
+      "id": "1766252863130",
+      "durationSec": 6,
+      "dateISO": "2025-12-20T17:47:43.130Z"
+    },
+    {
+      "dateISO": "2025-12-20T14:20:01.456Z",
+      "id": "1766240401456",
+      "source": "bottle",
+      "durationSec": 4,
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-20T11:33:21.049Z",
+      "id": "1766230401049",
+      "durationSec": 4,
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-20T09:02:00.000Z",
+      "amountMl": 130,
+      "id": "1766228358567"
+    },
+    {
+      "durationSec": 694,
+      "dateISO": "2025-12-20T04:43:18.976Z",
+      "amountMl": 130,
+      "id": "1766205798976",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 130,
+      "dateISO": "2025-12-20T01:05:00.000Z",
+      "id": "1766194120650",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 714,
+      "amountMl": 110,
+      "dateISO": "2025-12-19T19:47:15.282Z",
+      "id": "1766173635282",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-19T17:13:00.000Z",
+      "amountMl": 120,
+      "id": "1766164391657",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1766156139941",
+      "dateISO": "2025-12-19T14:55:00.000Z",
+      "amountMl": 100
+    },
+    {
+      "id": "1766149198176",
+      "amountMl": 60,
+      "dateISO": "2025-12-19T12:44:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-19T12:07:22.050Z",
+      "durationSec": 235,
+      "source": "breast",
+      "id": "1766146042050"
+    },
+    {
+      "durationSec": 272,
+      "dateISO": "2025-12-19T11:48:24.338Z",
+      "id": "1766144904338",
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-19T10:26:40.226Z",
+      "amountMl": 80,
+      "durationSec": 1,
+      "id": "1766140000226"
+    },
+    {
+      "amountMl": 50,
+      "durationSec": 2,
+      "id": "1766133104997",
+      "dateISO": "2025-12-19T08:31:44.997Z",
+      "source": "bottle"
+    },
+    {
+      "id": "1766131462756",
+      "dateISO": "2025-12-19T08:04:22.756Z",
+      "source": "bottle",
+      "amountMl": 80,
+      "durationSec": 2
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-19T05:16:36.033Z",
+      "amountMl": 130,
+      "durationSec": 555,
+      "id": "1766121396033"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 578,
+      "amountMl": 130,
+      "id": "1766109504841",
+      "dateISO": "2025-12-19T01:58:24.841Z"
+    },
+    {
+      "amountMl": 85,
+      "source": "bottle",
+      "id": "1766084803858",
+      "dateISO": "2025-12-18T19:06:00.000Z"
+    },
+    {
+      "amountMl": 40,
+      "id": "1766077328033",
+      "dateISO": "2025-12-18T17:02:08.033Z",
+      "durationSec": 3,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-18T16:49:51.528Z",
+      "amountMl": 80,
+      "source": "bottle",
+      "durationSec": 517,
+      "id": "1766076591528"
+    },
+    {
+      "source": "breast",
+      "durationSec": 212,
+      "dateISO": "2025-12-18T15:45:44.174Z",
+      "breastSide": "Droite",
+      "id": "1766072744174"
+    },
+    {
+      "id": "1766069193369",
+      "durationSec": 1042,
+      "dateISO": "2025-12-18T14:46:33.369Z",
+      "breastSide": "Gauche",
+      "source": "breast"
+    },
+    {
+      "source": "bottle",
+      "id": "1766057172420",
+      "durationSec": 419,
+      "amountMl": 80,
+      "dateISO": "2025-12-18T11:26:12.420Z"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 3,
+      "dateISO": "2025-12-18T08:03:01.994Z",
+      "amountMl": 40,
+      "id": "1766044981994"
+    },
+    {
+      "durationSec": 529,
+      "dateISO": "2025-12-18T07:53:34.148Z",
+      "amountMl": 90,
+      "id": "1766044414148",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-18T04:15:19.362Z",
+      "source": "bottle",
+      "id": "1766031319362",
+      "amountMl": 120,
+      "durationSec": 2
+    },
+    {
+      "id": "1766029640485",
+      "source": "bottle",
+      "dateISO": "2025-12-18T01:49:00.000Z",
+      "amountMl": 130
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-12-17T20:11:01.988Z",
+      "source": "breast",
+      "id": "1766002261988",
+      "durationSec": 61
+    },
+    {
+      "breastSide": "Droite",
+      "id": "1766002110594",
+      "dateISO": "2025-12-17T20:08:30.594Z",
+      "durationSec": 512,
+      "source": "breast"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-12-17T19:02:06.385Z",
+      "breastSide": "Gauche",
+      "durationSec": 1165,
+      "id": "1765998126385"
+    },
+    {
+      "durationSec": 2,
+      "source": "bottle",
+      "dateISO": "2025-12-17T17:10:59.134Z",
+      "id": "1765991459134",
+      "amountMl": 70
+    },
+    {
+      "dateISO": "2025-12-17T16:04:43.153Z",
+      "source": "bottle",
+      "durationSec": 2,
+      "amountMl": 40,
+      "id": "1765987483153"
+    },
+    {
+      "dateISO": "2025-12-17T14:06:00.000Z",
+      "source": "bottle",
+      "amountMl": 120,
+      "id": "1765980602695"
+    },
+    {
+      "id": "1765967928751",
+      "source": "bottle",
+      "amountMl": 130,
+      "dateISO": "2025-12-17T10:28:00.000Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1765959386018",
+      "source": "breast",
+      "dateISO": "2025-12-17T08:16:26.018Z",
+      "durationSec": 49
+    },
+    {
+      "source": "breast",
+      "breastSide": "Droite",
+      "durationSec": 305,
+      "dateISO": "2025-12-17T08:13:10.678Z",
+      "id": "1765959190678"
+    },
+    {
+      "id": "1765956384832",
+      "notes": "Il a remis environ 30 ml",
+      "amountMl": 120,
+      "dateISO": "2025-12-17T07:18:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 120,
+      "source": "bottle",
+      "dateISO": "2025-12-17T04:07:00.000Z",
+      "id": "1765954660525"
+    },
+    {
+      "amountMl": 110,
+      "dateISO": "2025-12-17T00:59:25.109Z",
+      "durationSec": 3,
+      "source": "bottle",
+      "id": "1765933165109"
+    },
+    {
+      "durationSec": 2,
+      "amountMl": 110,
+      "id": "1765916790414",
+      "source": "bottle",
+      "dateISO": "2025-12-16T20:26:30.414Z"
+    },
+    {
+      "id": "1765911206550",
+      "dateISO": "2025-12-16T18:53:00.000Z",
+      "source": "breast",
+      "durationSec": 120,
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 5,
+      "amountMl": 100,
+      "id": "1765907343644",
+      "dateISO": "2025-12-16T17:49:03.644Z"
+    },
+    {
+      "durationSec": 633,
+      "dateISO": "2025-12-16T16:38:22.058Z",
+      "breastSide": "Droite",
+      "id": "1765903102058",
+      "source": "breast"
+    },
+    {
+      "durationSec": 218,
+      "id": "1765897742006",
+      "dateISO": "2025-12-16T15:09:02.006Z",
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "durationSec": 1735,
+      "dateISO": "2025-12-16T14:56:36.423Z",
+      "breastSide": "Gauche",
+      "id": "1765896996423",
+      "source": "breast"
+    },
+    {
+      "durationSec": 5,
+      "source": "bottle",
+      "dateISO": "2025-12-16T12:53:21.553Z",
+      "id": "1765889601553",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-16T10:24:36.605Z",
+      "source": "breast",
+      "id": "1765880676605",
+      "breastSide": "Gauche",
+      "durationSec": 226
+    },
+    {
+      "id": "1765879112150",
+      "source": "breast",
+      "durationSec": 980,
+      "dateISO": "2025-12-16T09:58:32.150Z",
+      "breastSide": "Droite"
+    },
+    {
+      "amountMl": 80,
+      "id": "1765870884666",
+      "durationSec": 496,
+      "dateISO": "2025-12-16T07:41:24.666Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 605,
+      "source": "bottle",
+      "id": "1765860494774",
+      "dateISO": "2025-12-16T04:48:14.774Z",
+      "amountMl": 110
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 137,
+      "dateISO": "2025-12-16T02:15:43.761Z",
+      "id": "1765851343761"
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-12-16T02:02:51.881Z",
+      "id": "1765850571881",
+      "durationSec": 295,
+      "source": "breast"
+    },
+    {
+      "id": "1765842442471",
+      "durationSec": 640,
+      "source": "bottle",
+      "amountMl": 120,
+      "dateISO": "2025-12-15T23:47:22.471Z"
+    },
+    {
+      "id": "1765828395795",
+      "source": "bottle",
+      "amountMl": 100,
+      "durationSec": 2,
+      "dateISO": "2025-12-15T19:53:15.795Z"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-15T18:07:28.404Z",
+      "durationSec": 438,
+      "id": "1765822048404"
+    },
+    {
+      "durationSec": 3,
+      "source": "bottle",
+      "id": "1765821600111",
+      "amountMl": 90,
+      "dateISO": "2025-12-15T18:00:00.111Z"
+    },
+    {
+      "durationSec": 429,
+      "id": "1765816145468",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-15T16:29:05.468Z",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-12-15T16:06:12.228Z",
+      "source": "bottle",
+      "durationSec": 185,
+      "amountMl": 30,
+      "id": "1765814772228"
+    },
+    {
+      "durationSec": 434,
+      "source": "bottle",
+      "amountMl": 90,
+      "dateISO": "2025-12-15T12:58:46.160Z",
+      "id": "1765803526160"
+    },
+    {
+      "durationSec": 1118,
+      "dateISO": "2025-12-15T11:55:32.965Z",
+      "id": "1765799732965",
+      "amountMl": 30,
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1765794935947",
+      "dateISO": "2025-12-15T10:20:00.000Z",
+      "durationSec": 420
+    },
+    {
+      "durationSec": 292,
+      "breastSide": "Droite",
+      "dateISO": "2025-12-15T09:56:03.608Z",
+      "id": "1765792563608",
+      "source": "breast"
+    },
+    {
+      "amountMl": 120,
+      "source": "bottle",
+      "durationSec": 603,
+      "id": "1765788349982",
+      "dateISO": "2025-12-15T08:45:49.982Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-15T06:54:33.429Z",
+      "durationSec": 304,
+      "id": "1765781673429",
+      "source": "breast"
+    },
+    {
+      "durationSec": 861,
+      "id": "1765780803595",
+      "source": "breast",
+      "breastSide": "Droite",
+      "dateISO": "2025-12-15T06:40:03.595Z"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-12-15T05:08:06.376Z",
+      "id": "1765775286376",
+      "durationSec": 228,
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1765767117588",
+      "source": "breast",
+      "durationSec": 500,
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-15T02:51:57.588Z"
+    },
+    {
+      "dateISO": "2025-12-15T02:30:10.514Z",
+      "source": "bottle",
+      "amountMl": 100,
+      "id": "1765765810514",
+      "durationSec": 484
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-14T23:30:00.000Z",
+      "source": "bottle",
+      "id": "1765764376689"
+    },
+    {
+      "source": "bottle",
+      "id": "1765744957967",
+      "dateISO": "2025-12-14T20:42:37.967Z",
+      "amountMl": 130,
+      "durationSec": 631
+    },
+    {
+      "source": "bottle",
+      "id": "1765733912053",
+      "durationSec": 2,
+      "amountMl": 100,
+      "dateISO": "2025-12-14T17:38:32.053Z"
+    },
+    {
+      "dateISO": "2025-12-14T15:11:00.000Z",
+      "source": "bottle",
+      "id": "1765725084218",
+      "amountMl": 110
+    },
+    {
+      "source": "breast",
+      "id": "1765716996869",
+      "dateISO": "2025-12-14T12:56:36.869Z",
+      "breastSide": "Droite",
+      "durationSec": 1048
+    },
+    {
+      "id": "1765708189842",
+      "dateISO": "2025-12-14T10:29:49.842Z",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 822
+    },
+    {
+      "id": "1765700314295",
+      "source": "bottle",
+      "amountMl": 60,
+      "durationSec": 1,
+      "dateISO": "2025-12-14T08:18:34.295Z"
+    },
+    {
+      "dateISO": "2025-12-14T06:32:00.000Z",
+      "amountMl": 30,
+      "source": "bottle",
+      "id": "1765700768244"
+    },
+    {
+      "dateISO": "2025-12-14T05:08:34.275Z",
+      "source": "breast",
+      "durationSec": 308,
+      "id": "1765688914275",
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "bottle",
+      "id": "1765684263395",
+      "dateISO": "2025-12-14T03:51:03.395Z",
+      "durationSec": 594,
+      "amountMl": 130
+    },
+    {
+      "id": "1765656562665",
+      "durationSec": 226,
+      "dateISO": "2025-12-13T20:09:22.665Z",
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-12-13T20:04:02.161Z",
+      "durationSec": 846,
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1765656242161"
+    },
+    {
+      "durationSec": 2,
+      "dateISO": "2025-12-13T18:01:05.392Z",
+      "id": "1765648865392",
+      "source": "bottle",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-13T15:20:00.000Z",
+      "source": "bottle",
+      "amountMl": 110,
+      "id": "1765640914850"
+    },
+    {
+      "id": "1765626013002",
+      "durationSec": 4,
+      "amountMl": 70,
+      "source": "bottle",
+      "dateISO": "2025-12-13T11:40:13.002Z"
+    },
+    {
+      "id": "1765617846971",
+      "dateISO": "2025-12-13T09:24:06.971Z",
+      "amountMl": 30,
+      "source": "bottle",
+      "durationSec": 281
+    },
+    {
+      "source": "bottle",
+      "id": "1765611240433",
+      "amountMl": 90,
+      "dateISO": "2025-12-13T07:34:00.433Z",
+      "durationSec": 1
+    },
+    {
+      "id": "1765606575455",
+      "source": "bottle",
+      "amountMl": 35,
+      "durationSec": 4,
+      "dateISO": "2025-12-13T06:16:15.455Z"
+    },
+    {
+      "durationSec": 673,
+      "dateISO": "2025-12-13T04:08:08.099Z",
+      "amountMl": 120,
+      "source": "bottle",
+      "id": "1765598888099"
+    },
+    {
+      "id": "1765577617275",
+      "source": "bottle",
+      "amountMl": 60,
+      "dateISO": "2025-12-12T22:13:37.275Z",
+      "durationSec": 4
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-12-12T21:37:07.033Z",
+      "durationSec": 645,
+      "id": "1765575427033",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 775,
+      "id": "1765574187378",
+      "dateISO": "2025-12-12T21:16:27.378Z"
+    },
+    {
+      "dateISO": "2025-12-12T19:19:53.662Z",
+      "id": "1765567193662",
+      "durationSec": 428,
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "dateISO": "2025-12-12T18:31:25.848Z",
+      "durationSec": 6,
+      "source": "bottle",
+      "amountMl": 60,
+      "id": "1765564285848"
+    },
+    {
+      "dateISO": "2025-12-12T16:17:05.105Z",
+      "id": "1765556225105",
+      "source": "bottle",
+      "durationSec": 2,
+      "amountMl": 40
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-12T15:43:00.000Z",
+      "amountMl": 90,
+      "id": "1765553653310"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 130,
+      "durationSec": 2,
+      "id": "1765545894676",
+      "dateISO": "2025-12-12T13:24:54.676Z"
+    },
+    {
+      "id": "1765538292237",
+      "dateISO": "2025-12-12T11:18:12.237Z",
+      "durationSec": 454,
+      "source": "bottle",
+      "amountMl": 80
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1765529407368",
+      "source": "breast",
+      "durationSec": 412,
+      "dateISO": "2025-12-12T08:50:07.368Z"
+    },
+    {
+      "amountMl": 120,
+      "source": "bottle",
+      "durationSec": 816,
+      "id": "1765528632981",
+      "dateISO": "2025-12-12T08:37:12.981Z"
+    },
+    {
+      "amountMl": 70,
+      "dateISO": "2025-12-12T05:14:27.245Z",
+      "source": "bottle",
+      "id": "1765516467245",
+      "durationSec": 512
+    },
+    {
+      "id": "1765507694876",
+      "durationSec": 586,
+      "amountMl": 120,
+      "dateISO": "2025-12-12T02:48:14.876Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 556,
+      "amountMl": 120,
+      "source": "bottle",
+      "id": "1765495315506",
+      "dateISO": "2025-12-11T23:21:55.506Z"
+    },
+    {
+      "durationSec": 328,
+      "id": "1765480696095",
+      "source": "bottle",
+      "dateISO": "2025-12-11T19:18:16.095Z",
+      "amountMl": 30
+    },
+    {
+      "id": "1765476277012",
+      "durationSec": 1032,
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-11T18:04:37.012Z"
+    },
+    {
+      "id": "1765474952295",
+      "source": "bottle",
+      "dateISO": "2025-12-11T17:42:32.295Z",
+      "durationSec": 4,
+      "amountMl": 120
+    },
+    {
+      "source": "bottle",
+      "amountMl": 120,
+      "id": "1765461296628",
+      "dateISO": "2025-12-11T13:54:56.628Z",
+      "durationSec": 712
+    },
+    {
+      "id": "1765453397730",
+      "durationSec": 677,
+      "source": "bottle",
+      "dateISO": "2025-12-11T11:43:17.730Z",
+      "amountMl": 120
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-12-11T09:35:07.203Z",
+      "id": "1765445707203",
+      "source": "breast",
+      "durationSec": 909
+    },
+    {
+      "durationSec": 1253,
+      "source": "breast",
+      "id": "1765444739624",
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-11T09:18:59.624Z"
+    },
+    {
+      "dateISO": "2025-12-11T06:28:05.639Z",
+      "source": "bottle",
+      "amountMl": 30,
+      "id": "1765434485639",
+      "durationSec": 110
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-11T03:51:44.325Z",
+      "source": "bottle",
+      "id": "1765425104325",
+      "durationSec": 644
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-10T23:39:32.468Z",
+      "id": "1765409972468",
+      "source": "bottle",
+      "durationSec": 597
+    },
+    {
+      "durationSec": 503,
+      "id": "1765394956352",
+      "dateISO": "2025-12-10T19:29:16.352Z",
+      "source": "bottle",
+      "amountMl": 80
+    },
+    {
+      "id": "1765391846230",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "dateISO": "2025-12-10T18:37:26.230Z",
+      "durationSec": 551
+    },
+    {
+      "id": "1765386579484",
+      "amountMl": 115,
+      "durationSec": 756,
+      "source": "bottle",
+      "dateISO": "2025-12-10T17:09:39.484Z"
+    },
+    {
+      "amountMl": 80,
+      "id": "1765386595998",
+      "dateISO": "2025-12-10T12:09:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 2,
+      "id": "1765365100277",
+      "amountMl": 60,
+      "source": "bottle",
+      "dateISO": "2025-12-10T11:11:40.277Z"
+    },
+    {
+      "durationSec": 3,
+      "dateISO": "2025-12-10T09:22:52.070Z",
+      "amountMl": 120,
+      "source": "bottle",
+      "id": "1765358572070"
+    },
+    {
+      "amountMl": 130,
+      "dateISO": "2025-12-10T06:58:37.471Z",
+      "source": "bottle",
+      "id": "1765349917471",
+      "durationSec": 813
+    },
+    {
+      "dateISO": "2025-12-10T03:52:59.873Z",
+      "source": "bottle",
+      "id": "1765338779873",
+      "durationSec": 714,
+      "amountMl": 120
+    },
+    {
+      "source": "bottle",
+      "id": "1765329621534",
+      "amountMl": 120,
+      "dateISO": "2025-12-10T01:05:00.000Z"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 508,
+      "dateISO": "2025-12-09T21:01:37.831Z",
+      "amountMl": 10,
+      "id": "1765314097831"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-09T19:05:00.000Z",
+      "id": "1765307925092",
+      "amountMl": 50
+    },
+    {
+      "source": "bottle",
+      "id": "1765305066604",
+      "amountMl": 70,
+      "durationSec": 6,
+      "dateISO": "2025-12-09T18:31:06.604Z"
+    },
+    {
+      "amountMl": 110,
+      "source": "bottle",
+      "dateISO": "2025-12-09T16:05:15.277Z",
+      "durationSec": 3,
+      "id": "1765296315277"
+    },
+    {
+      "id": "1765288114782",
+      "dateISO": "2025-12-09T13:48:34.782Z",
+      "amountMl": 110,
+      "source": "bottle",
+      "durationSec": 747
+    },
+    {
+      "id": "1765280298790",
+      "dateISO": "2025-12-09T11:48:00.000Z",
+      "amountMl": 125,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-09T09:15:53.109Z",
+      "id": "1765271753109",
+      "amountMl": 110,
+      "durationSec": 1030,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-09T07:12:48.195Z",
+      "amountMl": 120,
+      "id": "1765264368195",
+      "durationSec": 2,
+      "source": "bottle"
+    },
+    {
+      "durationSec": 2,
+      "id": "1765251312442",
+      "source": "bottle",
+      "dateISO": "2025-12-09T03:35:12.442Z",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-08T23:48:04.923Z",
+      "amountMl": 120,
+      "durationSec": 574,
+      "id": "1765237684923",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 120,
+      "durationSec": 603,
+      "dateISO": "2025-12-08T19:30:28.760Z",
+      "id": "1765222228760"
+    },
+    {
+      "durationSec": 261392,
+      "breastSide": "Droite",
+      "dateISO": "2025-12-08T19:20:13.206Z",
+      "source": "breast",
+      "id": "1765221613206"
+    },
+    {
+      "id": "1765212219237",
+      "durationSec": 777,
+      "dateISO": "2025-12-08T16:43:39.237Z",
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "amountMl": 100,
+      "id": "1765203291128",
+      "dateISO": "2025-12-08T14:14:51.128Z",
+      "durationSec": 675,
+      "source": "bottle"
+    },
+    {
+      "source": "breast",
+      "durationSec": 8,
+      "dateISO": "2025-12-08T12:23:03.652Z",
+      "id": "1765196583652",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-12-08T10:24:48.548Z",
+      "durationSec": 3,
+      "amountMl": 90,
+      "source": "bottle",
+      "id": "1765189488548"
+    },
+    {
+      "dateISO": "2025-12-08T09:12:47.279Z",
+      "durationSec": 545,
+      "amountMl": 60,
+      "id": "1765185167279",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 536,
+      "amountMl": 120,
+      "source": "bottle",
+      "dateISO": "2025-12-08T03:34:53.796Z",
+      "id": "1765164893796"
+    },
+    {
+      "durationSec": 725,
+      "dateISO": "2025-12-07T23:02:12.057Z",
+      "amountMl": 140,
+      "id": "1765148532057",
+      "source": "bottle"
+    },
+    {
+      "id": "1765133783414",
+      "amountMl": 110,
+      "durationSec": 592,
+      "dateISO": "2025-12-07T18:56:23.414Z",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-07T15:33:14.112Z",
+      "durationSec": 738,
+      "id": "1765121594112",
+      "source": "bottle"
+    },
+    {
+      "id": "1765115881434",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 250,
+      "dateISO": "2025-12-07T13:58:01.434Z"
+    },
+    {
+      "source": "bottle",
+      "id": "1765111004436",
+      "dateISO": "2025-12-07T12:20:00.000Z",
+      "amountMl": 120
+    },
+    {
+      "amountMl": 120,
+      "id": "1765101283191",
+      "durationSec": 878,
+      "dateISO": "2025-12-07T09:54:43.191Z",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-07T06:58:00.000Z",
+      "id": "1765099540509",
+      "amountMl": 100
+    },
+    {
+      "dateISO": "2025-12-07T04:43:51.625Z",
+      "durationSec": 656,
+      "amountMl": 90,
+      "id": "1765082631625",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 747,
+      "source": "bottle",
+      "amountMl": 130,
+      "dateISO": "2025-12-07T02:15:03.577Z",
+      "id": "1765073703577"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 120,
+      "id": "1765056368328",
+      "durationSec": 741,
+      "dateISO": "2025-12-06T21:26:08.328Z"
+    },
+    {
+      "amountMl": 80,
+      "id": "1765045745665",
+      "durationSec": 693,
+      "source": "bottle",
+      "dateISO": "2025-12-06T18:29:05.665Z"
+    },
+    {
+      "source": "bottle",
+      "id": "1765037558153",
+      "amountMl": 110,
+      "dateISO": "2025-12-06T16:05:00.000Z"
+    },
+    {
+      "amountMl": 120,
+      "durationSec": 739,
+      "source": "bottle",
+      "dateISO": "2025-12-06T13:27:39.158Z",
+      "id": "1765027659158"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 120,
+      "id": "1765017107332",
+      "durationSec": 904,
+      "dateISO": "2025-12-06T10:31:47.332Z"
+    },
+    {
+      "amountMl": 60,
+      "durationSec": 3,
+      "dateISO": "2025-12-06T07:44:08.990Z",
+      "source": "bottle",
+      "id": "1765007048990"
+    },
+    {
+      "source": "bottle",
+      "id": "1764999710067",
+      "durationSec": 662,
+      "dateISO": "2025-12-06T05:41:50.067Z",
+      "amountMl": 120
+    },
+    {
+      "id": "1764989094905",
+      "dateISO": "2025-12-06T02:20:00.000Z",
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-05T21:04:30.912Z",
+      "amountMl": 70,
+      "source": "bottle",
+      "durationSec": 571,
+      "id": "1764968670912"
+    },
+    {
+      "id": "1764965540299",
+      "durationSec": 327,
+      "source": "breast",
+      "breastSide": "Droite",
+      "dateISO": "2025-12-05T20:12:20.299Z"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-12-05T19:10:00.000Z",
+      "durationSec": 300,
+      "id": "1764965177023",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-12-05T16:15:00.000Z",
+      "id": "1764960036393",
+      "source": "bottle",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-05T14:45:00.000Z",
+      "source": "bottle",
+      "amountMl": 120,
+      "id": "1764947777413"
+    },
+    {
+      "durationSec": 625,
+      "amountMl": 120,
+      "source": "bottle",
+      "dateISO": "2025-12-05T12:21:27.472Z",
+      "id": "1764937287472"
+    },
+    {
+      "dateISO": "2025-12-05T10:01:00.000Z",
+      "id": "1764928896678",
+      "durationSec": 720,
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 696,
+      "source": "bottle",
+      "dateISO": "2025-12-05T08:02:18.543Z",
+      "id": "1764921738543",
+      "amountMl": 120
+    },
+    {
+      "durationSec": 692,
+      "amountMl": 120,
+      "id": "1764909130600",
+      "source": "bottle",
+      "dateISO": "2025-12-05T04:32:10.600Z"
+    },
+    {
+      "source": "bottle",
+      "id": "1764896985625",
+      "durationSec": 588,
+      "dateISO": "2025-12-05T01:09:45.625Z",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-04T19:38:00.000Z",
+      "id": "1764877715118",
+      "source": "bottle",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-04T16:57:27.022Z",
+      "id": "1764867447022",
+      "source": "bottle",
+      "durationSec": 654,
+      "amountMl": 120
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-12-04T16:00:00.000Z",
+      "id": "1764864043553",
+      "durationSec": 180,
+      "source": "breast"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1764859187988",
+      "source": "breast",
+      "dateISO": "2025-12-04T14:39:47.988Z",
+      "durationSec": 846
+    },
+    {
+      "durationSec": 3149,
+      "dateISO": "2025-12-04T11:58:57.406Z",
+      "source": "bottle",
+      "amountMl": 100,
+      "id": "1764849537406"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 492,
+      "id": "1764835011176",
+      "dateISO": "2025-12-04T07:56:51.176Z",
+      "amountMl": 60
+    },
+    {
+      "amountMl": 90,
+      "durationSec": 493,
+      "dateISO": "2025-12-04T05:43:36.027Z",
+      "source": "bottle",
+      "id": "1764827016027"
+    },
+    {
+      "id": "1764813272241",
+      "source": "bottle",
+      "dateISO": "2025-12-04T01:54:32.241Z",
+      "durationSec": 683,
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-03T19:45:00.000Z",
+      "id": "1764790533433",
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1764781176473",
+      "amountMl": 110,
+      "dateISO": "2025-12-03T16:50:00.000Z"
+    },
+    {
+      "id": "1764778230411",
+      "amountMl": 110,
+      "source": "bottle",
+      "dateISO": "2025-12-03T14:35:00.000Z"
+    },
+    {
+      "durationSec": 1101,
+      "dateISO": "2025-12-03T12:04:24.209Z",
+      "amountMl": 110,
+      "id": "1764763464209",
+      "source": "bottle"
+    },
+    {
+      "id": "1764763486806",
+      "dateISO": "2025-12-03T09:40:00.000Z",
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "durationSec": 384,
+      "amountMl": 100,
+      "dateISO": "2025-12-03T07:03:34.727Z",
+      "source": "bottle",
+      "id": "1764745414727"
+    },
+    {
+      "amountMl": 110,
+      "source": "bottle",
+      "durationSec": 470,
+      "dateISO": "2025-12-03T04:22:49.660Z",
+      "id": "1764735769660"
+    },
+    {
+      "durationSec": 3,
+      "id": "1764725990158",
+      "amountMl": 120,
+      "dateISO": "2025-12-03T01:39:50.158Z",
+      "source": "bottle"
+    },
+    {
+      "id": "1764715931375",
+      "durationSec": 649,
+      "dateISO": "2025-12-02T22:52:11.375Z",
+      "source": "bottle",
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-12-02T19:18:02.613Z",
+      "durationSec": 734,
+      "amountMl": 120,
+      "id": "1764703082613",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-02T18:00:00.000Z",
+      "source": "bottle",
+      "amountMl": 30,
+      "id": "1764699064880"
+    },
+    {
+      "id": "1764690545240",
+      "durationSec": 1247,
+      "source": "bottle",
+      "dateISO": "2025-12-02T15:49:05.240Z",
+      "amountMl": 120
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-02T12:50:00.000Z",
+      "source": "bottle",
+      "id": "1764680950450"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-12-02T10:32:30.830Z",
+      "amountMl": 120,
+      "id": "1764671550830",
+      "durationSec": 795
+    },
+    {
+      "dateISO": "2025-12-02T08:49:55.134Z",
+      "breastSide": "Gauche",
+      "id": "1764665395134",
+      "source": "breast",
+      "durationSec": 385
+    },
+    {
+      "dateISO": "2025-12-02T08:02:00.000Z",
+      "source": "bottle",
+      "id": "1764663680527",
+      "amountMl": 120
+    },
+    {
+      "source": "breast",
+      "breastSide": "Droite",
+      "dateISO": "2025-12-02T04:47:40.858Z",
+      "id": "1764650860858",
+      "durationSec": 148
+    },
+    {
+      "durationSec": 584,
+      "dateISO": "2025-12-02T04:43:35.582Z",
+      "source": "bottle",
+      "id": "1764650615582",
+      "amountMl": 120
+    },
+    {
+      "id": "1764637493458",
+      "durationSec": 498,
+      "breastSide": "Gauche",
+      "dateISO": "2025-12-02T01:04:53.458Z",
+      "source": "breast"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 530,
+      "dateISO": "2025-12-02T00:53:05.127Z",
+      "amountMl": 120,
+      "id": "1764636785127"
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-12-01T18:48:30.475Z",
+      "source": "bottle",
+      "durationSec": 758,
+      "id": "1764614910475"
+    },
+    {
+      "source": "bottle",
+      "id": "1764607974012",
+      "dateISO": "2025-12-01T16:52:54.012Z",
+      "amountMl": 20,
+      "durationSec": 204
+    },
+    {
+      "dateISO": "2025-12-01T15:05:00.000Z",
+      "amountMl": 120,
+      "id": "1764606367544",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-12-01T11:53:14.827Z",
+      "source": "bottle",
+      "id": "1764589994827",
+      "durationSec": 748,
+      "amountMl": 120
+    },
+    {
+      "source": "bottle",
+      "id": "1764577583129",
+      "amountMl": 120,
+      "durationSec": 4,
+      "dateISO": "2025-12-01T08:26:23.129Z"
+    },
+    {
+      "id": "1764565899226",
+      "amountMl": 110,
+      "source": "bottle",
+      "durationSec": 540,
+      "dateISO": "2025-12-01T05:11:39.226Z"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 120,
+      "id": "1764555738090",
+      "dateISO": "2025-12-01T02:00:00.000Z"
+    },
+    {
+      "id": "1764535862459",
+      "source": "bottle",
+      "amountMl": 40,
+      "dateISO": "2025-11-30T20:40:00.000Z"
+    },
+    {
+      "durationSec": 531,
+      "id": "1764534894243",
+      "amountMl": 80,
+      "source": "bottle",
+      "dateISO": "2025-11-30T20:34:54.243Z"
+    },
+    {
+      "amountMl": 70,
+      "dateISO": "2025-11-30T17:35:00.000Z",
+      "id": "1764524622567",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 4,
+      "dateISO": "2025-11-30T15:56:35.028Z",
+      "amountMl": 80,
+      "id": "1764518195028"
+    },
+    {
+      "dateISO": "2025-11-30T15:08:45.569Z",
+      "id": "1764515325569",
+      "breastSide": "Droite",
+      "durationSec": 271,
+      "source": "breast"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 789,
+      "dateISO": "2025-11-30T15:03:57.135Z",
+      "id": "1764515037135"
+    },
+    {
+      "dateISO": "2025-11-30T13:50:23.076Z",
+      "durationSec": 342,
+      "source": "breast",
+      "id": "1764510623076",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-30T12:54:05.334Z",
+      "durationSec": 540,
+      "id": "1764507245334",
+      "breastSide": "Gauche"
+    },
+    {
+      "breastSide": "Droite",
+      "source": "breast",
+      "id": "1764506701332",
+      "dateISO": "2025-11-30T12:45:01.332Z",
+      "durationSec": 516
+    },
+    {
+      "durationSec": 643,
+      "dateISO": "2025-11-30T11:59:34.299Z",
+      "source": "breast",
+      "id": "1764503974299",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-11-30T10:56:06.950Z",
+      "id": "1764500166950",
+      "breastSide": "Droite",
+      "source": "breast",
+      "durationSec": 321
+    },
+    {
+      "source": "breast",
+      "id": "1764494567486",
+      "dateISO": "2025-11-30T09:22:47.486Z",
+      "breastSide": "Gauche",
+      "durationSec": 593
+    },
+    {
+      "dateISO": "2025-11-30T08:55:00.000Z",
+      "durationSec": 900,
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1764492901292"
+    },
+    {
+      "durationSec": 579,
+      "breastSide": "Gauche",
+      "source": "breast",
+      "dateISO": "2025-11-30T06:50:32.828Z",
+      "id": "1764485432828"
+    },
+    {
+      "dateISO": "2025-11-30T04:32:05.138Z",
+      "durationSec": 162,
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1764477125138"
+    },
+    {
+      "durationSec": 469,
+      "breastSide": "Droite",
+      "source": "breast",
+      "dateISO": "2025-11-30T04:22:25.504Z",
+      "id": "1764476545504"
+    },
+    {
+      "dateISO": "2025-11-30T03:11:20.363Z",
+      "source": "breast",
+      "id": "1764472280363",
+      "breastSide": "Droite",
+      "durationSec": 623
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-30T00:54:13.234Z",
+      "source": "breast",
+      "id": "1764464053234",
+      "durationSec": 842
+    },
+    {
+      "id": "1764450268450",
+      "dateISO": "2025-11-29T21:04:28.450Z",
+      "amountMl": 120,
+      "source": "bottle",
+      "durationSec": 679
+    },
+    {
+      "id": "1764438715022",
+      "amountMl": 40,
+      "dateISO": "2025-11-29T17:25:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 322,
+      "source": "bottle",
+      "dateISO": "2025-11-29T15:50:51.182Z",
+      "amountMl": 90,
+      "id": "1764431451182"
+    },
+    {
+      "durationSec": 664,
+      "source": "breast",
+      "breastSide": "Droite",
+      "dateISO": "2025-11-29T13:14:34.082Z",
+      "id": "1764422074082"
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-11-29T12:49:27.480Z",
+      "durationSec": 437,
+      "source": "breast",
+      "id": "1764420567480"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1764419713870",
+      "source": "breast",
+      "durationSec": 930,
+      "dateISO": "2025-11-29T12:35:13.870Z"
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-11-29T10:33:00.000Z",
+      "id": "1764413369050",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 120,
+      "dateISO": "2025-11-29T08:19:28.176Z",
+      "source": "bottle",
+      "durationSec": 907,
+      "id": "1764404368176"
+    },
+    {
+      "amountMl": 120,
+      "id": "1764393389529",
+      "durationSec": 687,
+      "dateISO": "2025-11-29T05:16:29.529Z",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 120,
+      "id": "1764382546598",
+      "source": "bottle",
+      "dateISO": "2025-11-29T01:50:00.000Z"
+    },
+    {
+      "dateISO": "2025-11-28T21:55:01.907Z",
+      "source": "bottle",
+      "durationSec": 4,
+      "amountMl": 120,
+      "id": "1764366901907"
+    },
+    {
+      "id": "1764357494859",
+      "source": "bottle",
+      "amountMl": 120,
+      "dateISO": "2025-11-28T19:18:14.859Z",
+      "durationSec": 969
+    },
+    {
+      "dateISO": "2025-11-28T18:30:46.025Z",
+      "breastSide": "Droite",
+      "source": "breast",
+      "durationSec": 1075,
+      "id": "1764354646025"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1764353565003",
+      "durationSec": 2,
+      "dateISO": "2025-11-28T18:12:45.003Z"
+    },
+    {
+      "durationSec": 935,
+      "dateISO": "2025-11-28T17:16:54.508Z",
+      "source": "breast",
+      "id": "1764350214508",
+      "breastSide": "Gauche"
+    },
+    {
+      "id": "1764342727656",
+      "source": "bottle",
+      "durationSec": 499,
+      "dateISO": "2025-11-28T15:12:07.656Z",
+      "amountMl": 120
+    },
+    {
+      "id": "1764331136331",
+      "amountMl": 115,
+      "source": "bottle",
+      "dateISO": "2025-11-28T11:58:00.000Z"
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 272,
+      "id": "1764326454828",
+      "dateISO": "2025-11-28T10:40:54.828Z",
+      "source": "breast"
+    },
+    {
+      "id": "1764319964082",
+      "dateISO": "2025-11-28T08:52:44.083Z",
+      "amountMl": 120,
+      "source": "bottle",
+      "durationSec": 734
+    },
+    {
+      "amountMl": 120,
+      "source": "bottle",
+      "id": "1764319219848",
+      "dateISO": "2025-11-28T06:06:00.000Z"
+    },
+    {
+      "amountMl": 120,
+      "id": "1764299172831",
+      "source": "bottle",
+      "durationSec": 723,
+      "dateISO": "2025-11-28T03:06:12.831Z"
+    },
+    {
+      "source": "bottle",
+      "id": "1764294657304",
+      "dateISO": "2025-11-28T00:45:00.000Z",
+      "amountMl": 110
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-11-27T22:32:51.494Z",
+      "source": "breast",
+      "id": "1764282771494",
+      "durationSec": 447
+    },
+    {
+      "durationSec": 900,
+      "source": "breast",
+      "id": "1764272524344",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-27T17:42:00.000Z"
+    },
+    {
+      "amountMl": 80,
+      "dateISO": "2025-11-27T16:15:00.000Z",
+      "source": "bottle",
+      "id": "1764261517275"
+    },
+    {
+      "dateISO": "2025-11-27T14:12:36.114Z",
+      "durationSec": 801,
+      "source": "bottle",
+      "amountMl": 110,
+      "id": "1764252756114"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 110,
+      "dateISO": "2025-11-27T11:15:00.000Z",
+      "id": "1764247694282"
+    },
+    {
+      "dateISO": "2025-11-27T08:30:00.000Z",
+      "id": "1764236373421",
+      "amountMl": 100,
+      "source": "bottle"
+    },
+    {
+      "id": "1764226182505",
+      "source": "bottle",
+      "dateISO": "2025-11-27T06:35:00.000Z",
+      "amountMl": 120
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-27T04:04:08.182Z",
+      "durationSec": 669,
+      "amountMl": 70,
+      "id": "1764216248182"
+    },
+    {
+      "amountMl": 60,
+      "durationSec": 690,
+      "source": "bottle",
+      "id": "1764206630541",
+      "dateISO": "2025-11-27T01:23:50.541Z"
+    },
+    {
+      "amountMl": 120,
+      "source": "bottle",
+      "durationSec": 185,
+      "id": "1764198309165",
+      "dateISO": "2025-11-26T23:05:09.165Z"
+    },
+    {
+      "amountMl": 40,
+      "durationSec": 668,
+      "source": "bottle",
+      "id": "1764181427647",
+      "dateISO": "2025-11-26T18:23:47.647Z"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-26T15:40:00.000Z",
+      "id": "1764172070168",
+      "amountMl": 120
+    },
+    {
+      "source": "bottle",
+      "id": "1764165087557",
+      "amountMl": 110,
+      "dateISO": "2025-11-26T13:35:00.000Z"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 70,
+      "dateISO": "2025-11-26T11:05:00.000Z",
+      "id": "1764156133788"
+    },
+    {
+      "dateISO": "2025-11-26T09:44:07.702Z",
+      "source": "breast",
+      "id": "1764150247702",
+      "breastSide": "Gauche",
+      "durationSec": 412
+    },
+    {
+      "id": "1764149763323",
+      "breastSide": "Droite",
+      "dateISO": "2025-11-26T09:36:03.323Z",
+      "source": "breast",
+      "durationSec": 1271
+    },
+    {
+      "durationSec": 283,
+      "id": "1764147934968",
+      "source": "bottle",
+      "amountMl": 60,
+      "dateISO": "2025-11-26T09:05:34.968Z"
+    },
+    {
+      "id": "1764140417379",
+      "source": "bottle",
+      "amountMl": 60,
+      "dateISO": "2025-11-26T07:00:00.000Z"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-26T04:50:35.818Z",
+      "id": "1764132635818",
+      "durationSec": 590,
+      "amountMl": 120
+    },
+    {
+      "dateISO": "2025-11-26T00:58:19.940Z",
+      "id": "1764118699940",
+      "amountMl": 120,
+      "source": "bottle",
+      "durationSec": 3
+    },
+    {
+      "durationSec": 711,
+      "source": "bottle",
+      "dateISO": "2025-11-25T20:12:37.639Z",
+      "id": "1764101557639",
+      "amountMl": 110
+    },
+    {
+      "dateISO": "2025-11-25T17:20:00.000Z",
+      "amountMl": 120,
+      "id": "1764098812111",
+      "source": "bottle"
+    },
+    {
+      "id": "1764083834456",
+      "durationSec": 1076,
+      "source": "bottle",
+      "amountMl": 110,
+      "dateISO": "2025-11-25T15:17:14.456Z"
+    },
+    {
+      "dateISO": "2025-11-25T13:26:00.000Z",
+      "id": "1764077188070",
+      "durationSec": 720,
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "id": "1764075162596",
+      "dateISO": "2025-11-25T12:46:00.000Z",
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "durationSec": 995,
+      "dateISO": "2025-11-25T11:21:48.352Z",
+      "id": "1764069708352",
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1764067063162",
+      "amountMl": 110,
+      "source": "bottle",
+      "durationSec": 818,
+      "dateISO": "2025-11-25T10:37:43.162Z"
+    },
+    {
+      "durationSec": 812,
+      "id": "1764057239133",
+      "dateISO": "2025-11-25T07:53:59.133Z",
+      "source": "bottle",
+      "amountMl": 110
+    },
+    {
+      "source": "breast",
+      "durationSec": 780,
+      "breastSide": "Gauche",
+      "id": "1764047392889",
+      "dateISO": "2025-11-25T04:55:00.000Z"
+    },
+    {
+      "id": "1764044988022",
+      "source": "bottle",
+      "amountMl": 120,
+      "dateISO": "2025-11-25T04:25:00.000Z"
+    },
+    {
+      "dateISO": "2025-11-25T01:46:00.000Z",
+      "amountMl": 110,
+      "id": "1764035218354",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-11-24T22:34:17.425Z",
+      "source": "bottle",
+      "id": "1764023657425",
+      "amountMl": 120,
+      "durationSec": 816
+    },
+    {
+      "amountMl": 100,
+      "source": "bottle",
+      "dateISO": "2025-11-24T19:30:00.000Z",
+      "id": "1764013633877"
+    },
+    {
+      "id": "1764006627334",
+      "dateISO": "2025-11-24T17:50:27.334Z",
+      "durationSec": 554,
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "id": "1764003893993",
+      "durationSec": 770,
+      "dateISO": "2025-11-24T17:04:53.993Z",
+      "amountMl": 120,
+      "source": "bottle"
+    },
+    {
+      "id": "1763995346563",
+      "durationSec": 811,
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-24T14:42:26.563Z"
+    },
+    {
+      "dateISO": "2025-11-24T14:07:00.000Z",
+      "id": "1763993275868",
+      "durationSec": 1020,
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "source": "bottle",
+      "id": "1763986101257",
+      "durationSec": 968,
+      "dateISO": "2025-11-24T12:08:21.257Z",
+      "amountMl": 120
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-24T10:22:10.212Z",
+      "durationSec": 807,
+      "id": "1763979730212",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-11-24T07:47:19.986Z",
+      "amountMl": 90,
+      "durationSec": 1081,
+      "id": "1763970439986",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-11-24T04:14:00.000Z",
+      "id": "1763957665470",
+      "source": "bottle",
+      "amountMl": 120
+    },
+    {
+      "source": "bottle",
+      "id": "1763947668537",
+      "amountMl": 50,
+      "dateISO": "2025-11-24T01:27:48.537Z",
+      "durationSec": 221
+    },
+    {
+      "durationSec": 724,
+      "source": "bottle",
+      "amountMl": 110,
+      "id": "1763939006951",
+      "dateISO": "2025-11-23T23:03:26.951Z"
+    },
+    {
+      "dateISO": "2025-11-23T17:35:00.000Z",
+      "source": "bottle",
+      "id": "1763921036349",
+      "amountMl": 110
+    },
+    {
+      "source": "bottle",
+      "amountMl": 120,
+      "dateISO": "2025-11-23T14:55:00.000Z",
+      "id": "1763910202761"
+    },
+    {
+      "source": "breast",
+      "id": "1763900954382",
+      "durationSec": 6600,
+      "dateISO": "2025-11-23T12:29:00.000Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-23T09:20:00.000Z",
+      "amountMl": 90,
+      "id": "1763888661691"
+    },
+    {
+      "amountMl": 90,
+      "id": "1763877037098",
+      "source": "bottle",
+      "dateISO": "2025-11-23T05:40:00.000Z"
+    },
+    {
+      "id": "1763867431280",
+      "durationSec": 739,
+      "source": "bottle",
+      "dateISO": "2025-11-23T03:10:31.280Z",
+      "amountMl": 100
+    },
+    {
+      "source": "bottle",
+      "id": "1763855738913",
+      "durationSec": 1030,
+      "amountMl": 100,
+      "dateISO": "2025-11-22T23:55:38.913Z"
+    },
+    {
+      "amountMl": 100,
+      "id": "1763848373470",
+      "dateISO": "2025-11-22T20:15:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "id": "1763834624057",
+      "dateISO": "2025-11-22T18:03:00.000Z",
+      "source": "bottle",
+      "amountMl": 80
+    },
+    {
+      "id": "1763834688568",
+      "amountMl": 100,
+      "source": "bottle",
+      "dateISO": "2025-11-22T16:10:00.000Z"
+    },
+    {
+      "amountMl": 120,
+      "id": "1763820891046",
+      "durationSec": 1506,
+      "dateISO": "2025-11-22T14:14:51.046Z",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 100,
+      "id": "1763810682893",
+      "durationSec": 889,
+      "source": "bottle",
+      "dateISO": "2025-11-22T11:24:42.893Z"
+    },
+    {
+      "durationSec": 1012,
+      "amountMl": 100,
+      "dateISO": "2025-11-22T09:11:28.249Z",
+      "id": "1763802688249",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 100,
+      "id": "1763794692508",
+      "source": "bottle",
+      "dateISO": "2025-11-22T06:35:00.000Z"
+    },
+    {
+      "durationSec": 754,
+      "dateISO": "2025-11-22T03:30:30.540Z",
+      "id": "1763782230540",
+      "source": "bottle",
+      "amountMl": 100
+    },
+    {
+      "durationSec": 538,
+      "source": "bottle",
+      "dateISO": "2025-11-22T00:01:23.945Z",
+      "amountMl": 100,
+      "id": "1763769683945"
+    },
+    {
+      "amountMl": 90,
+      "dateISO": "2025-11-21T20:25:12.572Z",
+      "source": "bottle",
+      "durationSec": 822,
+      "id": "1763756712572"
+    },
+    {
+      "amountMl": 90,
+      "id": "1763748979413",
+      "dateISO": "2025-11-21T18:16:19.413Z",
+      "source": "bottle",
+      "durationSec": 692
+    },
+    {
+      "dateISO": "2025-11-21T16:20:00.000Z",
+      "source": "bottle",
+      "id": "1763748262258",
+      "amountMl": 100
+    },
+    {
+      "amountMl": 50,
+      "dateISO": "2025-11-21T14:36:54.546Z",
+      "durationSec": 1698,
+      "source": "bottle",
+      "id": "1763735814546"
+    },
+    {
+      "dateISO": "2025-11-21T13:53:00.021Z",
+      "source": "bottle",
+      "amountMl": 50,
+      "durationSec": 804,
+      "id": "1763733180021"
+    },
+    {
+      "dateISO": "2025-11-21T11:35:00.000Z",
+      "source": "bottle",
+      "amountMl": 100,
+      "id": "1763732131680"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 600,
+      "dateISO": "2025-11-21T10:05:00.000Z",
+      "id": "1763719537437"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 40,
+      "id": "1763714968424",
+      "durationSec": 621,
+      "dateISO": "2025-11-21T08:49:28.424Z"
+    },
+    {
+      "source": "breast",
+      "durationSec": 890,
+      "dateISO": "2025-11-21T08:38:47.479Z",
+      "id": "1763714327479",
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-21T07:53:55.106Z",
+      "id": "1763711635106",
+      "breastSide": "Droite",
+      "durationSec": 687
+    },
+    {
+      "id": "1763706070690",
+      "source": "bottle",
+      "amountMl": 90,
+      "durationSec": 578,
+      "dateISO": "2025-11-21T06:21:10.690Z"
+    },
+    {
+      "durationSec": 707,
+      "id": "1763698141056",
+      "amountMl": 90,
+      "source": "bottle",
+      "dateISO": "2025-11-21T04:09:01.056Z"
+    },
+    {
+      "id": "1763688111846",
+      "source": "bottle",
+      "dateISO": "2025-11-21T01:21:51.846Z",
+      "amountMl": 100,
+      "durationSec": 584
+    },
+    {
+      "dateISO": "2025-11-20T20:41:15.942Z",
+      "source": "bottle",
+      "durationSec": 577,
+      "id": "1763671275942",
+      "amountMl": 90
+    },
+    {
+      "durationSec": 300,
+      "dateISO": "2025-11-20T18:30:00.000Z",
+      "breastSide": "Droite",
+      "id": "1763666454884",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-11-20T18:24:30.821Z",
+      "source": "bottle",
+      "id": "1763663070821",
+      "durationSec": 806,
+      "amountMl": 90
+    },
+    {
+      "amountMl": 110,
+      "dateISO": "2025-11-20T15:10:00.000Z",
+      "source": "bottle",
+      "id": "1763654014505"
+    },
+    {
+      "id": "1763643309411",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-20T12:40:00.000Z",
+      "durationSec": 420,
+      "source": "breast"
+    },
+    {
+      "id": "1763642058263",
+      "durationSec": 320,
+      "amountMl": 100,
+      "dateISO": "2025-11-20T12:34:18.263Z",
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Gauche",
+      "durationSec": 360,
+      "id": "1763641729075",
+      "dateISO": "2025-11-20T11:00:00.000Z",
+      "source": "breast"
+    },
+    {
+      "id": "1763632341393",
+      "source": "breast",
+      "dateISO": "2025-11-20T09:52:21.393Z",
+      "breastSide": "Droite",
+      "durationSec": 475
+    },
+    {
+      "durationSec": 776,
+      "source": "bottle",
+      "amountMl": 100,
+      "id": "1763630350712",
+      "dateISO": "2025-11-20T09:19:10.712Z"
+    },
+    {
+      "durationSec": 584,
+      "amountMl": 90,
+      "dateISO": "2025-11-20T06:29:19.229Z",
+      "id": "1763620159229",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 520,
+      "dateISO": "2025-11-20T04:13:38.517Z",
+      "id": "1763612018517",
+      "amountMl": 100
+    },
+    {
+      "durationSec": 288,
+      "amountMl": 90,
+      "source": "bottle",
+      "id": "1763595385580",
+      "dateISO": "2025-11-19T23:36:25.580Z"
+    },
+    {
+      "id": "1763582037536",
+      "amountMl": 90,
+      "dateISO": "2025-11-19T19:53:57.536Z",
+      "durationSec": 1207,
+      "source": "bottle"
+    },
+    {
+      "amountMl": 80,
+      "durationSec": 607,
+      "id": "1763570040482",
+      "dateISO": "2025-11-19T16:34:00.482Z",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1763561517958",
+      "amountMl": 100,
+      "dateISO": "2025-11-19T14:11:57.958Z",
+      "durationSec": 713
+    },
+    {
+      "dateISO": "2025-11-19T11:20:02.395Z",
+      "id": "1763551202395",
+      "durationSec": 644,
+      "source": "bottle",
+      "amountMl": 100
+    },
+    {
+      "amountMl": 100,
+      "durationSec": 554,
+      "source": "bottle",
+      "id": "1763541067888",
+      "dateISO": "2025-11-19T08:31:07.888Z"
+    },
+    {
+      "dateISO": "2025-11-19T05:49:34.145Z",
+      "durationSec": 472,
+      "source": "bottle",
+      "id": "1763531374145",
+      "amountMl": 90
+    },
+    {
+      "amountMl": 100,
+      "source": "bottle",
+      "id": "1763523251718",
+      "dateISO": "2025-11-19T03:15:00.000Z"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 90,
+      "dateISO": "2025-11-18T23:55:00.000Z",
+      "id": "1763511881179"
+    },
+    {
+      "amountMl": 30,
+      "id": "1763504161727",
+      "dateISO": "2025-11-18T22:16:00.000Z",
+      "source": "bottle",
+      "notes": "Il a tout remis"
+    },
+    {
+      "id": "1763497036844",
+      "dateISO": "2025-11-18T20:17:16.844Z",
+      "durationSec": 599,
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "id": "1763489446864",
+      "amountMl": 110,
+      "dateISO": "2025-11-18T18:10:46.864Z",
+      "durationSec": 1453,
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1763477332525",
+      "amountMl": 100,
+      "durationSec": 1225,
+      "dateISO": "2025-11-18T14:48:52.525Z"
+    },
+    {
+      "id": "1763467576537",
+      "amountMl": 80,
+      "source": "bottle",
+      "dateISO": "2025-11-18T12:06:16.537Z",
+      "durationSec": 1543
+    },
+    {
+      "amountMl": 30,
+      "id": "1763460476221",
+      "durationSec": 606,
+      "source": "bottle",
+      "dateISO": "2025-11-18T10:07:56.221Z"
+    },
+    {
+      "notes": "Il a tout remis",
+      "amountMl": 80,
+      "dateISO": "2025-11-18T09:40:00.000Z",
+      "id": "1763458829949",
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Droite",
+      "id": "1763452761406",
+      "dateISO": "2025-11-18T07:59:21.406Z",
+      "source": "breast",
+      "durationSec": 1205
+    },
+    {
+      "durationSec": 721,
+      "breastSide": "Gauche",
+      "source": "breast",
+      "dateISO": "2025-11-18T06:10:45.002Z",
+      "id": "1763446245002"
+    },
+    {
+      "durationSec": 5,
+      "source": "bottle",
+      "id": "1763439013360",
+      "amountMl": 45,
+      "dateISO": "2025-11-18T04:10:13.360Z"
+    },
+    {
+      "amountMl": 60,
+      "id": "1763438267752",
+      "dateISO": "2025-11-18T03:57:47.752Z",
+      "source": "bottle",
+      "durationSec": 393
+    },
+    {
+      "source": "bottle",
+      "durationSec": 526,
+      "dateISO": "2025-11-18T01:35:57.180Z",
+      "id": "1763429757180",
+      "amountMl": 90
+    },
+    {
+      "dateISO": "2025-11-17T23:28:03.051Z",
+      "id": "1763422083051",
+      "source": "bottle",
+      "durationSec": 361,
+      "amountMl": 40
+    },
+    {
+      "source": "bottle",
+      "id": "1763416631453",
+      "dateISO": "2025-11-17T21:45:00.000Z",
+      "amountMl": 50
+    },
+    {
+      "id": "1763410742460",
+      "amountMl": 30,
+      "dateISO": "2025-11-17T20:19:02.460Z",
+      "source": "bottle",
+      "durationSec": 6
+    },
+    {
+      "dateISO": "2025-11-17T20:16:00.000Z",
+      "durationSec": 960,
+      "breastSide": "Droite",
+      "source": "breast",
+      "id": "1763410579750"
+    },
+    {
+      "dateISO": "2025-11-17T19:02:25.329Z",
+      "id": "1763406145329",
+      "amountMl": 100,
+      "durationSec": 539,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-11-17T16:32:18.636Z",
+      "breastSide": "Gauche",
+      "durationSec": 511,
+      "source": "breast",
+      "id": "1763397138636"
+    },
+    {
+      "dateISO": "2025-11-17T14:57:00.000Z",
+      "id": "1763391449378",
+      "source": "bottle",
+      "amountMl": 100
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-17T12:03:38.135Z",
+      "durationSec": 599,
+      "id": "1763381018135",
+      "breastSide": "Droite"
+    },
+    {
+      "dateISO": "2025-11-17T11:21:34.777Z",
+      "durationSec": 515,
+      "source": "bottle",
+      "amountMl": 100,
+      "id": "1763378494777"
+    },
+    {
+      "dateISO": "2025-11-17T08:33:40.748Z",
+      "amountMl": 100,
+      "durationSec": 470,
+      "id": "1763368420748",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-11-17T06:01:22.090Z",
+      "amountMl": 90,
+      "durationSec": 441,
+      "id": "1763359282090",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 780,
+      "amountMl": 100,
+      "id": "1763348094812",
+      "source": "bottle",
+      "dateISO": "2025-11-17T02:54:54.812Z"
+    },
+    {
+      "amountMl": 100,
+      "durationSec": 472,
+      "source": "bottle",
+      "id": "1763339637326",
+      "dateISO": "2025-11-17T00:33:57.326Z"
+    },
+    {
+      "source": "bottle",
+      "id": "1763329476279",
+      "dateISO": "2025-11-16T21:44:36.279Z",
+      "amountMl": 100,
+      "durationSec": 7
+    },
+    {
+      "amountMl": 100,
+      "dateISO": "2025-11-16T18:48:55.267Z",
+      "durationSec": 742,
+      "source": "bottle",
+      "id": "1763318935267"
+    },
+    {
+      "dateISO": "2025-11-16T17:04:13.210Z",
+      "id": "1763312653210",
+      "amountMl": 100,
+      "source": "bottle",
+      "durationSec": 671
+    },
+    {
+      "amountMl": 90,
+      "id": "1763305531260",
+      "source": "bottle",
+      "dateISO": "2025-11-16T13:15:00.000Z"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-16T11:39:37.534Z",
+      "durationSec": 508,
+      "breastSide": "Gauche",
+      "id": "1763293177534"
+    },
+    {
+      "durationSec": 620,
+      "amountMl": 90,
+      "dateISO": "2025-11-16T11:31:04.501Z",
+      "source": "bottle",
+      "id": "1763292664501"
+    },
+    {
+      "id": "1763278356184",
+      "amountMl": 100,
+      "dateISO": "2025-11-16T07:32:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1763278989456",
+      "amountMl": 90,
+      "dateISO": "2025-11-16T04:55:00.000Z"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-16T02:18:00.000Z",
+      "durationSec": 1080,
+      "id": "1763279067818",
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1763248257723",
+      "durationSec": 0,
+      "breastSide": "Gauche",
+      "source": "breast",
+      "dateISO": "2025-11-15T23:10:00.000Z"
+    },
+    {
+      "amountMl": 80,
+      "source": "bottle",
+      "durationSec": 615,
+      "id": "1763238372977",
+      "dateISO": "2025-11-15T20:26:12.977Z"
+    },
+    {
+      "id": "1763232565255",
+      "source": "bottle",
+      "amountMl": 100,
+      "dateISO": "2025-11-15T18:30:00.000Z"
+    },
+    {
+      "id": "1763222340005",
+      "durationSec": 568,
+      "amountMl": 100,
+      "dateISO": "2025-11-15T15:59:00.005Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 401,
+      "dateISO": "2025-11-15T14:03:14.203Z",
+      "source": "bottle",
+      "amountMl": 50,
+      "id": "1763215394203"
+    },
+    {
+      "id": "1763211081755",
+      "source": "bottle",
+      "durationSec": 494,
+      "amountMl": 85,
+      "dateISO": "2025-11-15T12:51:21.755Z"
+    },
+    {
+      "amountMl": 90,
+      "source": "bottle",
+      "durationSec": 1331,
+      "id": "1763201220273",
+      "dateISO": "2025-11-15T10:07:00.273Z"
+    },
+    {
+      "id": "1763193290898",
+      "durationSec": 552,
+      "source": "bottle",
+      "dateISO": "2025-11-15T07:54:50.898Z",
+      "amountMl": 100
+    },
+    {
+      "amountMl": 60,
+      "source": "bottle",
+      "dateISO": "2025-11-15T06:25:00.000Z",
+      "id": "1763187929961"
+    },
+    {
+      "dateISO": "2025-11-15T04:15:36.275Z",
+      "amountMl": 100,
+      "durationSec": 498,
+      "id": "1763180136275",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-15T01:01:48.454Z",
+      "amountMl": 90,
+      "durationSec": 438,
+      "id": "1763168508454"
+    },
+    {
+      "id": "1763151169616",
+      "durationSec": 282,
+      "source": "bottle",
+      "amountMl": 50,
+      "dateISO": "2025-11-14T20:12:49.616Z"
+    },
+    {
+      "id": "1763150804195",
+      "amountMl": 40,
+      "durationSec": 237,
+      "dateISO": "2025-11-14T20:06:44.195Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 851,
+      "id": "1763147925940",
+      "dateISO": "2025-11-14T19:18:45.940Z",
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-14T17:06:00.000Z",
+      "amountMl": 100,
+      "id": "1763139973625"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-14T15:15:00.000Z",
+      "amountMl": 100,
+      "id": "1763138308163"
+    },
+    {
+      "amountMl": 80,
+      "dateISO": "2025-11-14T13:00:00.000Z",
+      "source": "bottle",
+      "id": "1763138238526"
+    },
+    {
+      "id": "1763116006419",
+      "source": "bottle",
+      "bottleEndISO": "2025-11-14T10:26:46.417Z",
+      "amountMl": 110,
+      "bottleStartISO": "2025-11-14T10:18:14.091Z",
+      "dateISO": "2025-11-14T10:26:46.419Z",
+      "bottleType": "maternal",
+      "durationSec": 512
+    },
+    {
+      "bottleType": "maternal",
+      "id": "1763107697174",
+      "dateISO": "2025-11-14T08:08:17.174Z",
+      "bottleEndISO": "2025-11-14T08:08:17.172Z",
+      "source": "bottle",
+      "bottleStartISO": "2025-11-14T08:01:16.917Z",
+      "amountMl": 100,
+      "durationSec": 420
+    },
+    {
+      "amountMl": 90,
+      "dateISO": "2025-11-14T04:31:58.272Z",
+      "bottleStartISO": "2025-11-14T04:31:46.958Z",
+      "durationSec": 11,
+      "bottleEndISO": "2025-11-14T04:31:58.272Z",
+      "bottleType": "maternal",
+      "id": "1763094718272",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 19,
+      "bottleStartISO": "2025-11-14T01:24:58.346Z",
+      "source": "bottle",
+      "bottleType": "maternal",
+      "amountMl": 100,
+      "bottleEndISO": "2025-11-14T01:25:17.001Z",
+      "id": "1763083517002",
+      "dateISO": "2025-11-14T01:25:17.002Z"
+    },
+    {
+      "amountMl": 80,
+      "bottleEndISO": "2025-11-13T21:19:00.000Z",
+      "dateISO": "2025-11-13T21:19:00.000Z",
+      "bottleStartISO": "2025-11-13T21:19:00.000Z",
+      "bottleType": "maternal",
+      "source": "bottle",
+      "id": "1763071799214"
+    },
+    {
+      "bottleEndISO": "2025-11-13T19:45:38.356Z",
+      "bottleStartISO": "2025-11-13T19:38:39.078Z",
+      "amountMl": 90,
+      "bottleType": "maternal",
+      "id": "1763063138356",
+      "dateISO": "2025-11-13T19:45:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 679,
+      "source": "breast",
+      "id": "1763054417716",
+      "dateISO": "2025-11-13T17:20:17.716Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 178,
+      "source": "breast",
+      "dateISO": "2025-11-13T16:50:06.629Z",
+      "breastSide": "Gauche",
+      "id": "1763052606629"
+    },
+    {
+      "durationSec": 906,
+      "dateISO": "2025-11-13T16:33:07.364Z",
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1763051587364"
+    },
+    {
+      "bottleType": "maternal",
+      "bottleStartISO": "2025-11-13T14:49:14.067Z",
+      "bottleEndISO": "2025-11-13T14:56:33.067Z",
+      "dateISO": "2025-11-13T14:56:40.125Z",
+      "durationSec": 439,
+      "id": "1763045800125",
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "bottleStartISO": "2025-11-13T14:17:58.298Z",
+      "source": "bottle",
+      "durationSec": 1,
+      "id": "1763043483954",
+      "bottleType": "maternal",
+      "dateISO": "2025-11-13T14:18:03.954Z",
+      "bottleEndISO": "2025-11-13T14:18:03.954Z",
+      "amountMl": 60
+    },
+    {
+      "durationSec": 284,
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-13T13:37:14.883Z",
+      "source": "breast",
+      "id": "1763041034883"
+    },
+    {
+      "bottleType": "maternal",
+      "bottleEndISO": "2025-11-13T12:26:33.636Z",
+      "dateISO": "2025-11-13T12:29:00.000Z",
+      "bottleStartISO": "2025-11-13T12:17:20.636Z",
+      "id": "1763036986451",
+      "source": "bottle",
+      "amountMl": 100
+    },
+    {
+      "id": "1763026041979",
+      "durationSec": 954,
+      "amountMl": 55,
+      "dateISO": "2025-11-13T09:27:21.979Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 1070,
+      "dateISO": "2025-11-13T09:09:30.524Z",
+      "amountMl": 45,
+      "id": "1763024970524",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-13T06:46:00.000Z",
+      "bottleEndISO": "2025-11-13T06:46:27.775Z",
+      "bottleStartISO": "2025-11-13T06:46:27.775Z",
+      "id": "1763016387775",
+      "amountMl": 35,
+      "bottleType": "supplement"
+    },
+    {
+      "id": "1763011125673",
+      "source": "bottle",
+      "amountMl": 110,
+      "dateISO": "2025-11-13T04:40:00.000Z"
+    },
+    {
+      "id": "1762997428413",
+      "source": "bottle",
+      "dateISO": "2025-11-13T01:30:28.413Z",
+      "durationSec": 519,
+      "amountMl": 110
+    },
+    {
+      "id": "1762989061380",
+      "dateISO": "2025-11-12T23:11:01.380Z",
+      "source": "breast",
+      "durationSec": 286,
+      "breastSide": "Droite"
+    },
+    {
+      "amountMl": 90,
+      "source": "bottle",
+      "durationSec": 429,
+      "dateISO": "2025-11-12T22:53:21.816Z",
+      "id": "1762988001816"
+    },
+    {
+      "source": "bottle",
+      "durationSec": 680,
+      "amountMl": 60,
+      "id": "1762975928698",
+      "dateISO": "2025-11-12T19:32:08.698Z"
+    },
+    {
+      "dateISO": "2025-11-12T17:26:14.224Z",
+      "source": "bottle",
+      "id": "1762968374224",
+      "durationSec": 713,
+      "amountMl": 90
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 1080,
+      "dateISO": "2025-11-12T05:14:00.000Z",
+      "source": "breast",
+      "id": "1762924478721"
+    },
+    {
+      "durationSec": 969,
+      "dateISO": "2025-11-12T02:05:43.986Z",
+      "amountMl": 110,
+      "id": "1762913143986",
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1762902610291",
+      "dateISO": "2025-11-11T23:10:10.291Z",
+      "durationSec": 469,
+      "amountMl": 110
+    },
+    {
+      "dateISO": "2025-11-11T19:34:00.000Z",
+      "amountMl": 60,
+      "source": "bottle",
+      "id": "1762890446484"
+    },
+    {
+      "amountMl": 120,
+      "source": "bottle",
+      "dateISO": "2025-11-11T16:49:26.414Z",
+      "durationSec": 626,
+      "id": "1762879766414"
+    },
+    {
+      "dateISO": "2025-11-11T13:46:27.936Z",
+      "durationSec": 626,
+      "id": "1762868787936",
+      "amountMl": 100,
+      "source": "bottle"
+    },
+    {
+      "durationSec": 282,
+      "breastSide": "Droite",
+      "id": "1762862058405",
+      "source": "breast",
+      "dateISO": "2025-11-11T11:54:18.406Z"
+    },
+    {
+      "dateISO": "2025-11-11T11:49:30.264Z",
+      "source": "bottle",
+      "amountMl": 90,
+      "durationSec": 680,
+      "id": "1762861770264"
+    },
+    {
+      "id": "1762850599024",
+      "dateISO": "2025-11-11T08:43:19.024Z",
+      "source": "breast",
+      "breastSide": "Droite",
+      "durationSec": 115
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762850130408",
+      "durationSec": 272,
+      "dateISO": "2025-11-11T08:35:30.408Z"
+    },
+    {
+      "id": "1762849826919",
+      "source": "bottle",
+      "dateISO": "2025-11-11T08:30:26.919Z",
+      "durationSec": 588,
+      "amountMl": 90
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "dateISO": "2025-11-11T08:30:00.000Z",
+      "durationSec": 300,
+      "id": "1762849834248"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762838594257",
+      "durationSec": 74,
+      "dateISO": "2025-11-11T05:23:14.257Z"
+    },
+    {
+      "amountMl": 90,
+      "source": "bottle",
+      "id": "1762837458420",
+      "dateISO": "2025-11-11T05:04:18.420Z",
+      "durationSec": 1
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762825475550",
+      "dateISO": "2025-11-11T01:44:35.550Z",
+      "durationSec": 460
+    },
+    {
+      "amountMl": 100,
+      "dateISO": "2025-11-11T01:29:51.162Z",
+      "durationSec": 478,
+      "id": "1762824591162",
+      "source": "bottle"
+    },
+    {
+      "amountMl": 50,
+      "dateISO": "2025-11-10T20:39:31.080Z",
+      "durationSec": 396,
+      "id": "1762807171080",
+      "source": "bottle"
+    },
+    {
+      "id": "1762803592733",
+      "dateISO": "2025-11-10T19:39:52.733Z",
+      "source": "bottle",
+      "amountMl": 90,
+      "durationSec": 553
+    },
+    {
+      "durationSec": 480,
+      "dateISO": "2025-11-10T17:08:34.888Z",
+      "source": "bottle",
+      "id": "1762794514888",
+      "amountMl": 60
+    },
+    {
+      "source": "breast",
+      "id": "1762792183107",
+      "dateISO": "2025-11-10T16:29:43.107Z",
+      "durationSec": 329,
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "bottle",
+      "id": "1762786275563",
+      "dateISO": "2025-11-10T14:51:15.563Z",
+      "durationSec": 769,
+      "amountMl": 120
+    },
+    {
+      "id": "1762776689873",
+      "dateISO": "2025-11-10T12:11:29.873Z",
+      "source": "bottle",
+      "amountMl": 60,
+      "durationSec": 380
+    },
+    {
+      "dateISO": "2025-11-10T11:48:20.237Z",
+      "source": "bottle",
+      "id": "1762775300237",
+      "durationSec": 45,
+      "amountMl": 5
+    },
+    {
+      "dateISO": "2025-11-10T11:46:27.850Z",
+      "breastSide": "Gauche",
+      "id": "1762775187850",
+      "source": "breast",
+      "durationSec": 853
+    },
+    {
+      "durationSec": 574,
+      "id": "1762773594327",
+      "source": "breast",
+      "breastSide": "Droite",
+      "dateISO": "2025-11-10T11:19:54.327Z"
+    },
+    {
+      "durationSec": 258,
+      "source": "bottle",
+      "id": "1762764844886",
+      "amountMl": 35,
+      "dateISO": "2025-11-10T08:54:04.886Z"
+    },
+    {
+      "id": "1762764531382",
+      "source": "bottle",
+      "durationSec": 402,
+      "dateISO": "2025-11-10T08:48:51.382Z",
+      "amountMl": 50
+    },
+    {
+      "dateISO": "2025-11-10T08:41:30.039Z",
+      "breastSide": "Droite",
+      "durationSec": 641,
+      "id": "1762764090039",
+      "source": "breast"
+    },
+    {
+      "durationSec": 692,
+      "id": "1762763434593",
+      "dateISO": "2025-11-10T08:30:34.593Z",
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "id": "1762756819200",
+      "source": "bottle",
+      "amountMl": 90,
+      "dateISO": "2025-11-10T06:40:19.200Z",
+      "durationSec": 572
+    },
+    {
+      "source": "bottle",
+      "durationSec": 122,
+      "dateISO": "2025-11-10T04:52:55.718Z",
+      "id": "1762750375718",
+      "amountMl": 1
+    },
+    {
+      "amountMl": 90,
+      "dateISO": "2025-11-10T01:30:00.000Z",
+      "source": "bottle",
+      "id": "1762738699467"
+    },
+    {
+      "id": "1762728156063",
+      "durationSec": 1287,
+      "dateISO": "2025-11-09T22:42:36.066Z",
+      "source": "bottle",
+      "amountMl": 110
+    },
+    {
+      "id": "1762716999899",
+      "amountMl": 20,
+      "source": "bottle",
+      "durationSec": 308,
+      "dateISO": "2025-11-09T19:36:39.899Z"
+    },
+    {
+      "source": "breast",
+      "id": "1762714445778",
+      "breastSide": "Droite",
+      "durationSec": 543,
+      "dateISO": "2025-11-09T18:54:05.778Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1762711575955",
+      "durationSec": 512,
+      "dateISO": "2025-11-09T18:06:15.955Z"
+    },
+    {
+      "dateISO": "2025-11-09T17:05:00.000Z",
+      "durationSec": 300,
+      "source": "breast",
+      "id": "1762707951716",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 466,
+      "dateISO": "2025-11-09T16:54:27.726Z",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762707267726"
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 630,
+      "dateISO": "2025-11-09T16:42:29.386Z",
+      "source": "breast",
+      "id": "1762706549386"
+    },
+    {
+      "dateISO": "2025-11-09T16:07:36.718Z",
+      "source": "bottle",
+      "id": "1762704456718",
+      "durationSec": 454,
+      "amountMl": 90
+    },
+    {
+      "amountMl": 90,
+      "durationSec": 681,
+      "source": "bottle",
+      "dateISO": "2025-11-09T12:22:44.007Z",
+      "id": "1762690964007"
+    },
+    {
+      "dateISO": "2025-11-09T11:02:15.982Z",
+      "source": "breast",
+      "id": "1762686135982",
+      "breastSide": "Gauche",
+      "durationSec": 412
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 1500,
+      "dateISO": "2025-11-09T10:39:00.000Z",
+      "id": "1762684742198",
+      "source": "breast"
+    },
+    {
+      "breastSide": "Gauche",
+      "durationSec": 227,
+      "dateISO": "2025-11-09T07:53:25.424Z",
+      "id": "1762674805424",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-11-09T07:38:29.072Z",
+      "id": "1762673909072",
+      "source": "breast",
+      "durationSec": 781,
+      "breastSide": "Droite"
+    },
+    {
+      "dateISO": "2025-11-09T07:13:56.206Z",
+      "durationSec": 1531,
+      "source": "bottle",
+      "id": "1762672436206",
+      "amountMl": 90
+    },
+    {
+      "source": "bottle",
+      "amountMl": 90,
+      "durationSec": 472,
+      "dateISO": "2025-11-09T03:35:10.754Z",
+      "id": "1762659310754"
+    },
+    {
+      "dateISO": "2025-11-08T22:33:07.268Z",
+      "breastSide": "Droite",
+      "source": "breast",
+      "durationSec": 296,
+      "id": "1762641187268"
+    },
+    {
+      "id": "1762638794469",
+      "durationSec": 471,
+      "dateISO": "2025-11-08T21:53:14.469Z",
+      "amountMl": 50,
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762635827524",
+      "source": "breast",
+      "dateISO": "2025-11-08T21:03:47.524Z",
+      "durationSec": 556
+    },
+    {
+      "durationSec": 460,
+      "source": "bottle",
+      "dateISO": "2025-11-08T19:39:24.228Z",
+      "amountMl": 60,
+      "id": "1762630764228"
+    },
+    {
+      "dateISO": "2025-11-08T19:01:59.346Z",
+      "amountMl": 10,
+      "id": "1762628519346",
+      "durationSec": 129,
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-11-08T18:58:39.683Z",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 721,
+      "id": "1762628319683"
+    },
+    {
+      "breastSide": "Droite",
+      "source": "breast",
+      "dateISO": "2025-11-08T18:45:55.964Z",
+      "durationSec": 926,
+      "id": "1762627555964"
+    },
+    {
+      "id": "1762622123947",
+      "amountMl": 90,
+      "source": "bottle",
+      "dateISO": "2025-11-08T16:45:00.000Z"
+    },
+    {
+      "durationSec": 473,
+      "id": "1762617165017",
+      "dateISO": "2025-11-08T15:52:45.017Z",
+      "breastSide": "Gauche",
+      "source": "breast"
+    },
+    {
+      "amountMl": 90,
+      "id": "1762611875873",
+      "durationSec": 6,
+      "dateISO": "2025-11-08T14:24:35.873Z",
+      "source": "bottle"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1762603425466",
+      "durationSec": 311,
+      "dateISO": "2025-11-08T12:03:45.466Z"
+    },
+    {
+      "amountMl": 90,
+      "dateISO": "2025-11-08T11:52:34.690Z",
+      "id": "1762602754690",
+      "durationSec": 370,
+      "source": "bottle"
+    },
+    {
+      "amountMl": 90,
+      "id": "1762595449198",
+      "source": "bottle",
+      "dateISO": "2025-11-08T08:50:00.000Z"
+    },
+    {
+      "id": "1762584621990",
+      "durationSec": 513,
+      "dateISO": "2025-11-08T06:50:21.990Z",
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "durationSec": 460,
+      "dateISO": "2025-11-08T06:25:21.833Z",
+      "amountMl": 90,
+      "source": "bottle",
+      "id": "1762583121833"
+    },
+    {
+      "id": "1762576933307",
+      "durationSec": 324,
+      "breastSide": "Droite",
+      "dateISO": "2025-11-08T04:42:13.307Z",
+      "source": "breast"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-08T04:31:15.391Z",
+      "durationSec": 1026,
+      "id": "1762576275391",
+      "breastSide": "Gauche"
+    },
+    {
+      "amountMl": 90,
+      "durationSec": 475,
+      "id": "1762566419312",
+      "dateISO": "2025-11-08T01:46:59.312Z",
+      "source": "bottle"
+    },
+    {
+      "dateISO": "2025-11-07T23:39:06.320Z",
+      "durationSec": 365,
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1762558746320"
+    },
+    {
+      "durationSec": 589,
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762551269548",
+      "dateISO": "2025-11-07T21:34:29.548Z"
+    },
+    {
+      "dateISO": "2025-11-07T21:11:41.480Z",
+      "breastSide": "Droite",
+      "durationSec": 300,
+      "source": "breast",
+      "id": "1762549901480"
+    },
+    {
+      "durationSec": 489,
+      "dateISO": "2025-11-07T20:56:15.665Z",
+      "id": "1762548975664",
+      "amountMl": 90,
+      "source": "bottle"
+    },
+    {
+      "source": "bottle",
+      "id": "1762539674282",
+      "amountMl": 120,
+      "dateISO": "2025-11-07T18:21:14.282Z",
+      "durationSec": 675
+    },
+    {
+      "durationSec": 574,
+      "dateISO": "2025-11-07T14:48:37.082Z",
+      "amountMl": 70,
+      "id": "1762526917082",
+      "source": "bottle"
+    },
+    {
+      "id": "1762521332032",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 545,
+      "dateISO": "2025-11-07T13:15:32.032Z"
+    },
+    {
+      "id": "1762520339686",
+      "source": "breast",
+      "durationSec": 837,
+      "breastSide": "Droite",
+      "dateISO": "2025-11-07T12:58:59.686Z"
+    },
+    {
+      "amountMl": 100,
+      "dateISO": "2025-11-07T12:21:09.214Z",
+      "durationSec": 504,
+      "source": "bottle",
+      "id": "1762518069214"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762506379418",
+      "source": "breast",
+      "dateISO": "2025-11-07T09:06:19.418Z",
+      "durationSec": 395
+    },
+    {
+      "durationSec": 525,
+      "source": "breast",
+      "id": "1762503171066",
+      "dateISO": "2025-11-07T08:12:51.066Z",
+      "breastSide": "Droite"
+    },
+    {
+      "amountMl": 100,
+      "id": "1762501267976",
+      "durationSec": 503,
+      "source": "bottle",
+      "dateISO": "2025-11-07T07:41:07.976Z"
+    },
+    {
+      "source": "bottle",
+      "amountMl": 110,
+      "id": "1762490879259",
+      "dateISO": "2025-11-07T04:47:59.259Z",
+      "durationSec": 586
+    },
+    {
+      "amountMl": 100,
+      "id": "1762477498896",
+      "dateISO": "2025-11-07T01:04:58.896Z",
+      "source": "bottle",
+      "durationSec": 452
+    },
+    {
+      "id": "1762462221994",
+      "durationSec": 551,
+      "amountMl": 80,
+      "source": "bottle",
+      "dateISO": "2025-11-06T20:50:21.994Z"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-06T19:38:57.503Z",
+      "durationSec": 336,
+      "id": "1762457937503"
+    },
+    {
+      "dateISO": "2025-11-06T18:23:02.665Z",
+      "durationSec": 1263,
+      "source": "bottle",
+      "amountMl": 10,
+      "id": "1762453382665"
+    },
+    {
+      "dateISO": "2025-11-06T17:25:13.754Z",
+      "source": "breast",
+      "id": "1762449913754",
+      "breastSide": "Gauche",
+      "durationSec": 532
+    },
+    {
+      "durationSec": 420,
+      "dateISO": "2025-11-06T16:17:16.136Z",
+      "source": "bottle",
+      "id": "1762445836136",
+      "amountMl": 90
+    },
+    {
+      "source": "bottle",
+      "id": "1762435845407",
+      "amountMl": 80,
+      "durationSec": 574,
+      "dateISO": "2025-11-06T13:30:45.407Z"
+    },
+    {
+      "id": "1762428302335",
+      "source": "breast",
+      "durationSec": 600,
+      "dateISO": "2025-11-06T11:25:00.000Z",
+      "breastSide": "Droite"
+    },
+    {
+      "dateISO": "2025-11-06T10:37:45.262Z",
+      "durationSec": 355,
+      "source": "breast",
+      "id": "1762425465262",
+      "breastSide": "Gauche"
+    },
+    {
+      "amountMl": 60,
+      "id": "1762424707863",
+      "source": "bottle",
+      "dateISO": "2025-11-06T10:15:00.000Z"
+    },
+    {
+      "durationSec": 501,
+      "id": "1762419360843",
+      "source": "breast",
+      "dateISO": "2025-11-06T08:56:00.843Z",
+      "breastSide": "Droite"
+    },
+    {
+      "amountMl": 100,
+      "dateISO": "2025-11-06T08:10:46.175Z",
+      "durationSec": 394,
+      "source": "bottle",
+      "id": "1762416646175"
+    },
+    {
+      "dateISO": "2025-11-06T05:01:04.667Z",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762405264667",
+      "durationSec": 598
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-06T04:36:52.982Z",
+      "durationSec": 432,
+      "id": "1762403812982",
+      "amountMl": 90
+    },
+    {
+      "durationSec": 530,
+      "dateISO": "2025-11-06T00:53:00.607Z",
+      "source": "bottle",
+      "id": "1762390380607",
+      "amountMl": 90
+    },
+    {
+      "id": "1762376020440",
+      "dateISO": "2025-11-05T20:53:40.440Z",
+      "durationSec": 337,
+      "source": "bottle",
+      "amountMl": 40
+    },
+    {
+      "source": "bottle",
+      "amountMl": 80,
+      "id": "1762373053554",
+      "dateISO": "2025-11-05T20:00:00.000Z"
+    },
+    {
+      "id": "1762368306864",
+      "amountMl": 110,
+      "dateISO": "2025-11-05T17:40:00.000Z",
+      "source": "bottle"
+    },
+    {
+      "durationSec": 418,
+      "dateISO": "2025-11-05T14:44:18.626Z",
+      "id": "1762353858626",
+      "source": "bottle",
+      "amountMl": 60
+    },
+    {
+      "source": "breast",
+      "id": "1762351393053",
+      "dateISO": "2025-11-05T14:03:13.053Z",
+      "durationSec": 475,
+      "breastSide": "Droite"
+    },
+    {
+      "dateISO": "2025-11-05T13:45:22.654Z",
+      "breastSide": "Droite",
+      "source": "breast",
+      "id": "1762350322654",
+      "durationSec": 408
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1762349866527",
+      "durationSec": 612,
+      "dateISO": "2025-11-05T13:37:46.527Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-05T13:17:52.834Z",
+      "source": "breast",
+      "id": "1762348672834",
+      "durationSec": 739
+    },
+    {
+      "dateISO": "2025-11-05T12:01:55.348Z",
+      "id": "1762344115348",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 463
+    },
+    {
+      "id": "1762342691332",
+      "dateISO": "2025-11-05T11:38:11.332Z",
+      "source": "breast",
+      "durationSec": 1297,
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1762336241651",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 751,
+      "dateISO": "2025-11-05T09:50:41.651Z"
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 501,
+      "dateISO": "2025-11-05T09:10:29.941Z",
+      "id": "1762333829941",
+      "source": "breast"
+    },
+    {
+      "durationSec": 770,
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-05T08:23:47.822Z",
+      "source": "breast",
+      "id": "1762331027822"
+    },
+    {
+      "dateISO": "2025-11-05T04:43:26.312Z",
+      "durationSec": 282,
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1762317806312"
+    },
+    {
+      "source": "bottle",
+      "id": "1762316303610",
+      "amountMl": 100,
+      "dateISO": "2025-11-05T04:18:00.000Z"
+    },
+    {
+      "durationSec": 203,
+      "source": "breast",
+      "id": "1762305099099",
+      "dateISO": "2025-11-05T01:11:39.099Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "id": "1762304526465",
+      "dateISO": "2025-11-05T01:02:06.465Z",
+      "durationSec": 943,
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-04T22:20:14.634Z",
+      "durationSec": 663,
+      "id": "1762294814634"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762287290942",
+      "durationSec": 391,
+      "source": "breast",
+      "dateISO": "2025-11-04T20:14:50.942Z"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-04T19:15:00.000Z",
+      "breastSide": "Droite",
+      "durationSec": 600,
+      "id": "1762283719923"
+    },
+    {
+      "dateISO": "2025-11-04T18:45:00.000Z",
+      "source": "bottle",
+      "id": "1762282576753",
+      "amountMl": 100
+    },
+    {
+      "source": "breast",
+      "id": "1762269785647",
+      "breastSide": "Droite",
+      "durationSec": 494,
+      "dateISO": "2025-11-04T15:23:05.647Z"
+    },
+    {
+      "id": "1762268458410",
+      "source": "breast",
+      "dateISO": "2025-11-04T15:00:58.410Z",
+      "durationSec": 887,
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 370,
+      "source": "bottle",
+      "id": "1762258893907",
+      "dateISO": "2025-11-04T12:21:33.907Z",
+      "amountMl": 90
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-04T10:24:38.839Z",
+      "durationSec": 244,
+      "breastSide": "Gauche",
+      "id": "1762251878839"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1762247999344",
+      "dateISO": "2025-11-04T09:19:59.344Z",
+      "durationSec": 294
+    },
+    {
+      "dateISO": "2025-11-04T08:48:02.166Z",
+      "id": "1762246082166",
+      "durationSec": 1159,
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "durationSec": 430,
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1762242244537",
+      "dateISO": "2025-11-04T07:44:04.537Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762237630809",
+      "durationSec": 934,
+      "source": "breast",
+      "dateISO": "2025-11-04T06:27:10.809Z"
+    },
+    {
+      "dateISO": "2025-11-04T03:55:45.598Z",
+      "id": "1762228545598",
+      "source": "breast",
+      "durationSec": 1244,
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1762216708684",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-04T00:38:28.684Z",
+      "durationSec": 133
+    },
+    {
+      "source": "breast",
+      "id": "1762215469438",
+      "dateISO": "2025-11-04T00:17:49.438Z",
+      "breastSide": "Gauche",
+      "durationSec": 741
+    },
+    {
+      "durationSec": 1123,
+      "id": "1762205257455",
+      "source": "breast",
+      "dateISO": "2025-11-03T21:27:37.455Z",
+      "breastSide": "Droite"
+    },
+    {
+      "amountMl": 70,
+      "dateISO": "2025-11-03T17:54:16.567Z",
+      "id": "1762192456567",
+      "source": "bottle",
+      "durationSec": 1016
+    },
+    {
+      "source": "breast",
+      "breastSide": "Droite",
+      "durationSec": 468,
+      "dateISO": "2025-11-03T16:53:25.073Z",
+      "id": "1762188805073"
+    },
+    {
+      "source": "breast",
+      "durationSec": 770,
+      "id": "1762186294494",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-03T16:11:34.494Z"
+    },
+    {
+      "breastSide": "Droite",
+      "id": "1762182192632",
+      "dateISO": "2025-11-03T15:03:12.632Z",
+      "durationSec": 339,
+      "source": "breast"
+    },
+    {
+      "source": "breast",
+      "durationSec": 425,
+      "breastSide": "Gauche",
+      "id": "1762181849133",
+      "dateISO": "2025-11-03T14:57:29.133Z"
+    },
+    {
+      "id": "1762180809898",
+      "amountMl": 90,
+      "source": "bottle",
+      "dateISO": "2025-11-03T14:40:09.898Z",
+      "durationSec": 408
+    },
+    {
+      "source": "bottle",
+      "id": "1762167052383",
+      "dateISO": "2025-11-03T10:50:52.383Z",
+      "durationSec": 280,
+      "amountMl": 60
+    },
+    {
+      "source": "breast",
+      "id": "1762163082232",
+      "dateISO": "2025-11-03T09:25:00.000Z",
+      "durationSec": 1200,
+      "breastSide": "Droite"
+    },
+    {
+      "breastSide": "Droite",
+      "id": "1762160802729",
+      "dateISO": "2025-11-03T09:06:00.000Z",
+      "source": "breast",
+      "durationSec": 540
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762159506860",
+      "source": "breast",
+      "durationSec": 1500,
+      "dateISO": "2025-11-03T08:45:00.000Z"
+    },
+    {
+      "dateISO": "2025-11-03T06:24:59.992Z",
+      "amountMl": 90,
+      "source": "bottle",
+      "durationSec": 399,
+      "id": "1762151099992"
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762142295650",
+      "dateISO": "2025-11-03T03:58:15.650Z",
+      "source": "breast",
+      "durationSec": 153
+    },
+    {
+      "dateISO": "2025-11-03T03:45:56.936Z",
+      "id": "1762141556936",
+      "durationSec": 1416,
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "id": "1762127677161",
+      "source": "breast",
+      "dateISO": "2025-11-02T23:54:37.161Z",
+      "breastSide": "Gauche",
+      "durationSec": 290
+    },
+    {
+      "durationSec": 287,
+      "dateISO": "2025-11-02T23:13:00.444Z",
+      "id": "1762125180444",
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1762112739437",
+      "durationSec": 381,
+      "dateISO": "2025-11-02T19:45:39.437Z"
+    },
+    {
+      "source": "breast",
+      "durationSec": 420,
+      "id": "1762112278016",
+      "dateISO": "2025-11-02T19:37:58.016Z",
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1762120890324",
+      "dateISO": "2025-11-02T18:35:00.000Z",
+      "source": "bottle",
+      "amountMl": 90
+    },
+    {
+      "durationSec": 731,
+      "id": "1762103860266",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-02T17:17:40.266Z",
+      "source": "breast"
+    },
+    {
+      "id": "1762102527950",
+      "breastSide": "Droite",
+      "source": "breast",
+      "dateISO": "2025-11-02T16:55:27.950Z",
+      "durationSec": 417
+    },
+    {
+      "id": "1762095551944",
+      "source": "bottle",
+      "dateISO": "2025-11-02T14:59:11.944Z",
+      "durationSec": 1,
+      "amountMl": 90
+    },
+    {
+      "durationSec": 405,
+      "source": "breast",
+      "id": "1762087193097",
+      "breastSide": "Droite",
+      "dateISO": "2025-11-02T12:39:53.097Z"
+    },
+    {
+      "durationSec": 310,
+      "id": "1762086443521",
+      "amountMl": 60,
+      "source": "bottle",
+      "dateISO": "2025-11-02T12:27:23.521Z"
+    },
+    {
+      "dateISO": "2025-11-02T10:58:00.000Z",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1762080599977",
+      "durationSec": 840
+    },
+    {
+      "durationSec": 263,
+      "id": "1762076969090",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-02T09:49:29.090Z"
+    },
+    {
+      "dateISO": "2025-11-02T09:40:00.000Z",
+      "breastSide": "Gauche",
+      "id": "1762076455309",
+      "durationSec": 600,
+      "source": "breast"
+    },
+    {
+      "durationSec": 547,
+      "dateISO": "2025-11-02T09:22:56.913Z",
+      "breastSide": "Droite",
+      "id": "1762075376913",
+      "source": "breast"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Droite",
+      "durationSec": 1046,
+      "id": "1762074696089",
+      "dateISO": "2025-11-02T09:11:36.089Z"
+    },
+    {
+      "durationSec": 782,
+      "dateISO": "2025-11-02T08:06:22.297Z",
+      "id": "1762070782297",
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "durationSec": 5,
+      "source": "breast",
+      "dateISO": "2025-11-02T08:02:31.015Z",
+      "id": "1762070551015",
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1762066340549",
+      "breastSide": "Gauche",
+      "durationSec": 573,
+      "source": "breast",
+      "dateISO": "2025-11-02T06:52:20.549Z"
+    },
+    {
+      "source": "breast",
+      "id": "1762059410920",
+      "durationSec": 520,
+      "dateISO": "2025-11-02T04:56:50.920Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-11-02T04:24:00.000Z",
+      "durationSec": 1260,
+      "id": "1762057447914",
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-11-02T01:18:42.717Z",
+      "source": "breast",
+      "durationSec": 729,
+      "id": "1762046322717",
+      "breastSide": "Gauche"
+    },
+    {
+      "id": "1762034009798",
+      "breastSide": "Droite",
+      "durationSec": 651,
+      "dateISO": "2025-11-01T21:53:29.798Z",
+      "source": "breast"
+    },
+    {
+      "id": "1762033186523",
+      "durationSec": 295,
+      "source": "bottle",
+      "amountMl": 60,
+      "dateISO": "2025-11-01T21:39:46.523Z"
+    },
+    {
+      "dateISO": "2025-11-01T20:27:09.597Z",
+      "durationSec": 8,
+      "id": "1762028829597",
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "breast",
+      "id": "1762028498446",
+      "breastSide": "Droite",
+      "dateISO": "2025-11-01T20:21:38.446Z",
+      "durationSec": 549
+    },
+    {
+      "breastSide": "Gauche",
+      "id": "1762024838110",
+      "durationSec": 1086,
+      "source": "breast",
+      "dateISO": "2025-11-01T19:20:38.110Z"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-11-01T18:21:51.056Z",
+      "amountMl": 55,
+      "id": "1762021311056"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-11-01T18:16:24.475Z",
+      "source": "breast",
+      "durationSec": 113,
+      "id": "1762020984475"
+    },
+    {
+      "durationSec": 780,
+      "dateISO": "2025-11-01T17:35:00.000Z",
+      "id": "1762018504131",
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1762015929533",
+      "dateISO": "2025-11-01T16:52:09.533Z",
+      "breastSide": "Droite",
+      "source": "breast",
+      "durationSec": 834
+    },
+    {
+      "id": "1762013520110",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 789,
+      "dateISO": "2025-11-01T16:12:00.110Z"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-11-01T15:52:30.381Z",
+      "durationSec": 918,
+      "breastSide": "Gauche",
+      "id": "1762012350381"
+    },
+    {
+      "source": "breast",
+      "id": "1762006171301",
+      "durationSec": 1032,
+      "dateISO": "2025-11-01T14:09:31.301Z",
+      "breastSide": "Droite"
+    },
+    {
+      "durationSec": 651,
+      "breastSide": "Droite",
+      "dateISO": "2025-11-01T13:42:09.812Z",
+      "id": "1762004529812",
+      "source": "breast"
+    },
+    {
+      "id": "1762000694773",
+      "dateISO": "2025-11-01T12:38:14.773Z",
+      "durationSec": 1301,
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "source": "bottle",
+      "id": "1761991190844",
+      "dateISO": "2025-11-01T09:59:00.000Z",
+      "amountMl": 60
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-11-01T08:56:08.299Z",
+      "id": "1761987368298",
+      "source": "breast",
+      "durationSec": 1115
+    },
+    {
+      "dateISO": "2025-11-01T07:45:32.821Z",
+      "id": "1761983132821",
+      "breastSide": "Droite",
+      "durationSec": 785,
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-11-01T06:40:00.000Z",
+      "source": "breast",
+      "id": "1761978582090",
+      "durationSec": 1380,
+      "breastSide": "Gauche"
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-11-01T03:07:10.161Z",
+      "id": "1761966430161",
+      "source": "breast",
+      "durationSec": 886
+    },
+    {
+      "id": "1761948601790",
+      "dateISO": "2025-10-31T22:10:01.790Z",
+      "breastSide": "Gauche",
+      "durationSec": 349,
+      "source": "breast"
+    },
+    {
+      "id": "1761947414431",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 135,
+      "dateISO": "2025-10-31T21:50:14.431Z"
+    },
+    {
+      "dateISO": "2025-10-31T21:04:36.671Z",
+      "id": "1761944676671",
+      "breastSide": "Gauche",
+      "durationSec": 431,
+      "source": "breast"
+    },
+    {
+      "breastSide": "Droite",
+      "id": "1761944213745",
+      "durationSec": 1193,
+      "source": "breast",
+      "dateISO": "2025-10-31T20:56:53.745Z"
+    },
+    {
+      "dateISO": "2025-10-31T18:34:57.366Z",
+      "breastSide": "Gauche",
+      "durationSec": 403,
+      "id": "1761935697366",
+      "source": "breast"
+    },
+    {
+      "id": "1761932220582",
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 702,
+      "dateISO": "2025-10-31T17:37:00.582Z"
+    },
+    {
+      "id": "1761929719147",
+      "breastSide": "Droite",
+      "dateISO": "2025-10-31T16:55:19.147Z",
+      "source": "breast",
+      "durationSec": 1762
+    },
+    {
+      "id": "1761921109492",
+      "durationSec": 774,
+      "dateISO": "2025-10-31T14:31:49.492Z",
+      "source": "breast",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 1393,
+      "source": "breast",
+      "id": "1761916715802",
+      "breastSide": "Droite",
+      "dateISO": "2025-10-31T13:18:35.802Z"
+    },
+    {
+      "durationSec": 423,
+      "source": "breast",
+      "dateISO": "2025-10-31T10:41:05.908Z",
+      "id": "1761907265908",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-10-31T09:51:00.000Z",
+      "source": "breast",
+      "durationSec": 900,
+      "id": "1761904296083",
+      "breastSide": "Gauche"
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 426,
+      "id": "1761900498770",
+      "source": "breast",
+      "dateISO": "2025-10-31T08:48:18.770Z"
+    },
+    {
+      "source": "bottle",
+      "dateISO": "2025-10-31T08:32:00.000Z",
+      "amountMl": 75,
+      "id": "1761900045363"
+    },
+    {
+      "id": "1761890659086",
+      "dateISO": "2025-10-31T06:04:19.086Z",
+      "durationSec": 1140,
+      "breastSide": "Gauche",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-10-31T02:07:02.216Z",
+      "id": "1761876422216",
+      "durationSec": 660,
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "breast",
+      "durationSec": 726,
+      "breastSide": "Droite",
+      "dateISO": "2025-10-31T01:49:58.223Z",
+      "id": "1761875398223"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-10-30T21:54:01.630Z",
+      "source": "breast",
+      "id": "1761861241630",
+      "durationSec": 1220
+    },
+    {
+      "id": "1761857115888",
+      "dateISO": "2025-10-30T20:45:15.888Z",
+      "source": "breast",
+      "durationSec": 2181,
+      "breastSide": "Droite"
+    },
+    {
+      "durationSec": 1020,
+      "dateISO": "2025-10-30T18:57:03.137Z",
+      "breastSide": "Droite",
+      "source": "breast",
+      "id": "1761850623137"
+    },
+    {
+      "dateISO": "2025-10-30T18:12:07.336Z",
+      "breastSide": "Gauche",
+      "durationSec": 541,
+      "source": "breast",
+      "id": "1761847927336"
+    },
+    {
+      "id": "1761846806934",
+      "durationSec": 825,
+      "source": "breast",
+      "dateISO": "2025-10-30T17:53:26.934Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 515,
+      "dateISO": "2025-10-30T14:17:41.867Z",
+      "id": "1761833861867",
+      "breastSide": "Gauche",
+      "source": "breast"
+    },
+    {
+      "id": "1761832684829",
+      "source": "breast",
+      "dateISO": "2025-10-30T13:58:04.829Z",
+      "durationSec": 1410,
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1761822084348",
+      "durationSec": 966,
+      "source": "breast",
+      "dateISO": "2025-10-30T11:01:24.348Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 596,
+      "dateISO": "2025-10-30T09:55:45.165Z",
+      "source": "breast",
+      "breastSide": "Droite",
+      "id": "1761818145165"
+    },
+    {
+      "durationSec": 1099,
+      "id": "1761817059281",
+      "dateISO": "2025-10-30T09:37:39.281Z",
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "dateISO": "2025-10-30T08:23:01.812Z",
+      "id": "1761812581812",
+      "source": "breast",
+      "durationSec": 631,
+      "breastSide": "Gauche"
+    },
+    {
+      "breastSide": "Droite",
+      "dateISO": "2025-10-30T07:27:37.318Z",
+      "source": "breast",
+      "id": "1761809257318",
+      "durationSec": 906
+    },
+    {
+      "dateISO": "2025-10-30T07:08:41.906Z",
+      "breastSide": "Droite",
+      "durationSec": 333,
+      "source": "breast",
+      "id": "1761808121906"
+    },
+    {
+      "source": "breast",
+      "durationSec": 997,
+      "dateISO": "2025-10-30T04:37:48.218Z",
+      "breastSide": "Gauche",
+      "id": "1761799068218"
+    },
+    {
+      "durationSec": 1075,
+      "breastSide": "Droite",
+      "source": "breast",
+      "dateISO": "2025-10-30T00:48:02.287Z",
+      "id": "1761785282287"
+    },
+    {
+      "breastSide": "Gauche",
+      "source": "breast",
+      "id": "1761771240198",
+      "dateISO": "2025-10-29T20:54:00.198Z",
+      "durationSec": 734
+    },
+    {
+      "id": "1761769959906",
+      "durationSec": 1161,
+      "breastSide": "Droite",
+      "source": "breast",
+      "dateISO": "2025-10-29T20:32:39.906Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-10-29T19:46:32.445Z",
+      "source": "breast",
+      "durationSec": 420,
+      "id": "1761767192445"
+    },
+    {
+      "breastSide": "Droite",
+      "source": "breast",
+      "durationSec": 474,
+      "id": "1761765759619",
+      "dateISO": "2025-10-29T19:22:39.619Z"
+    },
+    {
+      "source": "breast",
+      "id": "1761762923112",
+      "dateISO": "2025-10-29T18:35:23.112Z",
+      "durationSec": 614,
+      "breastSide": "Gauche"
+    },
+    {
+      "breastSide": "Gauche",
+      "dateISO": "2025-10-29T18:05:56.554Z",
+      "id": "1761761156554",
+      "durationSec": 201,
+      "source": "breast"
+    },
+    {
+      "breastSide": "Droite",
+      "source": "breast",
+      "durationSec": 1198,
+      "dateISO": "2025-10-29T17:56:39.232Z",
+      "id": "1761760599232"
+    },
+    {
+      "breastSide": "Gauche",
+      "durationSec": 1015,
+      "source": "breast",
+      "dateISO": "2025-10-29T16:22:05.683Z",
+      "id": "1761754925683"
+    },
+    {
+      "dateISO": "2025-10-29T15:37:09.337Z",
+      "id": "1761752229337",
+      "breastSide": "Gauche",
+      "source": "breast",
+      "durationSec": 984
+    },
+    {
+      "breastSide": "Droite",
+      "durationSec": 2149,
+      "dateISO": "2025-10-29T13:07:23.110Z",
+      "id": "1761743243110",
+      "source": "breast"
+    },
+    {
+      "dateISO": "2025-10-29T09:23:32.414Z",
+      "durationSec": 595,
+      "source": "breast",
+      "id": "1761729812414",
+      "breastSide": "Droite"
+    },
+    {
+      "source": "breast",
+      "id": "1761729089360",
+      "dateISO": "2025-10-29T09:11:29.360Z",
+      "breastSide": "Droite",
+      "durationSec": 780
+    },
+    {
+      "id": "1761728061179",
+      "dateISO": "2025-10-29T08:54:21.179Z",
+      "durationSec": 509,
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "durationSec": 943,
+      "dateISO": "2025-10-29T06:24:51.271Z",
+      "id": "1761719091271",
+      "breastSide": "Gauche",
+      "source": "breast"
+    },
+    {
+      "source": "breast",
+      "dateISO": "2025-10-29T00:04:55.059Z",
+      "breastSide": "Gauche",
+      "durationSec": 2,
+      "id": "1761696295059"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "dateISO": "2025-10-28T22:02:00.000Z",
+      "durationSec": 120,
+      "id": "1761688969258"
+    },
+    {
+      "source": "breast",
+      "id": "1761686356930",
+      "breastSide": "Gauche",
+      "durationSec": 177,
+      "dateISO": "2025-10-28T21:19:16.930Z"
+    },
+    {
+      "breastSide": "Droite",
+      "id": "1761686098818",
+      "durationSec": 1177,
+      "source": "breast",
+      "dateISO": "2025-10-28T21:14:58.818Z"
+    },
+    {
+      "breastSide": "Droite",
+      "source": "breast",
+      "id": "1761683439267",
+      "dateISO": "2025-10-28T20:30:39.267Z",
+      "durationSec": 2009
+    },
+    {
+      "id": "1761681631201",
+      "source": "breast",
+      "dateISO": "2025-10-28T18:05:00.000Z",
+      "breastSide": "Gauche",
+      "durationSec": 780
+    },
+    {
+      "id": "1761681612115",
+      "dateISO": "2025-10-28T17:25:00.000Z",
+      "durationSec": 360,
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "durationSec": 360,
+      "dateISO": "2025-10-28T17:17:00.000Z",
+      "id": "1761681577921",
+      "source": "breast",
+      "breastSide": "Droite"
+    },
+    {
+      "id": "1761681551151",
+      "source": "breast",
+      "dateISO": "2025-10-28T14:42:00.000Z",
+      "durationSec": 780,
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-10-28T13:54:00.000Z",
+      "durationSec": 1440,
+      "source": "breast",
+      "id": "1761681388902",
+      "breastSide": "Gauche"
+    },
+    {
+      "durationSec": 780,
+      "source": "breast",
+      "id": "1761681326698",
+      "dateISO": "2025-10-28T11:47:00.000Z",
+      "breastSide": "Gauche"
+    },
+    {
+      "id": "1761681268344",
+      "durationSec": 1440,
+      "breastSide": "Droite",
+      "source": "breast",
+      "dateISO": "2025-10-28T10:49:00.000Z"
+    },
+    {
+      "id": "1761681162615",
+      "breastSide": "Gauche",
+      "dateISO": "2025-10-28T08:37:00.000Z",
+      "durationSec": 600,
+      "source": "breast"
+    },
+    {
+      "source": "breast",
+      "durationSec": 600,
+      "breastSide": "Gauche",
+      "dateISO": "2025-10-28T08:05:00.000Z",
+      "id": "1761681204801"
+    },
+    {
+      "dateISO": "2025-10-28T07:56:00.000Z",
+      "source": "breast",
+      "durationSec": 660,
+      "id": "1761681132317",
+      "breastSide": "Gauche"
+    },
+    {
+      "dateISO": "2025-10-28T07:15:00.000Z",
+      "durationSec": 420,
+      "source": "breast",
+      "id": "1761681057144",
+      "breastSide": "Droite"
+    },
+    {
+      "durationSec": 960,
+      "dateISO": "2025-10-28T07:04:00.000Z",
+      "id": "1761681033158",
+      "breastSide": "Droite",
+      "source": "breast"
+    },
+    {
+      "durationSec": 1380,
+      "source": "breast",
+      "breastSide": "Gauche",
+      "id": "1761681007663",
+      "dateISO": "2025-10-28T04:08:00.000Z"
+    },
+    {
+      "source": "breast",
+      "breastSide": "Gauche",
+      "durationSec": 540,
+      "id": "1761680971781",
+      "dateISO": "2025-10-27T23:19:00.000Z"
+    },
+    {
+      "breastSide": "Gauche",
+      "durationSec": 840,
+      "dateISO": "2025-10-27T09:05:00.000Z",
+      "id": "1761681736100",
+      "source": "breast"
+    }
+  ],
+  "elims": [
+    {
+      "id": "1766927131643",
+      "poop": 0,
+      "pee": 1,
+      "type": "elim",
+      "vomit": 0,
+      "dateISO": "2025-12-28T12:30:00.000Z"
+    },
+    {
+      "pee": 2,
+      "vomit": 0,
+      "id": "1763877060690",
+      "dateISO": "2025-11-23T05:50:00.000Z",
+      "poop": 0
+    },
+    {
+      "id": "1763654041995",
+      "pee": 2,
+      "poop": 3,
+      "vomit": 0,
+      "dateISO": "2025-11-20T15:54:01.995Z"
+    },
+    {
+      "pee": 3,
+      "vomit": 0,
+      "poop": 0,
+      "dateISO": "2025-11-18T07:39:12.008Z",
+      "id": "1763451552008"
+    },
+    {
+      "poop": 1,
+      "vomit": 0,
+      "id": "1763439018308",
+      "dateISO": "2025-11-18T04:10:18.308Z",
+      "pee": 2
+    },
+    {
+      "pee": 2,
+      "dateISO": "2025-11-17T23:28:13.827Z",
+      "poop": 1,
+      "vomit": 0,
+      "id": "1763422093827"
+    },
+    {
+      "pee": 3,
+      "dateISO": "2025-11-17T02:41:54.794Z",
+      "vomit": 0,
+      "id": "1763347314794",
+      "poop": 0
+    },
+    {
+      "dateISO": "2025-11-15T20:26:19.267Z",
+      "poop": 2,
+      "vomit": 0,
+      "id": "1763238379267",
+      "pee": 3
+    },
+    {
+      "id": "1763187541499",
+      "dateISO": "2025-11-15T06:19:01.499Z",
+      "pee": 3,
+      "poop": 0,
+      "vomit": 0
+    },
+    {
+      "id": "1763084326131",
+      "vomit": 0,
+      "poop": 0,
+      "dateISO": "2025-11-14T01:38:46.131Z",
+      "pee": 3
+    },
+    {
+      "poop": 3,
+      "vomit": 0,
+      "dateISO": "2025-11-13T04:40:00.000Z",
+      "pee": 2,
+      "id": "1763011167706"
+    },
+    {
+      "dateISO": "2025-11-13T01:30:33.902Z",
+      "vomit": 0,
+      "id": "1762997433902",
+      "poop": 1,
+      "pee": 2
+    },
+    {
+      "poop": 1,
+      "pee": 2,
+      "id": "1762824099472",
+      "vomit": 0,
+      "dateISO": "2025-11-11T01:21:39.472Z"
+    },
+    {
+      "pee": 2,
+      "vomit": 0,
+      "poop": 1,
+      "dateISO": "2025-11-09T15:59:53.846Z",
+      "id": "1762703993846"
+    },
+    {
+      "poop": 1,
+      "id": "1762626587016",
+      "dateISO": "2025-11-08T18:29:47.016Z",
+      "vomit": 0,
+      "pee": 2
+    },
+    {
+      "pee": 2,
+      "poop": 1,
+      "id": "1762602769112",
+      "vomit": 0,
+      "dateISO": "2025-11-08T11:52:49.112Z"
+    },
+    {
+      "id": "1762582652175",
+      "dateISO": "2025-11-08T06:17:32.175Z",
+      "poop": 2,
+      "pee": 2,
+      "vomit": 0
+    },
+    {
+      "id": "1762566427128",
+      "poop": 1,
+      "vomit": 0,
+      "pee": 2,
+      "dateISO": "2025-11-08T01:47:07.128Z"
+    },
+    {
+      "pee": 2,
+      "dateISO": "2025-11-07T20:48:29.591Z",
+      "poop": 2,
+      "id": "1762548509591",
+      "vomit": 0
+    },
+    {
+      "pee": 2,
+      "dateISO": "2025-11-07T04:38:02.105Z",
+      "vomit": 0,
+      "id": "1762490282105",
+      "poop": 1
+    },
+    {
+      "id": "1762477033925",
+      "dateISO": "2025-11-07T00:57:13.925Z",
+      "pee": 2,
+      "poop": 1,
+      "vomit": 0
+    },
+    {
+      "id": "1762447079048",
+      "pee": 2,
+      "vomit": 0,
+      "poop": 2,
+      "dateISO": "2025-11-06T16:37:59.048Z"
+    },
+    {
+      "vomit": 0,
+      "id": "1762403361020",
+      "pee": 2,
+      "poop": 1,
+      "dateISO": "2025-11-06T04:29:21.020Z"
+    },
+    {
+      "poop": 2,
+      "pee": 2,
+      "id": "1762348684939",
+      "vomit": 0,
+      "dateISO": "2025-11-05T13:18:04.939Z"
+    },
+    {
+      "vomit": 0,
+      "id": "1762330252564",
+      "pee": 2,
+      "dateISO": "2025-11-05T08:10:52.564Z",
+      "poop": 1
+    },
+    {
+      "dateISO": "2025-11-05T01:08:23.827Z",
+      "id": "1762304903827",
+      "vomit": 0,
+      "poop": 0,
+      "pee": 2
+    },
+    {
+      "dateISO": "2025-11-04T00:32:41.726Z",
+      "pee": 2,
+      "id": "1762216361726",
+      "vomit": 0,
+      "poop": 2
+    },
+    {
+      "poop": 2,
+      "vomit": 0,
+      "pee": 2,
+      "dateISO": "2025-11-03T14:33:01.011Z",
+      "id": "1762180381011"
+    },
+    {
+      "dateISO": "2025-11-03T10:51:04.352Z",
+      "poop": 2,
+      "id": "1762167064352",
+      "pee": 2,
+      "vomit": 0
+    },
+    {
+      "vomit": 0,
+      "poop": 2,
+      "dateISO": "2025-11-03T03:53:45.254Z",
+      "pee": 2,
+      "id": "1762142025254"
+    },
+    {
+      "id": "1762108318122",
+      "dateISO": "2025-11-02T18:31:58.122Z",
+      "vomit": 0,
+      "poop": 0,
+      "pee": 3
+    },
+    {
+      "pee": 2,
+      "id": "1762058885812",
+      "poop": 0,
+      "dateISO": "2025-11-02T04:48:05.812Z",
+      "vomit": 0
+    },
+    {
+      "pee": 2,
+      "vomit": 0,
+      "poop": 0,
+      "id": "1762046882515",
+      "dateISO": "2025-11-02T01:02:00.000Z"
+    },
+    {
+      "vomit": 0,
+      "dateISO": "2025-11-01T15:37:49.542Z",
+      "id": "1762011469542",
+      "pee": 1,
+      "poop": 1
+    },
+    {
+      "vomit": 0,
+      "id": "1761999137084",
+      "poop": 1,
+      "pee": 1,
+      "dateISO": "2025-11-01T12:12:17.084Z"
+    },
+    {
+      "pee": 2,
+      "dateISO": "2025-11-01T06:16:37.214Z",
+      "vomit": 0,
+      "id": "1761977797214",
+      "poop": 1
+    },
+    {
+      "pee": 1,
+      "vomit": 0,
+      "dateISO": "2025-10-31T16:25:11.039Z",
+      "poop": 1,
+      "id": "1761927911039"
+    },
+    {
+      "id": "1761890959985",
+      "vomit": 0,
+      "pee": 1,
+      "dateISO": "2025-10-31T06:09:19.985Z",
+      "poop": 1
+    },
+    {
+      "poop": 1,
+      "pee": 2,
+      "id": "1761875756439",
+      "vomit": 0,
+      "dateISO": "2025-10-31T01:55:56.439Z"
+    },
+    {
+      "pee": 2,
+      "id": "1761831198732",
+      "vomit": 0,
+      "dateISO": "2025-10-30T13:33:18.732Z",
+      "poop": 1
+    },
+    {
+      "vomit": 0,
+      "dateISO": "2025-10-30T09:19:38.100Z",
+      "poop": 2,
+      "id": "1761815978100",
+      "pee": 1
+    },
+    {
+      "pee": 2,
+      "poop": 1,
+      "dateISO": "2025-10-30T07:09:09.849Z",
+      "id": "1761808149849",
+      "vomit": 0
+    },
+    {
+      "poop": 0,
+      "pee": 2,
+      "id": "1761784217605",
+      "vomit": 0,
+      "dateISO": "2025-10-30T00:30:17.605Z"
+    },
+    {
+      "pee": 1,
+      "poop": 1,
+      "id": "1761766786166",
+      "dateISO": "2025-10-29T19:39:46.166Z",
+      "vomit": 0
+    },
+    {
+      "poop": 1,
+      "vomit": 0,
+      "id": "1761751240347",
+      "dateISO": "2025-10-29T15:20:40.347Z",
+      "pee": 1
+    },
+    {
+      "pee": 1,
+      "id": "1761741110038",
+      "poop": 1,
+      "vomit": 0,
+      "dateISO": "2025-10-29T12:31:50.038Z"
+    },
+    {
+      "vomit": 0,
+      "poop": 1,
+      "id": "1761719108588",
+      "pee": 1,
+      "dateISO": "2025-10-29T06:25:08.588Z"
+    },
+    {
+      "vomit": 0,
+      "dateISO": "2025-10-29T00:06:35.706Z",
+      "poop": 0,
+      "pee": 2,
+      "id": "1761696395706"
+    },
+    {
+      "poop": 2,
+      "dateISO": "2025-10-28T10:54:00.000Z",
+      "pee": 0,
+      "id": "1761681297981",
+      "vomit": 0
+    },
+    {
+      "id": "1761681457304",
+      "poop": 0,
+      "vomit": 0,
+      "dateISO": "2025-10-28T06:48:00.000Z",
+      "pee": 2
+    }
+  ],
+  "meds": [
+    {
+      "name": "Protectis",
+      "dateISO": "2025-12-28T07:46:50.621Z",
+      "id": "1766908010621",
+      "medKey": "other"
+    },
+    {
+      "dateISO": "2025-12-25T15:38:53.445Z",
+      "id": "1766677133445",
+      "name": "Pardolan",
+      "medKey": "other"
+    }
+  ],
+  "measurements": [
+    {
+      "dateISO": "2025-12-28T21:29:06.922Z",
+      "id": "1766957346922",
+      "weight": 5.8,
+      "height": 58
+    },
+    {
+      "dateISO": "2025-11-28T17:59:53.765Z",
+      "id": "1764352793765",
+      "weight": 5.3
+    },
+    {
+      "height": 54,
+      "id": "1763585695302",
+      "dateISO": "2025-11-19T20:54:00.000Z",
+      "weight": 4.8
+    },
+    {
+      "dateISO": "2025-11-02T09:27:30.450Z",
+      "temp": 374,
+      "id": "1762075650450"
+    },
+    {
+      "id": "1761904199150",
+      "weight": 3.845,
+      "dateISO": "2025-10-31T09:49:59.150Z",
+      "temp": 37.1
+    }
+  ],
+  "sleepSessions": [
+    {
+      "id": "1766942215961",
+      "dateISO": "2025-12-28T17:16:55.903Z",
+      "durationSec": 519,
+      "startISO": "2025-12-28T17:08:16.903Z",
+      "endISO": "2025-12-28T17:16:55.903Z"
+    },
+    {
+      "durationSec": 3360,
+      "dateISO": "2025-12-28T14:30:00.000Z",
+      "id": "1766932205567",
+      "startISO": "2025-12-28T13:34:00.000Z",
+      "endISO": "2025-12-28T14:30:00.000Z"
+    },
+    {
+      "startISO": "2025-12-28T12:36:35.628Z",
+      "endISO": "2025-12-28T13:05:01.628Z",
+      "dateISO": "2025-12-28T13:05:01.628Z",
+      "id": "1766927101666",
+      "durationSec": 1706
+    },
+    {
+      "id": "1766920060106",
+      "durationSec": 1546,
+      "startISO": "2025-12-28T10:41:53.910Z",
+      "endISO": "2025-12-28T11:07:39.910Z",
+      "dateISO": "2025-12-28T11:07:39.910Z"
+    }
+  ],
+  "pumpSessions": [
+    {
+      "durationSec": 167,
+      "startISO": "2025-12-28T09:03:44.288Z",
+      "id": "pump-1766912791302",
+      "dateISO": "2025-12-28T09:06:31.288Z",
+      "endISO": "2025-12-28T09:06:31.288Z"
+    },
+    {
+      "dateISO": "2025-11-14T19:40:22.851Z",
+      "startISO": "2025-11-14T19:08:32.851Z",
+      "endISO": "2025-11-14T19:40:22.851Z",
+      "durationSec": 1910,
+      "id": "pump-1763149222879"
+    },
+    {
+      "durationSec": 1024,
+      "endISO": "2025-11-14T16:54:31.296Z",
+      "dateISO": "2025-11-14T16:54:31.296Z",
+      "id": "pump-1763139271893",
+      "startISO": "2025-11-14T16:37:27.296Z"
+    }
+  ],
+  "exportedAt": "2025-12-29T12:00:07.515Z"
+}

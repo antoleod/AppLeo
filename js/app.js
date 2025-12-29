@@ -5375,7 +5375,7 @@ function closeManualModal(){
 
 }
 
-const DEFAULT_FIRESTORE_DOC_ID = '1m2m3';
+const DEFAULT_FIRESTORE_DOC_ID = '5OVJ41gy1Iehks4dIu6NWsVvDrF2';
 const DOC_STORAGE_KEY = 'lo.sharedDocId';
 
 function resolveSharedDocumentId() {
