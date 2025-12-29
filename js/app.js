@@ -2582,6 +2582,60 @@ function exportReports(){
   }
 }
 
+const BACKUP_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000;
+const LAST_BACKUP_KEY = 'leo.lastBackupAt';
+let backupInFlight = false;
+
+function buildBackupJson() {
+  const snapshot = cloneDataSnapshot();
+  snapshot.exportedAt = new Date().toISOString();
+  return JSON.stringify(snapshot, null, 2);
+}
+
+async function writeBackupToOPFS(json) {
+  if (!navigator.storage || typeof navigator.storage.getDirectory !== 'function') {
+    return false;
+  }
+  const dirHandle = await navigator.storage.getDirectory();
+  const fileHandle = await dirHandle.getFileHandle('report.json', { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(json);
+  await writable.close();
+  return true;
+}
+
+function downloadBackup(json) {
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href: url, download: 'report.json' });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function runAutoBackup(force = false) {
+  if (backupInFlight) return;
+  const lastBackup = Number(localStorage.getItem(LAST_BACKUP_KEY) || 0);
+  if (!force && Date.now() - lastBackup < BACKUP_INTERVAL_MS) return;
+  backupInFlight = true;
+  try {
+    const json = buildBackupJson();
+    let saved = false;
+    try {
+      saved = await writeBackupToOPFS(json);
+    } catch (error) {
+      console.warn('Auto backup OPFS failed:', error);
+    }
+    if (!saved) {
+      downloadBackup(json);
+    }
+    localStorage.setItem(LAST_BACKUP_KEY, String(Date.now()));
+  } finally {
+    backupInFlight = false;
+  }
+}
+
 function exportToCSV() {
   if (exportCsvBtn && exportCsvBtn.classList.contains('is-loading')) return;
   if (exportCsvBtn) exportCsvBtn.classList.add('is-loading');
@@ -5571,8 +5625,12 @@ function saveManualEntry() {
   });
 
   if(reason && entry){
-    // Return promise for safeAction
-    return getPersistenceApi()?.saveEntry?.(targetType, entry, reason);
+    // Return promise for safeAction, close modal on success.
+    return getPersistenceApi()?.saveEntry?.(targetType, entry, reason)
+      .then(() => {
+        closeManualModal();
+        renderHistory();
+      });
   }
   // If no entry created (e.g. error), safeAction catches the error or we return resolved
   closeManualModal();
@@ -5642,6 +5700,7 @@ async function initFirebaseSync() {
       console.debug('Could not summarize initialData', e);
     }
     replaceDataFromSnapshot(initialData, { skipRender: false });
+    runAutoBackup();
     syncRemoteTimersFromLocal(initialData?.activeTimers);
 
     persistenceApi.on((event, payload) => {
@@ -5649,6 +5708,7 @@ async function initFirebaseSync() {
       // La lógica de fusión compleja ya no es necesaria en el cliente.
       if (event === 'data-changed') {
         replaceDataFromSnapshot(payload.snapshot, { skipRender: false });
+        runAutoBackup();
       } else if (event === 'server-raw') {
         // Debug: server gave us a raw document; log a compact summary so developer can compare
         try {
