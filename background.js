@@ -1,9 +1,9 @@
 const backgroundImages = [
     'img/baby.jpg',
     'img/baby1.jpg',
-    'img/baby2.jpg',
+    'img/baby2.jpeg',
     'img/baby3.jpg',
-    'img/baby4.jpg'
+    'img/baby4.jpeg'
     // Agrega aquí cualquier otra imagen que añadas a la carpeta img/
 ];
 
