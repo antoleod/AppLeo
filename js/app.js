@@ -42,7 +42,7 @@ const confirmAction = (msg) => new Promise(resolve => resolve(window.confirm(msg
 
 // ===== Constants =====
 // Date de naissance pour les courbes de croissance (basé sur le profil)
-const BABY_BIRTH_DATE = new Date('2025-10-27T16:13:00');
+const BABY_BIRTH_DATE = new Date('2025-10-21T00:00:00');
 
 // ===== Haptic Feedback =====
 let vibrationUnlocked = false;
@@ -2082,19 +2082,29 @@ function renderComparisonView(mode) {
 
 function renderWeekView() {
   const html = `
-    <div class="stat-card" style="margin-bottom:18px">
-      <div class="stat-card-head">
-        <span class="stat-pill">Lait (7 jours)</span>
-        <span class="stat-pill stat-pill-muted">Touchez un jour</span>
+    <div class="stat-overview-grid">
+      <div class="stat-card">
+        <div class="stat-card-head">
+          <span class="stat-pill">Lait (7 jours)</span>
+          <span class="stat-pill stat-pill-muted">Touchez un jour</span>
+        </div>
+        <div class="muted" id="stats-milk-goal-note">—</div>
+        <div class="weekly-sparkline" id="stats-milk-sparkline"></div>
       </div>
-      <div class="weekly-sparkline" id="stats-milk-sparkline"></div>
+      <div class="stat-card">
+        <div class="stat-card-head">
+          <span class="stat-pill">Croissance</span>
+          <span class="stat-pill stat-pill-muted">Dernière mesure</span>
+        </div>
+        <div class="muted" id="stats-growth-overview">—</div>
+      </div>
     </div>
     <div class="charts-grid">
       <div class="chart-container"><canvas id="chart-bottle-by-day"></canvas></div>
       <div class="chart-container"><canvas id="chart-breast-by-hour"></canvas></div>
       <div class="chart-container">
         <canvas id="chart-growth"></canvas>
-        <div class="muted" id="growth-point-panel" style="margin-top:10px">Touchez un point pour voir le détail.</div>
+        <div class="chart-panel" id="growth-point-panel">Touchez un point pour voir le détail.</div>
       </div>
     </div>
     <div class="stats-breakdown">
@@ -2108,6 +2118,8 @@ function renderWeekView() {
   requestAnimationFrame(() => {
     updateStatsChart(true);
     renderWeeklyBottleSparkline($('#stats-milk-sparkline'), {mode:'week'}, toDateInputValue(new Date()));
+    renderStatsGrowthOverview();
+    renderStatsMilkGoalNote();
     const stats = buildRangeStats({mode:'week'});
     renderStatsDailyList(stats, $('#stats-day-list-target'));
   });
@@ -3594,7 +3606,7 @@ function injectSleepStyles() {
     .sleep-minimal-ui { padding: 24px 20px; display: flex; flex-direction: column; height: 100%; color: var(--text-main); overflow-y: auto; box-sizing: border-box; }
     .sleep-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0; }
     .sleep-header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
-    .sleep-close { background: transparent; border: none; font-size: 2rem; line-height: 1; color: var(--text-muted); padding: 10px; margin: -10px; cursor: pointer; }
+    .sleep-close { display:none; }
     
     .sleep-timer-view { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; gap: 30px; animation: fadeIn 0.3s ease; }
     .sleep-chrono-big { font-size: 4.5rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; line-height: 1; }
@@ -3682,7 +3694,7 @@ function renderSleepUI(mode = 'timer', entry = null) {
     <div class="sleep-minimal-ui">
       <div class="sleep-header">
         <h2>${isManual ? (entry ? 'Modifier' : 'Ajouter') : 'Sommeil'}</h2>
-        <button class="sleep-close" id="sleep-ui-close">×</button>
+        <button class="modal-close" id="sleep-ui-close" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
       </div>
 
       ${!isManual ? `
@@ -5194,6 +5206,8 @@ const saveMesuresBtn = $('#save-mesures');
 const tempInput = $('#mesure-temp');
 const poidsInput = $('#mesure-poids');
 const tailleInput = $('#mesure-taille');
+const mesuresGrowthSummaryEl = $('#mesures-growth-summary');
+const mesuresGrowthHistoryEl = $('#mesures-growth-history');
 
 let mesuresState = {
   temp: null,
@@ -5237,6 +5251,79 @@ function handleMesureInput() {
   updateMesuresSaveButtonState();
 }
 
+function renderMesuresGrowthHistory(){
+  if(!mesuresGrowthSummaryEl || !mesuresGrowthHistoryEl) return;
+  const all = Array.isArray(state.measurements) ? state.measurements : [];
+  const entries = all
+    .filter(m => m && m.dateISO && (Number.isFinite(m.weight) || Number.isFinite(m.height)))
+    .sort((a,b)=> Date.parse(a.dateISO) - Date.parse(b.dateISO));
+
+  if(!entries.length){
+    mesuresGrowthSummaryEl.textContent = "Ajoutez un poids / une taille pour voir l’évolution.";
+    mesuresGrowthHistoryEl.innerHTML = '<div class="history-empty">Aucune mesure de croissance enregistrée</div>';
+    return;
+  }
+
+  const latest = entries[entries.length - 1];
+  const prev = entries.length > 1 ? entries[entries.length - 2] : null;
+  const latestDate = parseDateInput(latest.dateISO);
+  const latestDateLabel = latestDate
+    ? latestDate.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short', year:'numeric' })
+    : latest.dateISO;
+
+  const w = Number.isFinite(latest.weight) ? latest.weight : null;
+  const h = Number.isFinite(latest.height) ? latest.height : null;
+  const pw = prev && Number.isFinite(prev.weight) ? prev.weight : null;
+  const ph = prev && Number.isFinite(prev.height) ? prev.height : null;
+
+  const dW = w != null && pw != null ? (w - pw) : null;
+  const dH = h != null && ph != null ? (h - ph) : null;
+
+  const summaryParts = [];
+  summaryParts.push(`Dernière mesure: ${latestDateLabel}`);
+  if(w != null) summaryParts.push(`Poids ${formatNumber(w, 2, 2)} kg${dW != null ? ` (${formatSignedNumber(dW)} kg)` : ''}`);
+  if(h != null) summaryParts.push(`Taille ${formatNumber(h, 0, 1)} cm${dH != null ? ` (${formatSignedNumber(dH)} cm)` : ''}`);
+  if(w == null && h == null) summaryParts.push("Valeurs manquantes");
+
+  mesuresGrowthSummaryEl.textContent = summaryParts.join(' • ');
+
+  const lastItems = entries.slice(-10).reverse();
+  mesuresGrowthHistoryEl.innerHTML = lastItems.map((entry, reverseIndex) => {
+    const idx = entries.length - 1 - reverseIndex;
+    const prevEntry = idx > 0 ? entries[idx - 1] : null;
+    const date = parseDateInput(entry.dateISO);
+    const dateLabel = date ? date.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : entry.dateISO;
+
+    const ew = Number.isFinite(entry.weight) ? entry.weight : null;
+    const eh = Number.isFinite(entry.height) ? entry.height : null;
+    const epw = prevEntry && Number.isFinite(prevEntry.weight) ? prevEntry.weight : null;
+    const eph = prevEntry && Number.isFinite(prevEntry.height) ? prevEntry.height : null;
+    const ddW = ew != null && epw != null ? (ew - epw) : null;
+    const ddH = eh != null && eph != null ? (eh - eph) : null;
+
+    const deltaParts = [];
+    if(ddW != null) deltaParts.push(`${formatSignedNumber(ddW)} kg`);
+    if(ddH != null) deltaParts.push(`${formatSignedNumber(ddH)} cm`);
+    const deltaLabel = deltaParts.length ? deltaParts.join(' • ') : '—';
+    const deltaClass = deltaParts.length
+      ? (deltaParts.some(p => p.startsWith('-')) ? 'down' : (deltaParts.some(p => p.startsWith('+')) ? '' : 'neutral'))
+      : 'neutral';
+
+    const values = [];
+    if(ew != null) values.push(`Poids ${formatNumber(ew, 2, 2)} kg`);
+    if(eh != null) values.push(`Taille ${formatNumber(eh, 0, 1)} cm`);
+    return `
+      <div class="growth-item">
+        <div class="growth-item-main">
+          <div class="growth-item-date">${escapeHtml(dateLabel)}</div>
+          <div class="growth-item-values">${escapeHtml(values.join(' • ') || '—')}</div>
+        </div>
+        <div class="growth-item-delta ${deltaClass}">${escapeHtml(deltaLabel)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 async function saveMesures() {
   triggerVibration();
   const { temp, weight, height } = mesuresState;
@@ -5260,12 +5347,14 @@ async function saveMesures() {
   
   closeModal('#modal-mesures');
   renderHistory();
+  renderMesuresGrowthHistory();
 }
 
 mesuresBtn?.addEventListener('click', () => {
   mesuresState = { temp: null, weight: null, height: null, isDirty: false };
   resetMesuresForm();
   updateMesuresSaveButtonState();
+  renderMesuresGrowthHistory();
   openModal('#modal-mesures');
 });
 
@@ -5289,7 +5378,7 @@ if(avatarBtn){
 }
 
 function showProfile(){
-  alert('Profil de Léo:\n• Naissance: 27/10/25 16:13\n• Poids de naissance: 3800 gr');
+  alert('Profil de Léo:\n• Naissance: 21/10/2025\n• Poids de naissance: 3800 g');
 }
 
 infoBtn?.addEventListener('click', showProfile);
@@ -6444,6 +6533,66 @@ function getBottleFeedsForDay(dateISO){
     .sort((a,b)=> Date.parse(a.dateISO) - Date.parse(b.dateISO));
 }
 
+function getBelgianOneMilkGoalMlPerDay(now = new Date()){
+  const birth = BABY_BIRTH_DATE instanceof Date ? BABY_BIRTH_DATE : null;
+  if(!birth || !Number.isFinite(birth.getTime())) return null;
+  const ageMs = now.getTime() - birth.getTime();
+  if(!Number.isFinite(ageMs) || ageMs < 0) return null;
+  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  const ageMonths = ageDays / 30.44;
+
+  // Based on ONE (Belgium) "Le biberon de lait" examples by age (approximate):
+  // - 1 month: 7 biberons x 90 ml = 630 ml/day
+  // - 3 months: 5 day + 1 night; 6 biberons x 150 ml = 900 ml/day
+  // - 4-6 months: 5 biberons x 180 ml = 900 ml/day
+  // - After solids: 600 ml/day until 1 year
+  if(ageMonths < 0.75) return null;
+  if(ageMonths < 2.0) return 630;
+  if(ageMonths < 6.5) return 900;
+  if(ageMonths < 12.0) return 600;
+  return null;
+}
+
+function renderStatsMilkGoalNote(){
+  const el = document.getElementById('stats-milk-goal-note');
+  if(!el) return;
+  const goal = getBelgianOneMilkGoalMlPerDay(new Date());
+  if(!goal){
+    el.textContent = "Objectif (ONE): —";
+    return;
+  }
+  el.textContent = `Objectif (ONE): ${formatNumber(goal)} ml / jour (repère indicatif)`;
+}
+
+function renderStatsGrowthOverview(){
+  const el = document.getElementById('stats-growth-overview');
+  if(!el) return;
+  const entries = (Array.isArray(state.measurements) ? state.measurements : [])
+    .filter(m => m && m.dateISO && (Number.isFinite(m.weight) || Number.isFinite(m.height)))
+    .sort((a,b)=> Date.parse(a.dateISO) - Date.parse(b.dateISO));
+  if(!entries.length){
+    el.textContent = "Pas encore de mesures. Ajoutez poids/taille dans « Mesures ».";
+    return;
+  }
+  const latest = entries[entries.length - 1];
+  const prev = entries.length > 1 ? entries[entries.length - 2] : null;
+
+  const date = parseDateInput(latest.dateISO);
+  const dateLabel = date ? date.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : latest.dateISO;
+  const w = Number.isFinite(latest.weight) ? latest.weight : null;
+  const h = Number.isFinite(latest.height) ? latest.height : null;
+  const pw = prev && Number.isFinite(prev.weight) ? prev.weight : null;
+  const ph = prev && Number.isFinite(prev.height) ? prev.height : null;
+  const dW = w != null && pw != null ? (w - pw) : null;
+  const dH = h != null && ph != null ? (h - ph) : null;
+
+  const parts = [`Date: ${dateLabel}`];
+  if(w != null) parts.push(`Poids ${formatNumber(w, 2, 2)} kg${dW != null ? ` (${formatSignedNumber(dW)} kg)` : ''}`);
+  if(h != null) parts.push(`Taille ${formatNumber(h, 0, 1)} cm${dH != null ? ` (${formatSignedNumber(dH)} cm)` : ''}`);
+  if(w == null && h == null) parts.push('Valeurs manquantes');
+  el.textContent = parts.join(' • ');
+}
+
 let milkDetailsState = null;
 
 function renderMilkDetails(){
@@ -6471,6 +6620,10 @@ function renderMilkDetails(){
   const bottleCount = Number(day.bottleSessions || 0);
   const avgPerBottle = bottleCount > 0 ? (todayMl / bottleCount) : 0;
 
+  const goalMl = getBelgianOneMilkGoalMlPerDay(new Date(day.dateISO));
+  const goalPct = goalMl ? Math.round((todayMl / goalMl) * 100) : null;
+  const goalLabel = goalMl ? `Objectif (ONE): ${formatNumber(goalMl)} ml (${goalPct}%)` : null;
+
   const compareLabel = prev
     ? `${formatSignedNumber(diffMl)} ml${prevMl > 0 ? ` (${formatPercent(pct)})` : ''} vs veille`
     : 'Pas de comparaison';
@@ -6492,6 +6645,7 @@ function renderMilkDetails(){
       <span class="kpi-pill">Moyenne ${formatNumber(avgPerBottle, 0, 0)} ml</span>
       <span class="kpi-pill">${escapeHtml(compareLabel)}</span>
       <span class="kpi-pill">${escapeHtml(insight)}</span>
+      ${goalLabel ? `<span class="kpi-pill">${escapeHtml(goalLabel)}</span>` : ''}
     </div>
     <div class="stack" style="margin-top:12px; gap:10px">
       <strong>Liste des biberons</strong>
@@ -6590,6 +6744,11 @@ function updateSummaries(){
       ? `${formatSignedNumber(diffMl)} ml (${formatPercent(pct)}) vs hier`
       : 'Pas de comparaison';
 
+    const goalMl = getBelgianOneMilkGoalMlPerDay(today);
+    const goalLabel = goalMl ? `Objectif (ONE) ${formatNumber(goalMl)} ml` : null;
+    const goalPct = goalMl ? Math.round((todayBottleMl / goalMl) * 100) : null;
+    const goalProgress = goalMl ? `${formatNumber(todayBottleMl)} / ${formatNumber(goalMl)} ml (${goalPct}%)` : null;
+
     summaryFeedEl.innerHTML = `
       <strong>Lait aujourd'hui</strong>
       <span class="kpi-pill">Total ${formatNumber(todayBottleMl)} ml</span>
@@ -6597,6 +6756,8 @@ function updateSummaries(){
       <span class="kpi-pill">Moyenne ${formatNumber(todayAvg, 0, 0)} ml</span>
       <span class="kpi-pill">${escapeHtml(compareLabel)}</span>
       <span class="kpi-pill">${escapeHtml(insight)}</span>
+      ${goalLabel ? `<span class="kpi-pill">${escapeHtml(goalLabel)}</span>` : ''}
+      ${goalProgress ? `<span class="kpi-pill">${escapeHtml(goalProgress)}</span>` : ''}
       <div class="weekly-sparkline" id="weekly-bottle-sparkline"></div>
     `;
     renderWeeklyBottleSparkline(document.getElementById('weekly-bottle-sparkline'), {mode:'week'}, todayKey);
