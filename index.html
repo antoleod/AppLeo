@@ -533,6 +533,9 @@
         </span>
         <span class="theme-toggle-label">Mode nuit</span>
       </button>
+      <button class="icon-btn icon-btn-secondary icon-only" id="settings-btn" type="button" aria-label="Réglages">
+        <span class="icon-settings" aria-hidden="true"></span>
+      </button>
     </div>
 
     <!-- Avatar Léo -->
@@ -1088,6 +1091,129 @@
       <div class="stack stats-content">
         <div id="stats-dynamic-content"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal SETTINGS (Local only) -->
+  <div class="modal" id="modal-settings" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="row modal-header">
+        <h2>Réglages</h2>
+        <button class="btn btn-ghost btn-compact btn-danger" id="close-settings" type="button">Fermer</button>
+      </div>
+      <div class="settings-card">
+        <div class="settings-card-head">
+          <div class="stack" style="gap:4px">
+            <h3>Actions visibles</h3>
+            <div class="muted">Désactivez une action pour la retirer de l’écran d’accueil. (Sauvé sur cet appareil.)</div>
+          </div>
+          <button class="btn btn-ghost btn-compact" id="settings-reset-actions" type="button">Tout afficher</button>
+        </div>
+
+        <div class="settings-list" id="action-visibility-settings">
+          <div class="settings-item">
+            <div class="settings-item-main">
+              <div class="settings-item-icon">🍼</div>
+              <div class="settings-item-text">
+                <div class="settings-item-title">Lait</div>
+                <div class="settings-item-sub">Biberon / sein</div>
+              </div>
+            </div>
+            <label class="switch" aria-label="Afficher Lait">
+              <input type="checkbox" data-action="milk" checked>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-main">
+              <div class="settings-item-icon">🧷</div>
+              <div class="settings-item-text">
+                <div class="settings-item-title">Couche</div>
+                <div class="settings-item-sub">Pipi / caca / vomi</div>
+              </div>
+            </div>
+            <label class="switch" aria-label="Afficher Couche">
+              <input type="checkbox" data-action="diaper" checked>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-main">
+              <div class="settings-item-icon">💊</div>
+              <div class="settings-item-text">
+                <div class="settings-item-title">Médication</div>
+                <div class="settings-item-sub">Traitements / doses</div>
+              </div>
+            </div>
+            <label class="switch" aria-label="Afficher Médication">
+              <input type="checkbox" data-action="medication" checked>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-main">
+              <div class="settings-item-icon">📏</div>
+              <div class="settings-item-text">
+                <div class="settings-item-title">Mesures</div>
+                <div class="settings-item-sub">Poids / taille / température</div>
+              </div>
+            </div>
+            <label class="switch" aria-label="Afficher Mesures">
+              <input type="checkbox" data-action="measurements" checked>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-main">
+              <div class="settings-item-icon">😴</div>
+              <div class="settings-item-text">
+                <div class="settings-item-title">Sommeil</div>
+                <div class="settings-item-sub">Siestes</div>
+              </div>
+            </div>
+            <label class="switch" aria-label="Afficher Sommeil">
+              <input type="checkbox" data-action="sleep" checked>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+
+          <div class="settings-item">
+            <div class="settings-item-main">
+              <div class="settings-item-icon">🥛</div>
+              <div class="settings-item-text">
+                <div class="settings-item-title">Tirage</div>
+                <div class="settings-item-sub">Pompage</div>
+              </div>
+            </div>
+            <label class="switch" aria-label="Afficher Tirage">
+              <input type="checkbox" data-action="pumping" checked>
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal MILK DAY DETAILS -->
+  <div class="modal" id="modal-milk-details" aria-hidden="true">
+    <div class="sheet stack">
+      <div class="row modal-header" style="align-items:flex-start">
+        <div class="stack" style="gap:4px">
+          <h2 style="margin:0">Détail lait</h2>
+          <div class="muted" id="milk-details-subtitle">—</div>
+        </div>
+        <button class="btn btn-ghost btn-compact btn-danger" id="close-milk-details" type="button">Fermer</button>
+      </div>
+      <div class="milk-details-nav">
+        <button class="btn btn-ghost btn-compact" id="milk-details-prev" type="button">← Jour précédent</button>
+        <button class="btn btn-ghost btn-compact" id="milk-details-next" type="button">Jour suivant →</button>
+      </div>
+      <div id="milk-details-content"></div>
     </div>
   </div>
 

@@ -179,6 +179,93 @@ function initThemeManager(){
 
 initThemeManager();
 
+// ===== Local Settings: Action Visibility (UI only) =====
+const ACTION_VISIBILITY_KEY = 'appActionVisibility';
+const ACTION_VISIBILITY_DEFAULTS = Object.freeze({
+  milk: true,
+  diaper: true,
+  medication: true,
+  measurements: true,
+  sleep: true,
+  pumping: true,
+  behavior: true,
+});
+
+const ACTION_BUTTON_SELECTORS = Object.freeze({
+  milk: '#btn-leche',
+  diaper: '#btn-elim',
+  medication: '#btn-med',
+  measurements: '#btn-mesures',
+  sleep: '#btn-sleep',
+  pumping: '#btn-pump',
+  behavior: '#btn-behavior',
+});
+
+let actionVisibilityState = { ...ACTION_VISIBILITY_DEFAULTS };
+
+function loadActionVisibilityState() {
+  const raw = store.get(ACTION_VISIBILITY_KEY, null);
+  if (!raw || typeof raw !== 'object') {
+    actionVisibilityState = { ...ACTION_VISIBILITY_DEFAULTS };
+    return;
+  }
+  actionVisibilityState = {
+    ...ACTION_VISIBILITY_DEFAULTS,
+    ...Object.fromEntries(Object.entries(raw).map(([key, value]) => [key, Boolean(value)]))
+  };
+}
+
+function persistActionVisibilityState() {
+  store.set(ACTION_VISIBILITY_KEY, actionVisibilityState);
+}
+
+function applyActionVisibilityToUi() {
+  for (const [key, selector] of Object.entries(ACTION_BUTTON_SELECTORS)) {
+    const el = $(selector);
+    if (!el) continue;
+    el.hidden = !Boolean(actionVisibilityState[key]);
+  }
+}
+
+function syncActionVisibilitySettingsUi() {
+  if (!actionVisibilitySettingsEl) return;
+  $$('input[type=\"checkbox\"][data-action]', actionVisibilitySettingsEl).forEach(input => {
+    input.checked = Boolean(actionVisibilityState[input.dataset.action]);
+  });
+}
+
+function initActionVisibilitySettings() {
+  loadActionVisibilityState();
+  applyActionVisibilityToUi();
+  syncActionVisibilitySettingsUi();
+
+  settingsBtn?.addEventListener('click', () => {
+    applyActionVisibilityToUi();
+    syncActionVisibilitySettingsUi();
+    openModal('#modal-settings');
+  });
+  closeSettingsBtn?.addEventListener('click', () => closeModal('#modal-settings'));
+
+  actionVisibilitySettingsEl?.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (target.type !== 'checkbox') return;
+    const key = target.dataset.action;
+    if (!key || !(key in ACTION_VISIBILITY_DEFAULTS)) return;
+
+    actionVisibilityState[key] = target.checked;
+    persistActionVisibilityState();
+    applyActionVisibilityToUi();
+  });
+
+  settingsResetActionsBtn?.addEventListener('click', () => {
+    actionVisibilityState = { ...ACTION_VISIBILITY_DEFAULTS };
+    persistActionVisibilityState();
+    applyActionVisibilityToUi();
+    syncActionVisibilitySettingsUi();
+  });
+}
+
 const FOCUSABLE_SELECTOR = [
   'a[href]',
   'button:not([disabled])',
@@ -485,6 +572,11 @@ const saveIndicatorEl = $('#save-indicator');
 const saveLabelEl = $('#save-label');
 const exportReportsBtn = $('#export-pdf');
 const exportCsvBtn = $('#export-csv');
+const settingsBtn = $('#settings-btn');
+const settingsModal = $('#modal-settings');
+const closeSettingsBtn = $('#close-settings');
+const actionVisibilitySettingsEl = $('#action-visibility-settings');
+const settingsResetActionsBtn = $('#settings-reset-actions');
 const btnElim = $('#btn-elim');
 const footerAddManualBtn = $('#footer-add-manual');
 const summaryElimEl = $('#summary-elim');
@@ -497,6 +589,12 @@ const leoSummaryInfoEl = $('#leo-summary-info');
 const addManualBtn = $('#add-manual');
 const summaryFeedEl = $('#summary-feed');
 const summarySleepEl = $('#summary-sleep');
+const milkDetailsModal = $('#modal-milk-details');
+const closeMilkDetailsBtn = $('#close-milk-details');
+const milkDetailsSubtitleEl = $('#milk-details-subtitle');
+const milkDetailsContentEl = $('#milk-details-content');
+const milkDetailsPrevBtn = $('#milk-details-prev');
+const milkDetailsNextBtn = $('#milk-details-next');
 const manualModal = $('#modal-manual');
 const manualTitle = manualModal ? manualModal.querySelector('h2') : null;
 const manualTypeButtons = $$('#manual-type button');
@@ -1567,7 +1665,7 @@ function renderStatsDailyList(stats = null, container = null){
   }).join('');
 }
 
-function updateStatsChart(force = false, container = null){
+function updateStatsChartLegacy(force = false, container = null){
   const summary = getStatsChartData();
   const stats = summary.stats;
   
@@ -1984,9 +2082,20 @@ function renderComparisonView(mode) {
 
 function renderWeekView() {
   const html = `
+    <div class="stat-card" style="margin-bottom:18px">
+      <div class="stat-card-head">
+        <span class="stat-pill">Lait (7 jours)</span>
+        <span class="stat-pill stat-pill-muted">Touchez un jour</span>
+      </div>
+      <div class="weekly-sparkline" id="stats-milk-sparkline"></div>
+    </div>
     <div class="charts-grid">
       <div class="chart-container"><canvas id="chart-bottle-by-day"></canvas></div>
       <div class="chart-container"><canvas id="chart-breast-by-hour"></canvas></div>
+      <div class="chart-container">
+        <canvas id="chart-growth"></canvas>
+        <div class="muted" id="growth-point-panel" style="margin-top:10px">Touchez un point pour voir le détail.</div>
+      </div>
     </div>
     <div class="stats-breakdown">
       <div class="stats-breakdown-head"><h3>7 derniers jours</h3></div>
@@ -1998,6 +2107,7 @@ function renderWeekView() {
   // Re-init charts
   requestAnimationFrame(() => {
     updateStatsChart(true);
+    renderWeeklyBottleSparkline($('#stats-milk-sparkline'), {mode:'week'}, toDateInputValue(new Date()));
     const stats = buildRangeStats({mode:'week'});
     renderStatsDailyList(stats, $('#stats-day-list-target'));
   });
@@ -2797,7 +2907,7 @@ function getDayFeedStats(dayDate = new Date()){
   return { feedCount, bottleMl, breastMinutes, avgPerFeed, avgInterval };
 }
 
-function renderWeeklyBottleSparkline(container){
+function renderWeeklyBottleSparklineLegacy(container){
   if(!container) return;
   const weeklyStats = buildRangeStats({mode:'week'});
   const perDay = Array.isArray(weeklyStats.perDay) ? weeklyStats.perDay : [];
@@ -2819,7 +2929,7 @@ function renderWeeklyBottleSparkline(container){
   }).join('');
 }
 
-function updateSummaries(){
+function updateSummariesLegacy(){
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
@@ -5749,10 +5859,11 @@ async function initFirebaseSync() {
 }
 
 async function bootstrap() {
+  initActionVisibilitySettings();
   try {
-  const { db, storage, storageFns, ensureAuth } = await import('./firebase.js');
-    const persistenceModule = await import('./persistence.js');
-    const { Persistence } = persistenceModule;
+   const { db, storage, storageFns, ensureAuth } = await import('./firebase.js');
+     const persistenceModule = await import('./persistence.js');
+     const { Persistence } = persistenceModule;
 
     persistenceApi = Persistence;
     firebaseDbInstance = db;
@@ -5979,5 +6090,591 @@ document.addEventListener('click', (e) => {
     closeSwipedItem(swipeState.swipedItem);
   }
 });
+
+// ===== Reporting UX overrides (UI only) =====
+function detachChartFromCanvas(chart, canvas){
+  if(!chart) return null;
+  if(!canvas || chart.canvas !== canvas){
+    try { chart.destroy(); } catch {}
+    return null;
+  }
+  return chart;
+}
+
+function updateGrowthPointPanel(entries, index = null){
+  const panel = document.getElementById('growth-point-panel');
+  if(!panel) return;
+
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  if(!safeEntries.length){
+    panel.textContent = "Pas encore de mesures. Ajoutez un poids / taille pour suivre l'évolution.";
+    return;
+  }
+
+  const latestIndex = safeEntries.length - 1;
+  const resolvedIndex = typeof index === 'number' && index >= 0 && index < safeEntries.length
+    ? index
+    : latestIndex;
+
+  const current = safeEntries[resolvedIndex];
+  const prev = resolvedIndex > 0 ? safeEntries[resolvedIndex - 1] : null;
+  const date = parseDateInput(current?.dateISO);
+  const dateLabel = date
+    ? date.toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short', year:'numeric' })
+    : (current?.dateISO || '—');
+
+  const weight = Number.isFinite(current?.weight) ? current.weight : null;
+  const height = Number.isFinite(current?.height) ? current.height : null;
+
+  const prevWeight = prev && Number.isFinite(prev.weight) ? prev.weight : null;
+  const prevHeight = prev && Number.isFinite(prev.height) ? prev.height : null;
+
+  const dWeight = weight != null && prevWeight != null ? (weight - prevWeight) : null;
+  const dHeight = height != null && prevHeight != null ? (height - prevHeight) : null;
+
+  const parts = [`${dateLabel}`];
+  if(weight != null){
+    parts.push(`Poids: ${formatNumber(weight, 2, 2)} kg${dWeight != null ? ` (${formatSignedNumber(dWeight)} kg)` : ''}`);
+  }
+  if(height != null){
+    parts.push(`Taille: ${formatNumber(height, 0, 1)} cm${dHeight != null ? ` (${formatSignedNumber(dHeight)} cm)` : ''}`);
+  }
+  if(weight == null && height == null){
+    parts.push("Aucune valeur (poids/taille) pour ce point.");
+  }
+
+  const trend = (() => {
+    if(dWeight == null) return "Tendance: pas assez de données";
+    const abs = Math.abs(dWeight);
+    if(abs < 0.02) return "Tendance: stable";
+    return dWeight > 0 ? "Tendance: en hausse" : "Tendance: en baisse";
+  })();
+  parts.push(trend);
+  panel.textContent = parts.join(' • ');
+  return;
+
+  panel.textContent = parts.join(' • ');
+}
+
+function updateStatsChart(force = false){
+  const summary = getStatsChartData();
+  const stats = summary.stats;
+
+  if(typeof Chart === 'undefined') return;
+
+  const chartColors = getChartColors();
+
+  const breastCanvas = document.getElementById('chart-breast-by-hour');
+  const bottleCanvas = document.getElementById('chart-bottle-by-day');
+  const diaperCanvas = document.getElementById('chart-diaper-pie');
+  const growthCanvas = document.getElementById('chart-growth');
+
+  statsBreastHourChart = detachChartFromCanvas(statsBreastHourChart, breastCanvas);
+  statsBottleDayChart = detachChartFromCanvas(statsBottleDayChart, bottleCanvas);
+  statsDiaperChart = detachChartFromCanvas(statsDiaperChart, diaperCanvas);
+  statsGrowthChart = detachChartFromCanvas(statsGrowthChart, growthCanvas);
+
+  const hourCtx = breastCanvas?.getContext?.('2d');
+  if(hourCtx){
+    const hourLabels = Array.from({length:24}, (_, hour) => `${String(hour).padStart(2, '0')}h`);
+    const hourData = stats.perHour.map(value => Number(value.toFixed(2)));
+    if(!statsBreastHourChart){
+      statsBreastHourChart = new Chart(hourCtx, {
+        type: 'line',
+        data: {
+          labels: hourLabels,
+          datasets: [{
+            label: 'Minutes (sein)',
+            data: hourData,
+            borderColor: 'rgba(37, 99, 235, 0.9)',
+            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+            borderWidth: 3,
+            tension: 0.35,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Sein / heure', color: chartColors.textColor },
+            tooltip: {
+              callbacks: {
+                label(context){
+                  const val = context.parsed.y ?? 0;
+                  return `Minutes ${formatMinutes(val)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { color: chartColors.textColor }, grid: { color: chartColors.gridColor } },
+            x: { ticks: { color: chartColors.textColor }, grid: { color: chartColors.gridColor.replace('0.15', '0.1') } }
+          }
+        }
+      });
+    }else{
+      statsBreastHourChart.data.labels = hourLabels;
+      statsBreastHourChart.data.datasets[0].data = hourData;
+      statsBreastHourChart.update();
+    }
+  }
+
+  const bottleCtx = bottleCanvas?.getContext?.('2d');
+  if(bottleCtx){
+    if(!statsBottleDayChart){
+      statsBottleDayChart = new Chart(bottleCtx, {
+        type: 'bar',
+        data: {
+          labels: summary.labels,
+          datasets: [
+            {
+              label: 'Minutes (sein)',
+              data: summary.breastMinutes,
+              backgroundColor: chartColors.breastColor,
+              borderColor: chartColors.breastColor.replace('0.6', '0.9'),
+              borderWidth: 1,
+              borderRadius: 6,
+              maxBarThickness: 25,
+            },
+            {
+              label: 'Ml (biberon)',
+              data: summary.bottleMl,
+              backgroundColor: chartColors.bottleColor,
+              borderColor: chartColors.bottleColor.replace('0.6', '0.9'),
+              borderWidth: 1,
+              borderRadius: 6,
+              maxBarThickness: 25,
+            }
+          ]
+        },
+        options: {
+          animation: { duration: 600, easing: 'easeOutQuart' },
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { color: chartColors.textColor } },
+            title: { display: true, text: 'Alimentation / jour', color: chartColors.textColor },
+            tooltip: {
+              callbacks: {
+                label(context){
+                  return context.datasetIndex === 0
+                    ? ` ${formatNumber(context.parsed.y || 0)} min`
+                    : ` ${formatNumber(context.parsed.y || 0)} ml`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { color: chartColors.textColor }, grid: { color: chartColors.gridColor } },
+            x: { ticks: { color: chartColors.textColor }, grid: { color: chartColors.gridColor.replace('0.15', '0.1') } }
+          }
+        }
+      });
+    }else{
+      statsBottleDayChart.data.labels = summary.labels;
+      statsBottleDayChart.data.datasets[0].data = summary.breastMinutes;
+      statsBottleDayChart.data.datasets[1].data = summary.bottleMl;
+      statsBottleDayChart.update();
+    }
+  }
+
+  const growthCtx = growthCanvas?.getContext?.('2d');
+  if(growthCtx){
+    const entries = (Array.isArray(state.measurements) ? state.measurements : [])
+      .filter(entry => entry && entry.dateISO)
+      .sort((a, b) => Date.parse(a.dateISO) - Date.parse(b.dateISO));
+
+    const labels = entries.map(entry => {
+      const date = parseDateInput(entry.dateISO);
+      return date ? date.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'}) : '';
+    });
+
+    const weightData = entries.map(entry => Number.isFinite(entry.weight) ? entry.weight : null);
+    const heightData = entries.map(entry => Number.isFinite(entry.height) ? entry.height : null);
+
+    if(!statsGrowthChart || force){
+      statsGrowthChart && statsGrowthChart.destroy();
+      statsGrowthChart = new Chart(growthCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Poids (kg)',
+              data: weightData,
+              borderColor: 'rgba(59, 130, 246, 0.9)',
+              backgroundColor: 'rgba(59, 130, 246, 0.15)',
+              spanGaps: true,
+              tension: 0.25,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointHitRadius: 14,
+              yAxisID: 'yWeight'
+            },
+            {
+              label: 'Taille (cm)',
+              data: heightData,
+              borderColor: 'rgba(16, 185, 129, 0.9)',
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              spanGaps: true,
+              tension: 0.25,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointHitRadius: 14,
+              yAxisID: 'yHeight'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode:'nearest', intersect:true },
+          plugins: {
+            title: { display: true, text: 'Croissance', color: chartColors.textColor },
+            legend: { position: 'bottom', labels: { color: chartColors.textColor } },
+            tooltip: {
+              callbacks: {
+                title(items){
+                  const idx = items?.[0]?.dataIndex;
+                  const entry = Number.isFinite(idx) ? entries[idx] : null;
+                  const date = entry ? parseDateInput(entry.dateISO) : null;
+                  return date ? date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }) : '';
+                },
+                afterBody(items){
+                  const idx = items?.[0]?.dataIndex;
+                  if(!Number.isFinite(idx) || idx <= 0) return '';
+                  const cur = entries[idx];
+                  const prev = entries[idx - 1];
+                  const lines = [];
+                  if(Number.isFinite(cur?.weight) && Number.isFinite(prev?.weight)){
+                    lines.push(`Δ poids: ${formatSignedNumber(cur.weight - prev.weight)} kg`);
+                  }
+                  if(Number.isFinite(cur?.height) && Number.isFinite(prev?.height)){
+                    lines.push(`Δ taille: ${formatSignedNumber(cur.height - prev.height)} cm`);
+                  }
+                  return lines.join('\n');
+                }
+              }
+            }
+          },
+          onClick(_evt, elements){
+            const el = elements?.[0];
+            if(!el) return;
+            updateGrowthPointPanel(entries, el.index);
+          },
+          scales: {
+            yWeight: {
+              type: 'linear',
+              position: 'left',
+              title: { display:true, text:'kg', color: chartColors.textColor },
+              ticks: { color: chartColors.textColor },
+              grid: { color: chartColors.gridColor }
+            },
+            yHeight: {
+              type: 'linear',
+              position: 'right',
+              title: { display:true, text:'cm', color: chartColors.textColor },
+              ticks: { color: chartColors.textColor },
+              grid: { drawOnChartArea:false }
+            },
+            x: {
+              ticks: { color: chartColors.textColor },
+              grid: { color: chartColors.gridColor.replace('0.15', '0.08') }
+            }
+          }
+        }
+      });
+    }else{
+      statsGrowthChart.data.labels = labels;
+      statsGrowthChart.data.datasets[0].data = weightData;
+      statsGrowthChart.data.datasets[1].data = heightData;
+      statsGrowthChart.update();
+    }
+
+    updateGrowthPointPanel(entries, null);
+  }
+}
+
+function formatSignedNumber(value){
+  const safe = Number.isFinite(value) ? value : 0;
+  const sign = safe > 0 ? '+' : '';
+  return `${sign}${formatNumber(safe)}`;
+}
+
+function formatPercent(value){
+  if(!Number.isFinite(value)) return '';
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${formatNumber(value, 0, 0)}%`;
+}
+
+function getMilkInsight(diffMl, prevMl){
+  if(!Number.isFinite(prevMl) || prevMl <= 0){
+    return "Pas de comparaison";
+  }
+  if(!Number.isFinite(diffMl) || diffMl === 0){
+    return "Identique à la veille";
+  }
+  const pct = (diffMl / prevMl) * 100;
+  const absPct = Math.abs(pct);
+  if(absPct < 5){
+    return diffMl > 0 ? "Très légèrement plus qu'hier" : "Très légèrement moins qu'hier";
+  }
+  if(absPct < 15){
+    return diffMl > 0 ? "Un peu plus qu'hier" : "Un peu moins qu'hier";
+  }
+  return diffMl > 0 ? "Plus qu'hier" : "Moins qu'hier";
+}
+
+function getBottleFeedsForDay(dateISO){
+  const day = parseDateInput(dateISO);
+  if(!day) return [];
+  day.setHours(0, 0, 0, 0);
+  const start = day.getTime();
+  const end = start + DAY_MS - 1;
+  return (state.feeds || [])
+    .filter(feed => {
+      if(feed.source !== 'bottle') return false;
+      const ts = Date.parse(feed.dateISO);
+      return Number.isFinite(ts) && ts >= start && ts <= end;
+    })
+    .sort((a,b)=> Date.parse(a.dateISO) - Date.parse(b.dateISO));
+}
+
+let milkDetailsState = null;
+
+function renderMilkDetails(){
+  if(!milkDetailsState || !milkDetailsContentEl || !milkDetailsSubtitleEl) return;
+  const { perDay, index } = milkDetailsState;
+  const day = perDay[index];
+  if(!day){
+    milkDetailsContentEl.innerHTML = '<div class="history-empty">Aucune donnée</div>';
+    milkDetailsSubtitleEl.textContent = '—';
+    return;
+  }
+
+  const date = parseDateInput(day.dateISO);
+  milkDetailsSubtitleEl.textContent = date
+    ? date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    : day.dateISO;
+
+  const prev = perDay[index - 1] || null;
+  const prevMl = prev ? Number(prev.bottleMl || 0) : 0;
+  const todayMl = Number(day.bottleMl || 0);
+  const diffMl = todayMl - prevMl;
+  const pct = prevMl > 0 ? (diffMl / prevMl) * 100 : null;
+  const insight = getMilkInsight(diffMl, prevMl);
+
+  const bottleCount = Number(day.bottleSessions || 0);
+  const avgPerBottle = bottleCount > 0 ? (todayMl / bottleCount) : 0;
+
+  const compareLabel = prev
+    ? `${formatSignedNumber(diffMl)} ml${prevMl > 0 ? ` (${formatPercent(pct)})` : ''} vs veille`
+    : 'Pas de comparaison';
+
+  const feeds = getBottleFeedsForDay(day.dateISO);
+  const feedItems = feeds.length
+    ? feeds.map(feed => {
+        const time = new Date(feed.dateISO).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        const ml = Number(feed.amountMl || 0);
+        return `<div class="item"><strong>${escapeHtml(time)}</strong><span class="muted">${formatNumber(ml)} ml</span></div>`;
+      }).join('')
+    : '<div class="history-empty">Aucun biberon enregistré ce jour</div>';
+
+  milkDetailsContentEl.innerHTML = `
+    <div class="report-line" style="margin-top:0">
+      <strong>Total</strong>
+      <span class="kpi-pill">${formatNumber(todayMl)} ml</span>
+      <span class="kpi-pill">${formatNumber(bottleCount)} biberon(s)</span>
+      <span class="kpi-pill">Moyenne ${formatNumber(avgPerBottle, 0, 0)} ml</span>
+      <span class="kpi-pill">${escapeHtml(compareLabel)}</span>
+      <span class="kpi-pill">${escapeHtml(insight)}</span>
+    </div>
+    <div class="stack" style="margin-top:12px; gap:10px">
+      <strong>Liste des biberons</strong>
+      <div class="list">${feedItems}</div>
+    </div>
+  `;
+
+  milkDetailsPrevBtn && (milkDetailsPrevBtn.disabled = index <= 0);
+  milkDetailsNextBtn && (milkDetailsNextBtn.disabled = index >= perDay.length - 1);
+}
+
+function openMilkDetails(range, dateISO){
+  if(!milkDetailsModal) return;
+  const stats = buildRangeStats(range);
+  const perDay = Array.isArray(stats.perDay) ? stats.perDay : [];
+  const found = perDay.findIndex(day => day.dateISO === dateISO);
+  milkDetailsState = { perDay, index: Math.max(0, found), range };
+  renderMilkDetails();
+  openModal('#modal-milk-details');
+}
+
+function initMilkDetailsModal(){
+  if(!milkDetailsModal || milkDetailsModal.__milkBound) return;
+  milkDetailsModal.__milkBound = true;
+
+  closeMilkDetailsBtn?.addEventListener('click', () => closeModal('#modal-milk-details'));
+  milkDetailsPrevBtn?.addEventListener('click', () => {
+    if(!milkDetailsState) return;
+    milkDetailsState.index = Math.max(0, milkDetailsState.index - 1);
+    renderMilkDetails();
+  });
+  milkDetailsNextBtn?.addEventListener('click', () => {
+    if(!milkDetailsState) return;
+    const max = Math.max(0, milkDetailsState.perDay.length - 1);
+    milkDetailsState.index = Math.min(max, milkDetailsState.index + 1);
+    renderMilkDetails();
+  });
+}
+
+function renderWeeklyBottleSparkline(container, range = {mode:'week'}, selectedDateISO = null){
+  if(!container) return;
+  const stats = buildRangeStats(range);
+  const perDay = Array.isArray(stats.perDay) ? stats.perDay : [];
+  if(!perDay.length){
+    container.innerHTML = '<span class="muted">Pas de donnée</span>';
+    return;
+  }
+
+  const max = Math.max(...perDay.map(day => Number(day.bottleMl || 0)));
+  container.innerHTML = perDay.map(day => {
+    const value = Number(day.bottleMl || 0);
+    const percent = max > 0 ? Math.round((value / max) * 100) : 0;
+    const height = Math.max(6, percent);
+    const label = formatStatsDayLabel(day.dateISO, {weekday:'short'});
+    const valueLabel = `${formatNumber(value)} ml`;
+    const isZero = value <= 0;
+    const isSelected = selectedDateISO && day.dateISO === selectedDateISO;
+    return `
+      <button type="button" class="spark-bar${isZero ? ' is-zero' : ''}${isSelected ? ' is-selected' : ''}" data-date="${escapeHtml(day.dateISO)}" data-label="${escapeHtml(label)}" title="${escapeHtml(valueLabel)}" aria-label="${escapeHtml(label)}: ${escapeHtml(valueLabel)}">
+        <span class="spark-fill" style="--spark-height:${height}%"></span>
+      </button>
+    `;
+  }).join('');
+
+  if(container.__milkSparkBound) return;
+  container.__milkSparkBound = true;
+  container.addEventListener('click', (event) => {
+    const btn = event.target instanceof Element ? event.target.closest('.spark-bar') : null;
+    if(!(btn instanceof HTMLElement)) return;
+    const dateISO = btn.dataset.date;
+    if(!dateISO) return;
+    openMilkDetails(range, dateISO);
+  });
+}
+
+function updateSummaries(){
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+
+  if(summaryFeedEl){
+    const todayKey = toDateInputValue(today);
+    const todayBottleFeeds = getBottleFeedsForDay(todayKey);
+    const todayBottleMl = todayBottleFeeds.reduce((sum, feed) => sum + (Number(feed.amountMl || 0) || 0), 0);
+    const todayBottleCount = todayBottleFeeds.length;
+    const todayAvg = todayBottleCount > 0 ? (todayBottleMl / todayBottleCount) : 0;
+
+    const yesterday = new Date(today.getTime() - DAY_MS);
+    const yesterdayKey = toDateInputValue(yesterday);
+    const yesterdayBottleFeeds = getBottleFeedsForDay(yesterdayKey);
+    const yesterdayBottleMl = yesterdayBottleFeeds.reduce((sum, feed) => sum + (Number(feed.amountMl || 0) || 0), 0);
+
+    const diffMl = todayBottleMl - yesterdayBottleMl;
+    const pct = yesterdayBottleMl > 0 ? (diffMl / yesterdayBottleMl) * 100 : null;
+    const insight = getMilkInsight(diffMl, yesterdayBottleMl);
+    const compareLabel = yesterdayBottleMl > 0
+      ? `${formatSignedNumber(diffMl)} ml (${formatPercent(pct)}) vs hier`
+      : 'Pas de comparaison';
+
+    summaryFeedEl.innerHTML = `
+      <strong>Lait aujourd'hui</strong>
+      <span class="kpi-pill">Total ${formatNumber(todayBottleMl)} ml</span>
+      <span class="kpi-pill">${formatNumber(todayBottleCount)} biberon(s)</span>
+      <span class="kpi-pill">Moyenne ${formatNumber(todayAvg, 0, 0)} ml</span>
+      <span class="kpi-pill">${escapeHtml(compareLabel)}</span>
+      <span class="kpi-pill">${escapeHtml(insight)}</span>
+      <div class="weekly-sparkline" id="weekly-bottle-sparkline"></div>
+    `;
+    renderWeeklyBottleSparkline(document.getElementById('weekly-bottle-sparkline'), {mode:'week'}, todayKey);
+  }
+
+  if(summarySleepEl){
+    const todaySleep = state.sleepSessions
+      .filter(s => {
+        const ts = new Date(s.dateISO || s.endISO || s.startISO || '').getTime();
+        return Number.isFinite(ts) && ts >= start;
+      })
+      .sort((a,b)=> (a.dateISO || a.endISO || '') < (b.dateISO || b.endISO || '') ? 1 : -1);
+    if(!todaySleep.length){
+      summarySleepEl.innerHTML = "<strong>Sommeil</strong><span class=\"kpi-pill\">Aucune sieste enregistrée</span>";
+    }else{
+      const minutesTotal = todaySleep.reduce((sum, session) => {
+        if(Number.isFinite(session.durationSec)){
+          return sum + (session.durationSec / 60);
+        }
+        const startDate = parseDateTimeInput(session.startISO);
+        const endDate = parseDateTimeInput(session.endISO);
+        if(startDate && endDate){
+          return sum + Math.max(0, (endDate.getTime() - startDate.getTime()) / 60000);
+        }
+        return sum;
+      }, 0);
+      const avgMinutes = minutesTotal / Math.max(todaySleep.length, 1);
+      const lastEnd = toValidDate(todaySleep[0].endISO || todaySleep[0].dateISO);
+      const totalLabel = formatSleepMinutesLabel(minutesTotal);
+      const avgLabel = formatSleepMinutesLabel(avgMinutes);
+      summarySleepEl.innerHTML = `
+        <strong>Sommeil</strong>
+        <span class="kpi-pill">${todaySleep.length} sieste(s)</span>
+        <span class="kpi-pill">Total ${totalLabel}</span>
+        <span class="kpi-pill">Ø ${avgLabel}</span>
+        ${lastEnd ? `<span class="kpi-pill">Dernier réveil ${lastEnd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>` : ''}
+      `;
+    }
+  }
+
+  if(summaryElimEl || dashboardElimEl){
+    const todayElims = state.elims.filter(e => new Date(e.dateISO).getTime() >= start);
+    if(!todayElims.length){
+      if(summaryElimEl) summaryElimEl.innerHTML = "<strong>Aujourd'hui</strong><span class=\"kpi-pill\">Aucune donnée</span>";
+      if(dashboardElimEl) dashboardElimEl.innerHTML = "<strong>Pipi / Caca / Vomi</strong><span class=\"kpi-pill\">Aucune donnée aujourd'hui</span>";
+    }else{
+      const totals = todayElims.reduce((acc, cur)=> ({
+        pee: acc.pee + (cur.pee || 0),
+        poop: acc.poop + (cur.poop || 0),
+        vomit: acc.vomit + (cur.vomit || 0)
+      }), {pee:0, poop:0, vomit:0});
+      const last = todayElims[0];
+      const time = new Date(last.dateISO).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      if(summaryElimEl){
+        summaryElimEl.innerHTML = `
+          <strong>Aujourd'hui</strong>
+          <span class="kpi-pill">Pipi ${totals.pee}</span>
+          <span class="kpi-pill">Caca ${totals.poop}</span>
+          <span class="kpi-pill">Vomi ${totals.vomit}</span>
+          <span class="kpi-pill">${todayElims.length} entrée(s)</span>
+        `;
+      }
+      if(dashboardElimEl){
+        dashboardElimEl.innerHTML = `
+          <strong>Pipi / Caca / Vomi</strong>
+          <span>P ${totals.pee}</span>
+          <span>C ${totals.poop}</span>
+          <span>V ${totals.vomit}</span>
+          <span>Dernier ${time}</span>
+        `;
+      }
+    }
+  }
+
+  updateMedSummary();
+  updateLeoSummary();
+}
+
+initMilkDetailsModal();
 
 bootstrap();
