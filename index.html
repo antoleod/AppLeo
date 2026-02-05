@@ -46,6 +46,8 @@
     padding: 2px;
     border-radius: 8px;
     margin-bottom: 16px;
+    border: 1px solid rgba(198, 209, 223, 0.45);
+    box-shadow: var(--elev-1);
   }
   .segmented-control button {
     flex: 1;
@@ -58,10 +60,11 @@
     color: inherit;
     transition: background 0.2s, box-shadow 0.2s;
     margin: 0;
+    min-height: var(--btn-height-sm);
   }
   .segmented-control button.active {
     background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--elev-1);
     color: #000;
   }
   .dark-mode .segmented-control button.active {
@@ -81,21 +84,23 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    border: 1px solid rgba(198, 209, 223, 0.45);
+    box-shadow: var(--elev-1);
   }
   .dark-mode .comparison-card { background: rgba(255,255,255,0.05); }
-  .comparison-card.primary { background: var(--bg-card, #fff); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .comparison-card.primary { background: var(--bg-card, #fff); box-shadow: var(--elev-2); }
   .dark-mode .comparison-card.primary { background: #1c1c1e; }
-  .comp-label { font-size: 0.8rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
-  .comp-value { font-size: 1.5rem; font-weight: 700; }
+  .comp-label { font-size: 0.8rem; opacity: 0.78; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comp-value { font-size: 1.5rem; font-weight: 700; font-family: var(--font-display); }
   .comp-sub { font-size: 0.85rem; opacity: 0.8; display: flex; align-items: center; gap: 4px; }
   .trend-up { color: #34c759; }
   .trend-down { color: #ff3b30; }
-  .milestone-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card, #fff); border-radius: 12px; margin-bottom: 8px; }
+  .milestone-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card, #fff); border-radius: 12px; margin-bottom: 8px; box-shadow: var(--elev-1); }
   .milestone-icon { font-size: 1.5rem; background: rgba(0,0,0,0.05); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
   .milestone-content { flex: 1; }
-  .milestone-date { font-size: 0.8rem; opacity: 0.6; }
+  .milestone-date { font-size: 0.8rem; opacity: 0.7; }
   .milestone-title { font-weight: 600; }
-  .custom-settings { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; margin-bottom: 16px; }
+  .custom-settings { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; margin-bottom: 16px; box-shadow: var(--elev-1); }
   .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
   .toggle-row:last-child { border-bottom: none; }
   .chart-type-selector { display: flex; gap: 8px; margin-top: 8px; }
@@ -108,32 +113,14 @@
     padding: 4px;
     border-radius: 14px;
     background: rgba(255,255,255,0.6);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    box-shadow: var(--elev-1);
   }
   .dark-mode .preset-amounts {
     background: rgba(30,30,30,0.6);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+    box-shadow: var(--elev-1);
   }
   .preset-btn {
-    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  }
-  .btn,
-  .icon-btn,
-  .circle-btn,
-  .pump-step-btn,
-  .range-option,
-  .range-option-item,
-  .sleep-tag {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
-  .dark-mode .btn,
-  .dark-mode .icon-btn,
-  .dark-mode .circle-btn,
-  .dark-mode .pump-step-btn,
-  .dark-mode .range-option,
-  .dark-mode .range-option-item,
-  .dark-mode .sleep-tag {
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: var(--elev-1);
   }
 
   @media (max-width: 600px) {
@@ -197,7 +184,7 @@
     margin-bottom: 4px;
     background: rgba(255,255,255,0.7);
     backdrop-filter: blur(12px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    box-shadow: var(--elev-1);
   }
   .dark-mode #leo-card {
     background: rgba(30,30,30,0.6);
@@ -567,8 +554,8 @@
       <button class="btn btn-sleep btn-heartbeat" id="btn-sleep" type="button" aria-label="Enregistrer le sommeil">
         <span class="btn-icon">💤</span> Sommeil
       </button>
-      <button class="btn btn-primary btn-heartbeat" id="btn-pump" type="button" aria-label="Tirer son lait">
-        <span class="btn-icon">🍼</span> Tirer lait
+      <button class="btn btn-primary btn-heartbeat" id="btn-pump" type="button" aria-label="Tirer le lait">
+        <span class="btn-icon">🍼</span> Tirer le lait
       </button>
     </div>
 
@@ -616,7 +603,7 @@
           </div>
         </div>
         <div class="history-actions">
-          <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuel</button>
+          <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuellement</button>
           <button class="btn btn-ghost btn-compact btn-stats" id="btn-stats" type="button"><span class="btn-icon">📈</span> Statistiques</button>
           <button class="btn btn-ghost btn-compact" id="btn-milestones" type="button"><span class="btn-icon">🏆</span> Étapes</button>
         </div>
@@ -647,7 +634,7 @@
       <div class="sheet stack">
         <div class="modal-header">
           <h2>Tirer mon lait</h2>
-          <button class="modal-close" id="close-pump" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+          <button class="modal-close" id="close-pump" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
         </div>
         <section class="pump-card" id="pump-card" aria-labelledby="pump-card-title">
   <div class="pump-card-head">
@@ -704,7 +691,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Lait</h2>
-        <button class="modal-close" id="close-leche" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-leche" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
 
       <div class="seg">
@@ -747,27 +734,26 @@
               </div>
               <div class="bottle-edit-actions">
                 <button type="button" class="btn btn-ghost btn-compact" id="cancel-bottle-time">Annuler</button>
-                <button type="button" class="btn btn-ghost btn-compact btn-primary" id="confirm-bottle-time">OK</button>
+                <button type="button" class="btn btn-ghost btn-compact btn-primary" id="confirm-bottle-time">Valider</button>
               </div>
             </div>
           </div>
           <div id="bottle-form" class="stack">
             <div class="field field-padded" id="bottle-amount-field">
-              <label for="ml">QuantitAc (ml)</label>
+              <label for="ml">Quantité (ml)</label>
               <div class="bottle-amount-control">
                 <button type="button" class="circle-btn volume-step" id="bottle-decrease" aria-label="Retirer 10 ml">-10</button>
                 <div class="bottle-amount-input">
-                  <input id="ml" class="input" type="number" inputmode="decimal" step="10" min="0" placeholder="ex. 120" />
+                  <input id="ml" class="input" type="number" inputmode="decimal" step="10" min="0" placeholder="ex. 130" />
                   <div id="bottle-amount-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez</div>
                 </div>
                 <button type="button" class="circle-btn volume-step" id="bottle-increase" aria-label="Ajouter 10 ml">+10</button>
               </div>
-              <div class="preset-amounts" id="bottle-preset-buttons" role="group" aria-label="QuantitAcs suggAcrAces">
-                <button type="button" class="preset-btn" data-value="90">90 ml</button>
-                <button type="button" class="preset-btn" data-value="120">120 ml</button>
+              <div class="preset-amounts" id="bottle-preset-buttons" role="group" aria-label="Quantités suggérées">
+                <button type="button" class="preset-btn" data-value="100">100 ml</button>
                 <button type="button" class="preset-btn" data-value="130">130 ml</button>
-                <button type="button" class="preset-btn" data-value="140">140 ml</button>
                 <button type="button" class="preset-btn" data-value="150">150 ml</button>
+                <button type="button" class="preset-btn" data-value="180">180 ml</button>
               </div>
             </div>
             <button class="btn btn-primary" id="save-biberon">Enregistrer</button>
@@ -788,7 +774,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Sommeil</h2>
-        <button class="modal-close" id="close-sleep" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-sleep" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
       <div class="stack">
         <div class="text-center">
@@ -818,12 +804,12 @@
     </div>
   </div>
 
-  <!-- Modal ELIMINACIONES -->
+  <!-- Modal Éliminations -->
   <div class="modal" id="modal-elim" aria-hidden="true">
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Pipi / Caca / Vomi</h2>
-        <button class="modal-close" id="close-elim" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-elim" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
 
       <div class="stack">
@@ -855,7 +841,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Medicaments</h2>
-        <button class="modal-close" id="close-med" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-med" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
 
       <div class="stack">
@@ -886,7 +872,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Mesures</h2>
-        <button class="modal-close" id="close-mesures" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-mesures" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
 
       <div class="stack form-grid">
@@ -925,7 +911,7 @@
     <div class="sheet stack">
       <div class="row modal-header">
         <h2>Nouvel enregistrement</h2>
-        <button class="modal-close" id="close-manual" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-manual" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
 
       <div class="seg" id="manual-type">
@@ -1069,7 +1055,7 @@
     <div class="sheet stack">
       <div class="row modal-header">
         <h2>Statistiques</h2>
-        <button class="modal-close" id="close-stats" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-stats" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
 
       <!-- New Stats UX -->
@@ -1108,7 +1094,7 @@
     <div class="sheet stack">
       <div class="row modal-header">
         <h2>Réglages</h2>
-        <button class="modal-close" id="close-settings" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-settings" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
       <div class="settings-card">
         <div class="settings-card-head">
@@ -1216,7 +1202,7 @@
           <h2 style="margin:0">Détail lait</h2>
           <div class="muted" id="milk-details-subtitle">—</div>
         </div>
-        <button class="modal-close" id="close-milk-details" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-milk-details" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
       <div class="milk-details-nav">
         <button class="btn btn-ghost btn-compact" id="milk-details-prev" type="button">← Jour précédent</button>
@@ -1231,7 +1217,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Confirmer la suppression</h2>
-        <button class="modal-close" id="close-confirm-delete" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-confirm-delete" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
       <p id="confirm-delete-message" class="text-center">Voulez-vous vraiment supprimer cet élément ?</p>
       <div class="field">
@@ -1250,7 +1236,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Choisir une période</h2>
-        <button class="modal-close" id="close-range-picker" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-range-picker" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
       <div class="list" id="range-picker-options">
         <button class="range-option-item" data-range="day">
@@ -1274,7 +1260,7 @@
     <div class="sheet stack">
       <div class="modal-header">
         <h2>Étapes de développement</h2>
-        <button class="modal-close" id="close-milestones" type="button" aria-label="Cerrar" title="Cerrar" data-close-label="Cerrar"><span>×</span></button>
+        <button class="modal-close" id="close-milestones" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
       </div>
       
       <div class="list" id="milestones-list">
