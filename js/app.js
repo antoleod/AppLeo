@@ -1772,6 +1772,7 @@ const manualModal = $('#modal-manual');
 
 const manualTitle = manualModal ? manualModal.querySelector('h2') : null;
 
+const manualSubtitle = $('#manual-subtitle');
 
 const manualTypeButtons = $$('#manual-type button');
 
@@ -1799,6 +1800,17 @@ const manualBottleStartField = $('#manual-bottle-start-field');
 
 const manualBottleEndField = $('#manual-bottle-end-field');
 
+const manualBottleEndToggleField = $('#manual-bottle-end-toggle-field');
+
+const manualBottleEndToggle = $('#manual-bottle-end-toggle');
+
+const manualOptionsToggle = $('#manual-options-toggle');
+
+const manualOptionsContent = $('#manual-options-content');
+
+const manualSourceSeg = $('#manual-source-seg');
+
+const manualBreastSeg = $('#manual-breast-seg');
 
 const manualBreast = $('#manual-breast');
 
@@ -16486,6 +16498,24 @@ function getManualTypeMeta(type){
 
 
 
+function formatManualSubtitle(dateISO){
+
+  if(!dateISO) return '';
+
+  const date = new Date(dateISO);
+
+  if(Number.isNaN(date.getTime())) return '';
+
+  const dateLabel = date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const timeLabel = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+  return `${dateLabel} ? ${timeLabel}`;
+
+}
+
+
+
 function updateManualTitle(isEdit){
 
   const titleNode = manualTitle || manualModal?.querySelector('h2');
@@ -16496,11 +16526,19 @@ function updateManualTitle(isEdit){
 
     const meta = getManualTypeMeta(manualType);
 
-    titleNode.textContent = `${meta.icon} ${meta.label} ? Modifier`;
+    titleNode.textContent = `${meta.icon} Modifier ${meta.label}`;
+
+    if(manualSubtitle){
+
+      manualSubtitle.textContent = formatManualSubtitle(editingEntry?.entry?.dateISO || '');
+
+    }
 
   }else{
 
     titleNode.textContent = 'Nouvel enregistrement';
+
+    if(manualSubtitle) manualSubtitle.textContent = '';
 
   }
 
@@ -16546,6 +16584,23 @@ function setManualType(type){
 
 
 
+function syncManualSeg(segEl, value){
+
+
+  if(!segEl) return;
+
+
+  const buttons = Array.from(segEl.querySelectorAll('button'));
+
+
+  buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.value === value));
+
+
+}
+
+
+
+
 function updateManualSourceFields(){
 
 
@@ -16553,6 +16608,18 @@ function updateManualSourceFields(){
 
 
   const isBreast = source === 'breast';
+
+
+  syncManualSeg(manualSourceSeg, source);
+
+
+  if(manualBreast && manualBreast.value){
+
+
+    syncManualSeg(manualBreastSeg, manualBreast.value);
+
+
+  }
 
 
   manualBreastField?.classList?.toggle('is-hidden', !isBreast);
@@ -16573,7 +16640,22 @@ function updateManualSourceFields(){
   manualBottleStartField?.classList?.toggle('is-hidden', !showBottleWindow);
 
 
-  manualBottleEndField?.classList?.toggle('is-hidden', !showBottleWindow);
+  manualBottleEndToggleField?.classList?.toggle('is-hidden', !showBottleWindow);
+
+
+  const showEnd = Boolean(showBottleWindow && manualBottleEndToggle?.checked);
+
+
+  manualBottleEndField?.classList?.toggle('is-hidden', !showEnd);
+
+
+  if(!showBottleWindow && manualBottleEndToggle){
+
+
+    manualBottleEndToggle.checked = false;
+
+
+  }
 
 
   if(!isBreast){
@@ -16922,6 +17004,9 @@ function populateManualForm(type, entry){
       if(manualBottleEnd) manualBottleEnd.value = '';
 
 
+      if(manualBottleEndToggle) manualBottleEndToggle.checked = false;
+
+
     }else{
 
 
@@ -16952,13 +17037,29 @@ function populateManualForm(type, entry){
         manualBottleEnd.value = endDate ? toDateTimeInputValue(endDate) : '';
 
 
+        if(manualBottleEndToggle) manualBottleEndToggle.checked = Boolean(endDate);
+
+
       }
 
 
     }
 
 
+    updateManualSourceFields();
+
+
     if(manualNotes) manualNotes.value = entry.notes || '';
+
+    const hasOptions = Boolean(entry.notes || entry.bottleStartISO || entry.bottleEndISO);
+
+    if(manualOptionsToggle && manualOptionsContent){
+
+      manualOptionsToggle.setAttribute('aria-expanded', hasOptions ? 'true' : 'false');
+
+      manualOptionsContent.classList.toggle('is-collapsed', !hasOptions);
+
+    }
 
 
   }else if(type === 'elim'){
@@ -18411,6 +18512,38 @@ manualTypeButtons.forEach(btn => btn.addEventListener('click', ()=> setManualTyp
 
 
 manualSource?.addEventListener('change', updateManualSourceFields);
+
+manualBreast?.addEventListener('change', () => {
+  if(manualBreast && manualBreastSeg){
+    syncManualSeg(manualBreastSeg, manualBreast.value);
+  }
+});
+
+manualSourceSeg?.addEventListener('click', (event) => {
+  const btn = event.target instanceof Element ? event.target.closest('button[data-value]') : null;
+  if(!btn || !manualSource) return;
+  manualSource.value = btn.dataset.value || 'breast';
+  updateManualSourceFields();
+});
+
+manualBreastSeg?.addEventListener('click', (event) => {
+  const btn = event.target instanceof Element ? event.target.closest('button[data-value]') : null;
+  if(!btn || !manualBreast) return;
+  manualBreast.value = btn.dataset.value || 'Gauche';
+  syncManualSeg(manualBreastSeg, manualBreast.value);
+});
+
+manualOptionsToggle?.addEventListener('click', () => {
+  if(!manualOptionsContent || !manualOptionsToggle) return;
+  const isOpen = manualOptionsToggle.getAttribute('aria-expanded') === 'true';
+  manualOptionsToggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+  manualOptionsContent.classList.toggle('is-collapsed', isOpen);
+});
+
+manualBottleEndToggle?.addEventListener('change', () => {
+  const showEnd = Boolean(manualBottleEndToggle.checked);
+  manualBottleEndField?.classList?.toggle('is-hidden', !showEnd);
+});
 
 
 manualMedSelect?.addEventListener('change', updateManualMedFields);

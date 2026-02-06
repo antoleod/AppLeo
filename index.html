@@ -2727,12 +2727,12 @@
 
       <div class="row modal-header">
 
+        <div class="modal-title-stack">
+          <h2>Nouvel enregistrement</h2>
+          <div class="modal-subtitle" id="manual-subtitle"></div>
+        </div>
 
-        <h2>Nouvel enregistrement</h2>
-
-
-        <button class="modal-close" id="close-manual" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
-
+        <button class="modal-close" id="close-manual" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>?</span></button>
 
       </div>
 
@@ -2762,156 +2762,164 @@
 
 
 
+      <div class="field field-datetime" id="manual-datetime-field">
+
+        <label for="manual-datetime">Date &amp; heure</label>
+
+        <input id="manual-datetime" class="input" type="datetime-local" />
+
+      </div>
 
 
+
+
+
+
+      
       <div class="stack form-grid" id="manual-feed-fields">
-
 
         <div class="field span-2">
 
+          <label>Source</label>
 
-          <label for="manual-source">Source</label>
+          <div class="seg seg-inline" id="manual-source-seg" role="group" aria-label="Source">
 
+            <button type="button" data-value="bottle">Biberon</button>
 
-          <select id="manual-source" class="input">
+            <button type="button" data-value="breast" class="active">Sein</button>
 
+          </div>
+
+          <select id="manual-source" class="input is-hidden">
 
             <option value="breast">Sein</option>
 
-
             <option value="bottle">Biberon</option>
-
 
           </select>
 
-
         </div>
 
+        <div class="field" id="manual-breast-field">
 
-        <div class="field">
+          <label>Côté</label>
 
+          <div class="seg seg-inline" id="manual-breast-seg" role="group" aria-label="Côté">
 
-          <label for="manual-breast">Côté</label>
+            <button type="button" data-value="Gauche" class="active">Gauche</button>
 
+            <button type="button" data-value="Droite">Droite</button>
 
-          <select id="manual-breast" class="input">
+            <button type="button" data-value="Les deux">Les deux</button>
 
+          </div>
+
+          <select id="manual-breast" class="input is-hidden">
 
             <option value="Gauche">Gauche</option>
 
-
             <option value="Droite">Droite</option>
-
 
             <option value="Les deux">Les deux</option>
 
-
           </select>
 
-
         </div>
-
 
         <div class="field" id="manual-duration-field">
 
-
           <label for="manual-duration">Durée (minutes)</label>
-
 
           <input id="manual-duration" class="input" type="text" inputmode="numeric" min="0" step="1" placeholder="ex. 12" />
 
-
         </div>
-
 
         <div class="field is-hidden amount-focus" id="manual-amount-field">
 
-
           <label for="manual-amount">Quantité (ml)</label>
-
 
           <div class="bottle-amount-control">
 
-
             <button type="button" class="circle-btn volume-step" id="manual-bottle-decrease" aria-label="Retirer 10 ml">-10</button>
-
 
             <div class="bottle-amount-input">
 
-
               <input id="manual-amount" class="input" type="number" inputmode="decimal" min="0" step="10" placeholder="ex. 120" />
-
 
               <div id="manual-bottle-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez</div>
 
-
             </div>
-
 
             <button type="button" class="circle-btn volume-step" id="manual-bottle-increase" aria-label="Ajouter 10 ml">+10</button>
 
-
           </div>
-
 
           <div class="preset-amounts" id="manual-bottle-preset-buttons" role="group" aria-label="Quantités suggérées">
 
-
             <button type="button" class="preset-btn" data-value="90">90 ml</button>
-
 
             <button type="button" class="preset-btn" data-value="120">120 ml</button>
 
-
             <button type="button" class="preset-btn" data-value="130">130 ml</button>
-
 
             <button type="button" class="preset-btn" data-value="140">140 ml</button>
 
-
             <button type="button" class="preset-btn" data-value="150">150 ml</button>
-
 
           </div>
 
-
         </div>
 
+        <div class="options-accordion span-2" id="manual-options">
 
-                <div class="field is-hidden field-time" id="manual-bottle-start-field">
+          <button class="options-toggle" id="manual-options-toggle" type="button" aria-expanded="false" aria-controls="manual-options-content">Options</button>
 
+          <div class="options-content is-collapsed" id="manual-options-content">
 
-          <label for="manual-bottle-start">Début</label>
+            <div class="field is-hidden field-time" id="manual-bottle-start-field">
 
+              <label for="manual-bottle-start">Début</label>
 
-          <input id="manual-bottle-start" class="input" type="datetime-local" />
+              <input id="manual-bottle-start" class="input" type="datetime-local" />
 
+            </div>
+
+            <div class="field option-toggle" id="manual-bottle-end-toggle-field">
+
+              <label>Ajouter une fin</label>
+
+              <label class="switch">
+
+                <input type="checkbox" id="manual-bottle-end-toggle" />
+
+                <span class="slider"></span>
+
+              </label>
+
+            </div>
+
+            <div class="field is-hidden field-time" id="manual-bottle-end-field">
+
+              <label for="manual-bottle-end">Fin (optionnel)</label>
+
+              <input id="manual-bottle-end" class="input" type="datetime-local" />
+
+            </div>
+
+            <div class="field span-2">
+
+              <label for="manual-notes">Notes</label>
+
+              <textarea id="manual-notes" class="input textarea" rows="2" placeholder="Ajouter une note (facultatif)"></textarea>
+
+            </div>
+
+          </div>
 
         </div>
-
-
-        <div class="field is-hidden field-time" id="manual-bottle-end-field">
-
-
-          <label for="manual-bottle-end">Fin (optionnel)</label>
-
-
-          <input id="manual-bottle-end" class="input" type="datetime-local" />
-
-
-        </div><div class="field span-2">
-
-
-          <label for="manual-notes">Notes</label>
-
-
-          <textarea id="manual-notes" class="input textarea" rows="2" placeholder="Ajouter une note (facultatif)"></textarea>
-
-
-        </div>
-
 
       </div>
+
 
 
 
@@ -3128,22 +3136,6 @@
 
 
       </div>
-
-
-
-
-
-      <div class="field">
-
-
-        <label for="manual-datetime">Date &amp; heure</label>
-
-
-        <input id="manual-datetime" class="input" type="datetime-local" />
-
-
-      </div>
-
 
 
 
