@@ -519,8 +519,11 @@
           <span class="theme-toggle-thumb"></span>
         </span>
         <span class="theme-toggle-label">Mode nuit</span>
+        <span class="theme-toggle-gear" id="theme-toggle-gear" aria-hidden="true">
+          <span class="icon-settings"></span>
+        </span>
       </button>
-      <button class="icon-btn icon-btn-secondary icon-only" id="settings-btn" type="button" aria-label="Réglages">
+      <button class="icon-btn icon-btn-secondary icon-only" id="settings-btn" type="button" aria-label="Réglages" style="display:none">
         <span class="icon-settings" aria-hidden="true"></span>
       </button>
     </div>
@@ -536,6 +539,8 @@
       </div>
       <button class="chevron-btn" id="info-chevron" type="button" aria-label="Infos Léo">›</button>
     </div>
+
+    <div class="bottle-next-hint" id="bottle-next-hint" aria-live="polite" data-state="wait">Calcul en cours...</div>
 
     <!-- Actions principales -->
     <div class="primary-actions">
@@ -697,9 +702,7 @@
       <div class="seg">
         <button id="seg-pecho" class="active">Sein</button>
         <button id="seg-biberon">Biberon</button>
-      </div>
-
-      <div class="stack" id="feed-content">
+      </div>\r\n\r\n      <div class="stack" id="feed-content">
         <!-- Pecho -->
         <div id="pane-pecho" class="stack pane-content">
           <div class="seg seg-sides">
@@ -960,7 +963,14 @@
             <button type="button" class="preset-btn" data-value="150">150 ml</button>
           </div>
         </div>
-        <div class="field span-2">
+                <div class="field is-hidden" id="manual-bottle-start-field">
+          <label for="manual-bottle-start">Début</label>
+          <input id="manual-bottle-start" class="input" type="datetime-local" />
+        </div>
+        <div class="field is-hidden" id="manual-bottle-end-field">
+          <label for="manual-bottle-end">Fin</label>
+          <input id="manual-bottle-end" class="input" type="datetime-local" />
+        </div><div class="field span-2">
           <label for="manual-notes">Notes</label>
           <textarea id="manual-notes" class="input textarea" rows="2" placeholder="Observations rapides..."></textarea>
         </div>
@@ -1326,3 +1336,7 @@
   <script type="module" src="js/app.js?v=20250308"></script>
 </body>
 </html>
+
+
+
+

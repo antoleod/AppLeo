@@ -244,6 +244,13 @@ function initActionVisibilitySettings() {
     syncActionVisibilitySettingsUi();
     openModal('#modal-settings');
   });
+  themeToggleGear?.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    applyActionVisibilityToUi();
+    syncActionVisibilitySettingsUi();
+    openModal('#modal-settings');
+  });
   closeSettingsBtn?.addEventListener('click', () => closeModal('#modal-settings'));
 
   actionVisibilitySettingsEl?.addEventListener('change', (event) => {
@@ -573,6 +580,7 @@ const saveLabelEl = $('#save-label');
 const exportReportsBtn = $('#export-pdf');
 const exportCsvBtn = $('#export-csv');
 const settingsBtn = $('#settings-btn');
+const themeToggleGear = $('#theme-toggle-gear');
 const settingsModal = $('#modal-settings');
 const closeSettingsBtn = $('#close-settings');
 const actionVisibilitySettingsEl = $('#action-visibility-settings');
@@ -604,9 +612,13 @@ const manualSource = $('#manual-source');
 const manualBreastField = $('#manual-breast-field');
 const manualDurationField = $('#manual-duration-field');
 const manualAmountField = $('#manual-amount-field');
+const manualBottleStartField = $('#manual-bottle-start-field');
+const manualBottleEndField = $('#manual-bottle-end-field');
 const manualBreast = $('#manual-breast');
 const manualDuration = $('#manual-duration');
 const manualAmount = $('#manual-amount');
+const manualBottleStart = $('#manual-bottle-start');
+const manualBottleEnd = $('#manual-bottle-end');
 const manualBottleFeedback = $('#manual-bottle-feedback');
 const manualBottleDecreaseBtn = $('#manual-bottle-decrease');
 const manualBottleIncreaseBtn = $('#manual-bottle-increase');
@@ -640,6 +652,7 @@ const bottleTimeLabel = $('#bottle-time-label');
 const bottleDetailsWrapper = $('#bottle-details-wrapper');
 const cancelBottleTimeBtn = $('#cancel-bottle-time');
 const confirmBottleTimeBtn = $('#confirm-bottle-time');
+const bottleNextHint = $('#bottle-next-hint');
 
 const bottleTypeButtons = $$('#bottle-type-toggle button');
 const bottlePresetButtons = $$('#bottle-preset-buttons button');
@@ -796,6 +809,7 @@ const BOTTLE_BASE_DEFAULT_PRESET = 130;
 const BOTTLE_STEP_ML = 10;
 const BOTTLE_MAX_ML = 260;
 const BOTTLE_MIN_ML = 0;
+const BOTTLE_INTERVAL_MS = 3 * 60 * 60 * 1000;
 let manualType = 'feed';
 let timer = 0;
 let timerStart = null;
@@ -806,6 +820,7 @@ let bottleTimerStart = null;
 let bottleTimerInterval = null;
 let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
+let bottleHintTimer = null;
 
 let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
 let lastStoppedBottleStart = null;
@@ -2306,6 +2321,7 @@ function renderHistory(){
   }
   updateSummaries();
   renderFeedHistory();
+  updateBottleIntervalHint();
   // updateStatsChart(); // Removed auto update to avoid conflict with new dashboard
 }
 syncHistoryRangeUI();
@@ -4499,6 +4515,38 @@ function tickTimer(){
   if(activeFocusMode === 'breast') updateFocusDisplay(timer);
 }
 
+function updateBottleIntervalHint(){
+  if(!bottleNextHint) return;
+  const feeds = Array.isArray(state.feeds) ? state.feeds : [];
+  let lastTs = null;
+  let lastLabel = '';
+  for(const feed of feeds){
+    if(feed?.source !== 'bottle') continue;
+    const iso = feed.bottleEndISO || feed.dateISO || feed.bottleStartISO;
+    const ts = iso ? Date.parse(iso) : NaN;
+    if(Number.isFinite(ts) && (lastTs === null || ts > lastTs)){
+      lastTs = ts;
+      lastLabel = formatDateTimeLabel(new Date(ts));
+    }
+  }
+  if(!lastTs){
+    bottleNextHint.textContent = 'Pas de biberon enregistré encore.';
+    bottleNextHint.dataset.state = 'empty';
+    return;
+  }
+  const now = Date.now();
+  const diff = now - lastTs;
+  const remaining = BOTTLE_INTERVAL_MS - diff;
+  if(remaining <= 0){
+    bottleNextHint.textContent = `Biberon possible maintenant (dernier: ${lastLabel}).`;
+    bottleNextHint.dataset.state = 'ready';
+    return;
+  }
+  const remainingLabel = formatDuration(Math.round(remaining / 1000));
+  bottleNextHint.textContent = `Prochain biberon dans ${remainingLabel} (dernier: ${lastLabel}).`;
+  bottleNextHint.dataset.state = 'wait';
+}
+
 async function saveFeed(entry){
   updateState(currentData => {
     currentData.feeds.push(entry);
@@ -4506,6 +4554,8 @@ async function saveFeed(entry){
   });
   renderHistory();
   closeModal('#modal-leche');
+  if(bottleHintTimer) clearInterval(bottleHintTimer);
+  bottleHintTimer = null;
   const api = getPersistenceApi();
   try{
     if(api?.saveEntry){
@@ -4516,8 +4566,17 @@ async function saveFeed(entry){
   }
 }
 
-$('#btn-leche')?.addEventListener('click', ()=> openModal('#modal-leche'));
-$('#close-leche')?.addEventListener('click', ()=> closeModal('#modal-leche'));
+$('#btn-leche')?.addEventListener('click', ()=> {
+  openModal('#modal-leche');
+  updateBottleIntervalHint();
+  if(bottleHintTimer) clearInterval(bottleHintTimer);
+  bottleHintTimer = setInterval(updateBottleIntervalHint, 60000);
+});
+$('#close-leche')?.addEventListener('click', ()=> {
+  closeModal('#modal-leche');
+  if(bottleHintTimer) clearInterval(bottleHintTimer);
+  bottleHintTimer = null;
+});
 
 $('#seg-pecho')?.addEventListener('click', ()=> setFeedMode('breast'));
 $('#seg-biberon')?.addEventListener('click', ()=> setFeedMode('bottle'));
@@ -5448,6 +5507,10 @@ function updateManualSourceFields(){
   manualBreastField?.classList?.toggle('is-hidden', !isBreast);
   manualDurationField?.classList?.toggle('is-hidden', !isBreast);
   manualAmountField?.classList?.toggle('is-hidden', isBreast);
+  const isEditing = manualModal?.classList?.contains('is-editing');
+  const showBottleWindow = !isBreast && isEditing;
+  manualBottleStartField?.classList?.toggle('is-hidden', !showBottleWindow);
+  manualBottleEndField?.classList?.toggle('is-hidden', !showBottleWindow);
   if(!isBreast){
     const currentValue = parseFloat((manualAmount?.value || '').replace(',', '.'));
     if(Number.isFinite(currentValue) && currentValue > 0){
@@ -5507,8 +5570,8 @@ function replaceEntryInList(type, entry){
 function setManualMode(isEdit){
   manualTypeButtons.forEach(btn => {
     if(btn){
-      btn.disabled = isEdit;
-      btn.classList.toggle('is-disabled', isEdit);
+      btn.disabled = false;
+      btn.classList.remove('is-disabled');
     }
   });
   if(saveManualBtn){
@@ -5527,6 +5590,8 @@ function resetManualFields(){
   if(manualBreast) manualBreast.value = 'Gauche';
   if(manualDuration) manualDuration.value = '';
   if(manualAmount) manualAmount.value = '';
+  if(manualBottleStart) manualBottleStart.value = '';
+  if(manualBottleEnd) manualBottleEnd.value = '';
   updateManualBottleFeedback(null);
   highlightManualBottlePreset(null);
   if(manualNotes) manualNotes.value = '';
@@ -5563,9 +5628,19 @@ function populateManualForm(type, entry){
       if(manualBreast) manualBreast.value = entry.breastSide || 'Gauche';
       if(manualDuration) manualDuration.value = Math.round((entry.durationSec || 0) / 60);
       if(manualAmount) manualAmount.value = '';
+      if(manualBottleStart) manualBottleStart.value = '';
+      if(manualBottleEnd) manualBottleEnd.value = '';
     }else{
       if(manualAmount) setManualBottleAmount(entry.amountMl != null ? entry.amountMl : '');
       if(manualDuration) manualDuration.value = '';
+      if(manualBottleStart){
+        const startDate = parseDateTimeInput(entry.bottleStartISO);
+        manualBottleStart.value = startDate ? toDateTimeInputValue(startDate) : '';
+      }
+      if(manualBottleEnd){
+        const endDate = parseDateTimeInput(entry.bottleEndISO);
+        manualBottleEnd.value = endDate ? toDateTimeInputValue(endDate) : '';
+      }
     }
     if(manualNotes) manualNotes.value = entry.notes || '';
   }else if(type === 'elim'){
@@ -5600,13 +5675,14 @@ function populateManualForm(type, entry){
 
 function openManualModal({mode='create', type='feed', entry=null} = {}){
   const isEdit = mode === 'edit' && entry;
-  editingEntry = isEdit ? {type, id: entry.id} : null;
+  editingEntry = isEdit ? { type, originalType: type, entry } : null;
   setManualMode(isEdit);
   resetManualFields();
   const effectiveType = isEdit && entry ? type : 'feed';
   setManualType(effectiveType);
   if(isEdit && entry){
     populateManualForm(type, entry);
+    setManualType(type);
   } else if (effectiveType === 'med') {
     // FASE 3: Sugerir también en modo manual si es creación
     const lastMed = state.meds.length > 0 ? state.meds[state.meds.length - 1] : null;
@@ -5682,27 +5758,37 @@ function saveManualEntry() {
     triggerVibration();
   triggerVibration();
   const isEdit = Boolean(editingEntry);
-  const targetType = isEdit && editingEntry ? editingEntry.type : manualType;
+  const targetType = isEdit ? manualType : manualType;
+  const originalType = isEdit && editingEntry ? editingEntry.originalType : null;
   
   // Phase 3-E: Preserve Date Precision
   let dateISO;
-  if (isEdit && editingEntry && editingEntry.dateISO && manualDatetime) {
+  if (isEdit && editingEntry && editingEntry.entry?.dateISO && manualDatetime) {
     const inputVal = manualDatetime.value;
-    const originalVal = formatDateInput(new Date(editingEntry.dateISO));
+    const originalVal = formatDateInput(new Date(editingEntry.entry.dateISO));
     // If user didn't change the datetime input, keep the original ISO string (with seconds)
-    dateISO = (inputVal === originalVal) ? editingEntry.dateISO : new Date(inputVal).toISOString();
+    dateISO = (inputVal === originalVal) ? editingEntry.entry.dateISO : new Date(inputVal).toISOString();
   } else {
     dateISO = manualDatetime && manualDatetime.value ? new Date(manualDatetime.value).toISOString() : new Date().toISOString();
   }
 
   let reason = null;
   let entry = null;
+  const baseEntry = isEdit && originalType && targetType !== originalType
+    ? { id: editingEntry.entry.id }
+    : (isEdit ? { ...editingEntry.entry } : null);
 
   updateState(currentData => {
+    if(isEdit && originalType && targetType !== originalType){
+      const originalKey = getStateKeyForType(originalType);
+      if(currentData[originalKey]){
+        currentData[originalKey] = currentData[originalKey].filter(item => String(item.id) !== String(editingEntry.entry.id));
+      }
+    }
     if (targetType === 'feed') {
       const sourceValue = (manualSource?.value || 'breast') === 'bottle' ? 'bottle' : 'breast';
       // UX Fix: Merge with existing entry to preserve duration/start times if not editing them directly
-      entry = isEdit ? { ...editingEntry } : { id: Date.now()+'', source: sourceValue };
+      entry = isEdit ? { ...baseEntry } : { id: Date.now()+'', source: sourceValue };
       entry.dateISO = dateISO;
       entry.source = sourceValue;
 
@@ -5713,6 +5799,24 @@ function saveManualEntry() {
       } else {
         entry.amountMl = clampBottleValue(Number(manualAmount?.value || 0));
         if(entry.amountMl <= 0) throw new Error('Ajoutez la quantité totale en ml.');
+        const startDate = parseDateTimeInput(manualBottleStart?.value);
+        const endDate = parseDateTimeInput(manualBottleEnd?.value);
+        if(startDate && endDate && endDate < startDate){
+          throw new Error("L'heure de fin doit être postÃ©rieure au dÃ©but.");
+        }
+        if(startDate){
+          entry.bottleStartISO = startDate.toISOString();
+        }
+        if(endDate){
+          entry.bottleEndISO = endDate.toISOString();
+          entry.dateISO = entry.bottleEndISO;
+        }
+        if(startDate && endDate){
+          entry.durationSec = Math.round((endDate.getTime() - startDate.getTime()) / 1000);
+        }else if(startDate && Number.isFinite(entry.durationSec)){
+          entry.bottleEndISO = new Date(startDate.getTime() + (entry.durationSec * 1000)).toISOString();
+          entry.dateISO = entry.bottleEndISO;
+        }
       }
       const notes = manualNotes?.value?.trim();
       if (notes) entry.notes = notes;
@@ -5726,7 +5830,7 @@ function saveManualEntry() {
         reason = 'Manual feed entry';
       }
     } else if (targetType === 'elim') {
-      entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
+      entry = isEdit ? { ...baseEntry } : { id: Date.now()+'' };
       entry.dateISO = dateISO;
       entry.pee = clamp(Number(manualPee?.value || 0), 0, 3);
       entry.poop = clamp(Number(manualPoop?.value || 0), 0, 3);
@@ -5756,7 +5860,7 @@ function saveManualEntry() {
     }
     const dose = (manualMedDose?.value || '').trim();
     const notes = (manualMedNotes?.value || '').trim();
-    entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
+    entry = isEdit ? { ...baseEntry } : { id: Date.now()+'' };
     entry.dateISO = dateISO;
     entry.name = name;
     entry.medKey = selection === 'other' ? 'other' : name;
@@ -5780,7 +5884,7 @@ function saveManualEntry() {
         throw new Error("Veuillez entrer au moins une mesure.");
       }
 
-      entry = isEdit ? { ...editingEntry } : { id: Date.now() + '' };
+      entry = isEdit ? { ...baseEntry } : { id: Date.now() + '' };
       entry.dateISO = dateISO;
       if (temp !== null) entry.temp = temp;
       if (weight !== null) entry.weight = weight;
@@ -5801,7 +5905,7 @@ function saveManualEntry() {
       const endTs = new Date(dateISO).getTime();
       const startTs = endTs - (durationSec * 1000);
 
-      entry = isEdit ? { ...editingEntry } : { id: Date.now()+'' };
+      entry = isEdit ? { ...baseEntry } : { id: Date.now()+'' };
       entry.dateISO = dateISO;
       entry.startISO = new Date(startTs).toISOString();
       entry.endISO = dateISO;
@@ -5824,6 +5928,9 @@ function saveManualEntry() {
   });
 
   if(reason && entry){
+    if(isEdit && originalType && targetType !== originalType){
+      getPersistenceApi()?.deleteEntries?.([{ type: originalType, id: entry.id }]);
+    }
     // Return promise for safeAction, close modal on success.
     return getPersistenceApi()?.saveEntry?.(targetType, entry, reason)
       .then(() => {
