@@ -121,6 +121,7 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
   align-items:center;
   gap:clamp(12px,4vw,20px);
   flex-wrap:nowrap;
+  justify-content:space-between;
   margin:8px 0 22px;
 }
 .title-bar h1{margin:0;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2818,6 +2819,8 @@ body::after{
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
+  text-align:center;
+  width:100%;
 }
 .bottle-next-hint[data-state="ready"]{
   background: rgba(207, 255, 226, 0.7);

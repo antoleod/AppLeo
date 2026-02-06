@@ -820,7 +820,7 @@ let bottleTimerStart = null;
 let bottleTimerInterval = null;
 let bottlePendingDuration = store.get(BOTTLE_PENDING_KEY, 0) || 0;
 let bottlePendingAmount = store.get(BOTTLE_AMOUNT_KEY, null);
-let bottleHintTimer = null;
+let bottleHintTicker = null;
 
 let bottlePendingStart = store.get(BOTTLE_PENDING_START_KEY, null);
 let lastStoppedBottleStart = null;
@@ -4554,8 +4554,6 @@ async function saveFeed(entry){
   });
   renderHistory();
   closeModal('#modal-leche');
-  if(bottleHintTimer) clearInterval(bottleHintTimer);
-  bottleHintTimer = null;
   const api = getPersistenceApi();
   try{
     if(api?.saveEntry){
@@ -4569,13 +4567,9 @@ async function saveFeed(entry){
 $('#btn-leche')?.addEventListener('click', ()=> {
   openModal('#modal-leche');
   updateBottleIntervalHint();
-  if(bottleHintTimer) clearInterval(bottleHintTimer);
-  bottleHintTimer = setInterval(updateBottleIntervalHint, 60000);
 });
 $('#close-leche')?.addEventListener('click', ()=> {
   closeModal('#modal-leche');
-  if(bottleHintTimer) clearInterval(bottleHintTimer);
-  bottleHintTimer = null;
 });
 
 $('#seg-pecho')?.addEventListener('click', ()=> setFeedMode('breast'));
@@ -6158,6 +6152,12 @@ if(manualModal){
   setManualType('feed');
   updateManualSourceFields();
   updateManualMedFields();
+}
+
+// Keep next-bottle hint live on the home screen
+updateBottleIntervalHint();
+if(!bottleHintTicker){
+  bottleHintTicker = setInterval(updateBottleIntervalHint, 1000);
 }
 
 window.addEventListener('online', () => {
