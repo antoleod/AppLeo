@@ -8980,3 +8980,149 @@ body::after{
 .secondary-actions .btn .btn-icon{
   font-size: 1.2rem;
 }
+
+/* --- Manual edit redesign (dark mode, mobile-first) --- */
+#modal-manual.is-editing .sheet{
+  padding: 14px 16px;
+  gap: 16px;
+}
+#modal-manual.is-editing .modal-header{
+  padding: 4px 0 2px;
+  min-height: 40px;
+}
+#modal-manual.is-editing .modal-header h2{
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+#modal-manual.is-editing .modal-close{
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  opacity: 0.6;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(150,170,200,0.25);
+}
+#modal-manual.is-editing .modal-close:hover{
+  opacity: 0.9;
+}
+#modal-manual.is-editing #manual-type{
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+#modal-manual.is-editing #manual-type::-webkit-scrollbar{
+  display: none;
+}
+#modal-manual.is-editing #manual-type button{
+  flex: 0 0 auto;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(20,30,44,0.35);
+  border: 1px solid rgba(150,170,200,0.25);
+  color: rgba(230,240,255,0.85);
+  box-shadow: none;
+}
+#modal-manual.is-editing #manual-type button.active{
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 8px 16px rgba(10,132,255,0.28);
+}
+#modal-manual.is-editing .form-grid{
+  gap: 14px 12px;
+}
+#modal-manual.is-editing .amount-focus{
+  padding: 8px 0 4px;
+}
+#modal-manual.is-editing .amount-focus label{
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+#modal-manual.is-editing .bottle-amount-control{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+#modal-manual.is-editing .bottle-amount-input{
+  text-align: center;
+}
+#modal-manual.is-editing #manual-amount{
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  height: 56px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(12, 20, 36, 0.55);
+  border: 1px solid rgba(150,170,200,0.3);
+  color: #f2f5ff;
+}
+#modal-manual.is-editing .volume-step{
+  height: 36px;
+  min-width: 48px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  background: rgba(20,30,44,0.35);
+  border: 1px solid rgba(150,170,200,0.25);
+  color: rgba(230,240,255,0.85);
+  box-shadow: none;
+}
+#modal-manual.is-editing .preset-amounts{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+#modal-manual.is-editing .preset-amounts .preset-btn{
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  background: rgba(20,30,44,0.28);
+  border: 1px solid rgba(150,170,200,0.22);
+  color: rgba(230,240,255,0.85);
+}
+#modal-manual.is-editing .preset-amounts .preset-btn.active{
+  background: rgba(10,132,255,0.35);
+  border-color: rgba(10,132,255,0.6);
+  color: #fff;
+}
+#modal-manual.is-editing .field-datetime label,
+#modal-manual.is-editing .field-time label{
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+#modal-manual.is-editing .field-time{
+  opacity: 0.85;
+}
+#modal-manual.is-editing .field-time .input{
+  font-size: 0.9rem;
+  padding: 10px 12px;
+}
+#modal-manual.is-editing .textarea{
+  min-height: 80px;
+  font-size: 0.95rem;
+  background: rgba(12, 20, 36, 0.5);
+}
+#modal-manual.is-editing .footer{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+#modal-manual.is-editing #save-manual{
+  order: 1;
+}
+#modal-manual.is-editing #close-manual,
+#modal-manual.is-editing #cancel-manual{
+  order: 2;
+}

@@ -16448,13 +16448,63 @@ function formatDateInput(date){
 
 function clamp(value, min, max){
 
-
   return Math.min(max, Math.max(min, value));
-
 
 }
 
 
+
+function getManualTypeMeta(type){
+
+  switch(type){
+
+    case 'elim':
+
+      return { icon: '\ud83d\udebc', label: 'Couche' };
+
+    case 'med':
+
+      return { icon: '\ud83d\udc8a', label: 'Médicaments' };
+
+    case 'measurement':
+
+      return { icon: '\ud83c\udf21\ufe0f', label: 'Mesures' };
+
+    case 'pump':
+
+      return { icon: '\ud83c\udf00', label: 'Tire-lait' };
+
+    case 'feed':
+
+    default:
+
+      return { icon: '\ud83c\udf7c', label: 'Lait' };
+
+  }
+
+}
+
+
+
+function updateManualTitle(isEdit){
+
+  const titleNode = manualTitle || manualModal?.querySelector('h2');
+
+  if(!titleNode) return;
+
+  if(isEdit){
+
+    const meta = getManualTypeMeta(manualType);
+
+    titleNode.textContent = `${meta.icon} ${meta.label} ? Modifier`;
+
+  }else{
+
+    titleNode.textContent = 'Nouvel enregistrement';
+
+  }
+
+}
 
 
 
@@ -16486,6 +16536,8 @@ function setManualType(type){
 
 
   if(type === 'med') updateManualMedFields();
+
+  updateManualTitle(manualModal?.classList?.contains('is-editing'));
 
 
 }
@@ -16721,18 +16773,7 @@ function setManualMode(isEdit){
 
   }
 
-
-  const titleNode = manualTitle || manualModal?.querySelector('h2');
-
-
-  if(titleNode){
-
-
-    titleNode.textContent = isEdit ? 'Modifier un enregistrement' : 'Nouvel enregistrement';
-
-
-  }
-
+  updateManualTitle(isEdit);
 
   manualModal?.classList?.toggle('is-editing', isEdit);
 
