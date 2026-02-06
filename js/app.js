@@ -20579,7 +20579,7 @@ function updateSummaries(){
     const metaParts = [];
     if(todayBottleFeeds.length) metaParts.push(`${todayBottleFeeds.length} biberon(s)`);
     if(todayBreastFeeds.length) metaParts.push(`${todayBreastFeeds.length} tétée(s)`);
-    milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' · ') : 'Aucune prise aujourd'hui';
+    milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' · ') : "Aucune prise aujourd'hui";
   }
 
   if(milkRecoLineEl){
