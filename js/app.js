@@ -1171,6 +1171,10 @@ const HERO_FALLBACKS = [
   'img/baby4.jpeg'
 ];
 
+const HERO_LEGACY_MAP = Object.freeze({
+  'img/baby.jpg': 'img/baby1.jpg'
+});
+
 
 let heroRotationTimer = null;
 
@@ -1368,28 +1372,17 @@ function setHeroImage(src, {persist=true, fallbackIndex=0} = {}){
 
 
 function getHeroSources(){
-
-
   const list = [...HERO_FALLBACKS];
-
-
-  const custom = store.get(HERO_KEY, null);
-
-
-  if(custom && !list.includes(custom)){
-
-
-    list.unshift(custom);
-
-
+  let custom = store.get(HERO_KEY, null);
+  if(custom && HERO_LEGACY_MAP[custom]){
+    custom = HERO_LEGACY_MAP[custom];
+    store.set(HERO_KEY, custom);
   }
-
-
+  if(custom && !list.includes(custom)){
+    list.unshift(custom);
+  }
   return list;
-
-
 }
-
 
 
 
@@ -1628,7 +1621,7 @@ startHeroRotation();
 // ===== DOM refs =====
 
 
-const panePecho = $('#pane-pecho');
+const paneTetee = $('#pane-pecho');
 
 
 const paneBiberon = $('#pane-biberon');
@@ -1923,6 +1916,11 @@ const confirmBottleTimeBtn = $('#confirm-bottle-time');
 
 
 const bottleNextHint = $('#bottle-next-hint');
+const bottleNextValueEl = $('#bottle-next-value');
+const bottleNextMetaEl = $('#bottle-next-meta');
+const milkProgressEl = $('#milk-progress');
+const milkProgressFillEl = $('#milk-progress-fill');
+const milkProgressMessageEl = $('#milk-progress-message');
 
 
 
@@ -12356,7 +12354,7 @@ function setFeedMode(mode){
   biberon?.classList?.toggle('active', mode === 'bottle');
 
 
-  panePecho?.classList?.toggle('is-hidden', mode !== 'breast');
+  paneTetee?.classList?.toggle('is-hidden', mode !== 'breast');
 
 
   paneBiberon?.classList?.toggle('is-hidden', mode !== 'bottle');
@@ -13550,13 +13548,43 @@ function updateBottleIntervalHint(){
   }
 
 
+  const setBottleHint = (mainText, metaText, stateLabel) => {
+
+
+    if(bottleNextValueEl){
+
+
+      bottleNextValueEl.textContent = mainText;
+
+
+    }else{
+
+
+      bottleNextHint.textContent = mainText;
+
+
+    }
+
+
+    if(bottleNextMetaEl){
+
+
+      bottleNextMetaEl.textContent = metaText || '';
+
+
+    }
+
+
+    bottleNextHint.dataset.state = stateLabel;
+
+
+  };
+
+
   if(!lastTs){
 
 
-    bottleNextHint.textContent = 'Pas de biberon enregistré encore.';
-
-
-    bottleNextHint.dataset.state = 'empty';
+    setBottleHint('Prochain biberon a la demande', 'Aucun biberon enregistre', 'empty');
 
 
     return;
@@ -13577,10 +13605,7 @@ function updateBottleIntervalHint(){
   if(remaining <= 0){
 
 
-    bottleNextHint.textContent = `Biberon possible maintenant (dernier: ${lastLabel}).`;
-
-
-    bottleNextHint.dataset.state = 'ready';
+    setBottleHint('Prochain biberon possible maintenant', `Dernier: ${lastLabel}`, 'ready');
 
 
     return;
@@ -13592,13 +13617,11 @@ function updateBottleIntervalHint(){
   const remainingLabel = formatDuration(Math.round(remaining / 1000));
 
 
-  bottleNextHint.textContent = `Prochain biberon dans ${remainingLabel} (dernier: ${lastLabel}).`;
-
-
-  bottleNextHint.dataset.state = 'wait';
+  setBottleHint(`Prochain biberon dans ${remainingLabel}`, `Dernier: ${lastLabel}`, 'wait');
 
 
 }
+
 
 
 
@@ -20496,7 +20519,7 @@ function updateSummaries(){
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
   if(milkAgeEl){
-    milkAgeEl.textContent = `Edad: ${formatBabyAgeLabel(getBabyAgeParts(today))}`;
+    milkAgeEl.textContent = `Age: ${formatBabyAgeLabel(getBabyAgeParts(today))}`;
   }
 
   const feeds = Array.isArray(state.feeds) ? state.feeds : [];
@@ -20523,9 +20546,9 @@ function updateSummaries(){
 
   if(milkLastValueEl && milkLastMetaEl){
     if(lastFeed && lastTs){
-      const timeLabel = new Date(lastTs).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-      const sourceLabel = lastFeed.source === 'bottle' ? 'Biberon' : 'Sein';
-      milkLastValueEl.textContent = `${sourceLabel} ${timeLabel}`;
+      const timeLabel = new Date(lastTs).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const sourceLabel = lastFeed.source === 'bottle' ? 'Biberon' : 'Tetee';
+      milkLastValueEl.textContent = `${timeLabel}`;
       const metaParts = [];
       if(lastFeed.source === 'bottle' && Number.isFinite(lastFeed.amountMl)){
         metaParts.push(`${formatNumber(lastFeed.amountMl)} ml`);
@@ -20533,47 +20556,72 @@ function updateSummaries(){
       if(lastFeed.source === 'breast' && Number.isFinite(lastFeed.durationSec)){
         metaParts.push(`${formatMinutes(lastFeed.durationSec / 60)} min`);
       }
+      if(sourceLabel) metaParts.push(sourceLabel);
       if(lastFeed.breastSide){
         metaParts.push(lastFeed.breastSide);
       }
-      milkLastMetaEl.textContent = metaParts.length ? metaParts.join(' · ') : 'Dernière prise enregistrée';
+      milkLastMetaEl.textContent = metaParts.length ? metaParts.join(' - ') : 'Derniere prise enregistree';
+      if(milkSinceValueEl){
+        const diffMin = Math.max(0, Math.round((Date.now() - lastTs) / 60000));
+        milkSinceValueEl.textContent = diffMin === 0 ? 'Il y a 0 min' : `Il y a ${formatIntervalMinutes(diffMin)}`;
+      }
+      if(milkSinceMetaEl){
+        milkSinceMetaEl.textContent = 'Temps ecoule';
+      }
     }else{
-      milkLastValueEl.textContent = '—';
-      milkLastMetaEl.textContent = 'Aucune prise enregistrée';
+      milkLastValueEl.textContent = '-';
+      milkLastMetaEl.textContent = 'Aucun enregistrement';
+      if(milkSinceValueEl) milkSinceValueEl.textContent = '-';
+      if(milkSinceMetaEl) milkSinceMetaEl.textContent = 'Temps ecoule';
     }
   }
 
-  if(milkSinceValueEl && milkSinceMetaEl){
-    if(lastTs){
-      const diffMin = Math.max(0, Math.round((Date.now() - lastTs) / 60000));
-      milkSinceValueEl.textContent = diffMin === 0 ? '0m' : formatIntervalMinutes(diffMin);
-      const timeLabel = new Date(lastTs).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-      milkSinceMetaEl.textContent = `Dernière à ${timeLabel}`;
-    }else{
-      milkSinceValueEl.textContent = '—';
-      milkSinceMetaEl.textContent = 'Aucune donnée';
-    }
-  }
+  const range = getMilkRangeByAge(today);
 
   if(milkTotalValueEl && milkTotalMetaEl){
-    if(totalBottleMl > 0){
-      milkTotalValueEl.textContent = `${formatNumber(totalBottleMl)} ml`;
-    }else if(totalBreastMinutes > 0){
-      milkTotalValueEl.textContent = `${formatMinutes(totalBreastMinutes)} min`;
-    }else{
-      milkTotalValueEl.textContent = '—';
-    }
+    milkTotalValueEl.textContent = `Biberon aujourd hui: ${formatNumber(totalBottleMl)} ml`;
     const metaParts = [];
+    if(range){
+      metaParts.push(`Repere ${formatNumber(range.min)}-${formatNumber(range.max)} ml`);
+    }
     if(todayBottleFeeds.length) metaParts.push(`${todayBottleFeeds.length} biberon(s)`);
-    if(todayBreastFeeds.length) metaParts.push(`${todayBreastFeeds.length} tétée(s)`);
-    milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' - ') : 'Aucune prise aujourd hui';
+    if(totalBreastMinutes > 0) metaParts.push(`Tetee ${formatMinutes(totalBreastMinutes)} min`);
+    if(todayBreastFeeds.length) metaParts.push(`${todayBreastFeeds.length} tetee(s)`);
+    milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' - ') : 'Aucune prise enregistree';
+  }
+
+  if(milkProgressFillEl || milkProgressEl || milkProgressMessageEl){
+    const maxRange = range && range.max ? range.max : 0;
+    const progressPercent = maxRange > 0 ? Math.min(100, Math.round((totalBottleMl / maxRange) * 100)) : 0;
+    if(milkProgressFillEl) milkProgressFillEl.style.width = `${progressPercent}%`;
+    if(milkProgressEl) milkProgressEl.setAttribute('aria-valuenow', String(progressPercent));
+    if(milkProgressMessageEl){
+      let msg = 'Suivi en cours';
+      if(range){
+        if(totalBottleMl === 0){
+          msg = totalBreastMinutes > 0 ? 'Tetee registrado, biberon aun no' : 'Aucune prise enregistree';
+        }else if(totalBottleMl < range.min){
+          msg = 'On est bien, il reste de la marge';
+        }else if(totalBottleMl <= range.max){
+          msg = 'Dans la zone normale';
+        }else{
+          msg = 'Un peu au dessus, sans alarme';
+        }
+      }
+      milkProgressMessageEl.textContent = msg;
+    }
   }
 
   if(milkRecoLineEl){
-    const range = getMilkRangeByAge(today);
-    milkRecoLineEl.textContent = range
-      ? `Repère indicatif (varie selon bébé): ${formatNumber(range.min)}–${formatNumber(range.max)} ml/jour (${range.label})`
-      : 'Repère indicatif: —';
+    if(range){
+      const inRange = totalBottleMl >= range.min && totalBottleMl <= range.max;
+      const human = inRange
+        ? 'Les valeurs sont indicatives. Chaque bebe est different. Leo est dans une zone normale.'
+        : 'Les valeurs sont indicatives. Chaque bebe est different. Regardez la tendance et comment Leo va.';
+      milkRecoLineEl.textContent = `${human} Repere orientativo: ${formatNumber(range.min)}-${formatNumber(range.max)} ml/jour (${range.label}).`;
+    }else{
+      milkRecoLineEl.textContent = 'Les valeurs sont indicatives. Chaque bebe est different.';
+    }
   }
 
   if(summarySleepEl){
