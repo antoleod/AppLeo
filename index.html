@@ -1631,7 +1631,22 @@
         <button class="btn btn-ghost btn-compact" id="btn-milk-details" type="button">Détails</button>
       </div>
 
-       <div class="focus-reco" id="milk-reco-line">Repère indicatif: —</div>
+      <div class="status-visual status-visual-min" id="milk-status" style="--progress: 0.6;" aria-live="polite" data-state="in">
+        <div class="status-visual-head">
+          <div class="status-visual-text">
+            <div class="status-visual-label">Etat du jour</div>
+            <div class="status-visual-msg" id="milk-status-msg">Dans la zone normale</div>
+            <div class="status-visual-emote" id="milk-status-emote">Tout va bien</div>
+          </div>
+          <div class="status-visual-secondary" aria-hidden="true">
+            <span class="status-visual-num" id="milk-range-num">Repere 750–1050 ml</span>
+            <span class="status-visual-note">Objectif quotidien</span>
+          </div>
+        </div>
+        <div class="status-visual-bar" id="milk-status-bar" role="progressbar" aria-label="Etat du jour" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span class="status-visual-fill" id="milk-status-fill"></span>
+        </div>
+      </div>
       <div class="bottle-next-hint next-bottle-card" id="bottle-next-hint" aria-live="polite" data-state="wait">
         <div class="next-bottle-label">Prochain biberon</div>
         <div class="next-bottle-value" id="bottle-next-value">Prochain biberon dans 37m 28s</div>
@@ -1643,11 +1658,6 @@
           <div class="kpi-label">Dernière prise</div>
           <div class="kpi-value" id="milk-last-value">--</div>
           <div class="kpi-meta" id="milk-last-meta">Aucune donnée</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Total du jour</div>
-          <div class="kpi-value" id="milk-total-value">--</div>
-          <div class="kpi-meta" id="milk-total-meta">—</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Depuis la dernière</div>
