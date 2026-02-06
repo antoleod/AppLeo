@@ -1733,6 +1733,13 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   .action-row .btn{flex:1 1 100%}
   .section-head strong{font-size:17px}
   .seg-sides{margin:0 calc(-1 * (var(--card-padding) - 6px))}
+  .modal .seg{gap:8px}
+  .modal .seg button{
+    height:40px;
+    padding:0 10px;
+    font-size:14px;
+    border-radius:12px;
+  }
   .form-grid{grid-template-columns:1fr;}
   .form-grid .field.span-2{grid-column:span 1}
   .view-switcher{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:center}
