@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 
 
 <html lang="fr">
@@ -1619,11 +1619,6 @@
 
 
     </div>
-
-
-
-
-
         <section class="focus-panel" id="milk-focus" aria-label="Résumé lait">
       <div class="focus-head">
         <div class="focus-title">
@@ -1634,6 +1629,13 @@
           </div>
         </div>
         <button class="btn btn-ghost btn-compact" id="btn-milk-details" type="button">Détails</button>
+      </div>
+
+       <div class="focus-reco" id="milk-reco-line">Repère indicatif: —</div>
+      <div class="bottle-next-hint next-bottle-card" id="bottle-next-hint" aria-live="polite" data-state="wait">
+        <div class="next-bottle-label">Prochain biberon</div>
+        <div class="next-bottle-value" id="bottle-next-value">Prochain biberon dans 37m 28s</div>
+        <div class="next-bottle-meta" id="bottle-next-meta">Dernier: 06/02 18:02</div>
       </div>
 
       <div class="focus-kpis">
@@ -1654,12 +1656,7 @@
         </div>
       </div>
 
-      <div class="focus-reco" id="milk-reco-line">Repère indicatif: —</div>
-      <div class="bottle-next-hint next-bottle-card" id="bottle-next-hint" aria-live="polite" data-state="wait">
-        <div class="next-bottle-label">Prochain biberon</div>
-        <div class="next-bottle-value" id="bottle-next-value">Prochain biberon dans 37m 28s</div>
-        <div class="next-bottle-meta" id="bottle-next-meta">Dernier: 06/02 18:02</div>
-      </div>
+     
 
       <div class="focus-actions">
         <button class="btn btn-primary btn-heartbeat" id="btn-breast" aria-label="Enregistrer une tétée">
@@ -1674,6 +1671,9 @@
     <div class="quick-actions" id="quick-actions" aria-label="Actions rapides">
       <button class="btn btn-warning btn-heartbeat" id="btn-med" aria-label="Enregistrer un médicament">
         <span class="btn-icon">💊</span> Médicaments
+      </button>
+      <button class="btn btn-success btn-heartbeat" id="btn-elim" aria-label="Enregistrer une couche">
+        <span class="btn-icon">🚼</span> Couche
       </button>
       <button class="btn btn-info btn-heartbeat" id="btn-mesures" aria-label="Enregistrer la température, le poids ou la taille">
         <span class="btn-icon">🌡️</span> Mesures

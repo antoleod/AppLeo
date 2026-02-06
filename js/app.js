@@ -1748,7 +1748,6 @@ const milkTotalValueEl = $('#milk-total-value');
 const milkTotalMetaEl = $('#milk-total-meta');
 const milkSinceValueEl = $('#milk-since-value');
 const milkSinceMetaEl = $('#milk-since-meta');
-const milkRecoLineEl = $('#milk-reco-line');
 const milkDetailsBtn = $('#btn-milk-details');
 const btnBreast = $('#btn-breast');
 const btnBottle = $('#btn-bottle');
@@ -1918,9 +1917,12 @@ const confirmBottleTimeBtn = $('#confirm-bottle-time');
 const bottleNextHint = $('#bottle-next-hint');
 const bottleNextValueEl = $('#bottle-next-value');
 const bottleNextMetaEl = $('#bottle-next-meta');
-const milkProgressEl = $('#milk-progress');
-const milkProgressFillEl = $('#milk-progress-fill');
-const milkProgressMessageEl = $('#milk-progress-message');
+const milkStatusEl = $('#milk-status');
+const milkStatusMsgEl = $('#milk-status-msg');
+const milkStatusEmoteEl = $('#milk-status-emote');
+const milkRangeNumEl = $('#milk-range-num');
+const milkStatusBarEl = $('#milk-status-bar');
+const milkStatusFillEl = $('#milk-status-fill');
 
 
 
@@ -20590,38 +20592,56 @@ function updateSummaries(){
     milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' - ') : 'Aucune prise enregistree';
   }
 
-  if(milkProgressFillEl || milkProgressEl || milkProgressMessageEl){
+  if(milkStatusEl || milkStatusMsgEl || milkStatusEmoteEl || milkRangeNumEl || milkStatusBarEl || milkStatusFillEl){
     const maxRange = range && range.max ? range.max : 0;
+    const minRange = range && range.min ? range.min : 0;
     const progressPercent = maxRange > 0 ? Math.min(100, Math.round((totalBottleMl / maxRange) * 100)) : 0;
-    if(milkProgressFillEl) milkProgressFillEl.style.width = `${progressPercent}%`;
-    if(milkProgressEl) milkProgressEl.setAttribute('aria-valuenow', String(progressPercent));
-    if(milkProgressMessageEl){
-      let msg = 'Suivi en cours';
-      if(range){
-        if(totalBottleMl === 0){
-          msg = totalBreastMinutes > 0 ? 'Tetee registrado, biberon aun no' : 'Aucune prise enregistree';
-        }else if(totalBottleMl < range.min){
-          msg = 'On est bien, il reste de la marge';
-        }else if(totalBottleMl <= range.max){
-          msg = 'Dans la zone normale';
-        }else{
-          msg = 'Un peu au dessus, sans alarme';
-        }
-      }
-      milkProgressMessageEl.textContent = msg;
+    if(milkStatusEl) milkStatusEl.style.setProperty('--progress', String(progressPercent / 100));
+    if(milkStatusBarEl) milkStatusBarEl.setAttribute('aria-valuenow', String(progressPercent));
+    if(milkRangeNumEl){
+      milkRangeNumEl.textContent = range
+        ? `Repere ${formatNumber(minRange)}-${formatNumber(maxRange)} ml`
+        : 'Repere —';
     }
-  }
 
-  if(milkRecoLineEl){
+    let msg = 'Suivi en cours';
+    let emote = 'Tout va bien';
+    let state = 'none';
+
     if(range){
-      const inRange = totalBottleMl >= range.min && totalBottleMl <= range.max;
-      const human = inRange
-        ? 'Les valeurs sont indicatives. Chaque bebe est different. Leo est dans une zone normale.'
-        : 'Les valeurs sont indicatives. Chaque bebe est different. Regardez la tendance et comment Leo va.';
-      milkRecoLineEl.textContent = `${human} Repere orientativo: ${formatNumber(range.min)}-${formatNumber(range.max)} ml/jour (${range.label}).`;
+      if(totalBottleMl === 0){
+        msg = totalBreastMinutes > 0 ? "Sein uniquement pour l'instant" : 'Aucun biberon encore';
+        emote = 'Tout va bien, enregistrez quand vous voulez';
+        state = 'none';
+      }else if(totalBottleMl < minRange){
+        msg = 'Encore sous le repere';
+        emote = 'Pas de stress, ca va';
+        state = 'low';
+      }else if(totalBottleMl <= maxRange){
+        msg = 'Dans la zone normale';
+        emote = 'Tout va bien';
+        state = 'in';
+      }else{
+        msg = 'Legerement au-dessus';
+        emote = "Pas d'alarme, regardez la tendance";
+        state = 'high';
+      }
     }else{
-      milkRecoLineEl.textContent = 'Les valeurs sont indicatives. Chaque bebe est different.';
+      if(totalBottleMl === 0){
+        msg = 'Pas encore de saisie';
+        emote = 'Pret a commencer';
+        state = 'none';
+      }else{
+        msg = 'Suivi en cours';
+        emote = 'Tout va bien';
+        state = 'in';
+      }
     }
+
+    if(milkStatusMsgEl) milkStatusMsgEl.textContent = msg;
+    if(milkStatusEmoteEl) milkStatusEmoteEl.textContent = emote;
+    if(milkStatusEl) milkStatusEl.dataset.state = state;
+    if(milkStatusBarEl) milkStatusBarEl.setAttribute('aria-label', `Etat du jour: ${msg}`);
   }
 
   if(summarySleepEl){
