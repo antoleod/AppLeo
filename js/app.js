@@ -1165,23 +1165,10 @@ const HERO_KEY = 'heroImage';
 
 
 const HERO_FALLBACKS = [
-
-
-  'img/baby.jpg',
-
-
   'img/baby1.jpg',
-
-
   'img/baby2.jpeg',
-
-
   'img/baby3.jpg',
-
-
   'img/baby4.jpeg'
-
-
 ];
 
 
@@ -20509,7 +20496,7 @@ function updateSummaries(){
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
   if(milkAgeEl){
-    milkAgeEl.textContent = `Âge: ${formatBabyAgeLabel(getBabyAgeParts(today))}`;
+    milkAgeEl.textContent = `Edad: ${formatBabyAgeLabel(getBabyAgeParts(today))}`;
   }
 
   const feeds = Array.isArray(state.feeds) ? state.feeds : [];
@@ -20579,7 +20566,7 @@ function updateSummaries(){
     const metaParts = [];
     if(todayBottleFeeds.length) metaParts.push(`${todayBottleFeeds.length} biberon(s)`);
     if(todayBreastFeeds.length) metaParts.push(`${todayBreastFeeds.length} tétée(s)`);
-    milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' · ') : "Aucune prise aujourd'hui";
+    milkTotalMetaEl.textContent = metaParts.length ? metaParts.join(' - ') : 'Aucune prise aujourd hui';
   }
 
   if(milkRecoLineEl){
@@ -20671,5 +20658,6 @@ initMilkDetailsModal();
 
 
 bootstrap();
+
 
 
