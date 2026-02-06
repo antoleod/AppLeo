@@ -1,554 +1,1678 @@
 <!doctype html>
+
+
 <html lang="fr">
+
+
 <head>
+
+
 <meta charset="utf-8" />
+
+
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
 <title>App bebé — Léo</title>
+
+
 <link rel="stylesheet" href="css/styles.css" />
 
+
+
+
+
 <!-- Configuración PWA y tema -->
+
+
 <link rel="manifest" href="manifest.json">
+
+
 <meta name="theme-color" content="#0a84ff">
+
+
 <meta name="apple-mobile-web-app-capable" content="yes">
+
+
 <meta name="mobile-web-app-capable" content="yes">
+
+
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
 <meta name="apple-mobile-web-app-title" content="App Léo">
 
+
+
+
+
 <!-- Íconos de la aplicación -->
+
+
 <link rel="icon" href="img/icon/icon-square-180.png" type="image/png"> <!-- Ícono principal -->
+
+
 <link rel="apple-touch-icon" href="img/icon/icon-square-180.png"> <!-- Ícono para iOS -->
 
+
+
+
+
 <style>
+
+
   #app-background {
+
+
     position: fixed;
+
+
     top: 0;
+
+
     left: 0;
+
+
     width: 100%;
+
+
     height: 100%;
+
+
     z-index: -1;
+
+
     background-image: var(--hero-image);
+
+
     background-position: center center;
+
+
     background-size: cover;
+
+
     background-repeat: no-repeat;
+
+
     transform-origin: center center;
+
+
     animation: ken-burns 30s ease-in-out infinite alternate;
+
+
     transition: background-image 1.2s ease-in-out;
+
+
   }
+
+
   @keyframes ken-burns {
+
+
     0% { transform: scale(1); }
+
+
     100% { transform: scale(1.12); }
+
+
   }
+
+
+
+
 
   /* Stats & Milestones Styles */
+
+
   .segmented-control {
+
+
     display: flex;
+
+
     background: rgba(118, 118, 128, 0.12);
+
+
     padding: 2px;
+
+
     border-radius: 8px;
+
+
     margin-bottom: 16px;
+
+
     border: 1px solid rgba(198, 209, 223, 0.45);
+
+
     box-shadow: var(--elev-1);
+
+
   }
+
+
   .segmented-control button {
+
+
     flex: 1;
+
+
     border: none;
+
+
     background: transparent;
+
+
     padding: 8px 4px;
+
+
     font-size: 0.9rem;
+
+
     font-weight: 500;
+
+
     border-radius: 6px;
+
+
     color: inherit;
+
+
     transition: background 0.2s, box-shadow 0.2s;
+
+
     margin: 0;
+
+
     min-height: var(--btn-height-sm);
+
+
   }
+
+
   .segmented-control button.active {
+
+
     background: #fff;
+
+
     box-shadow: var(--elev-1);
+
+
     color: #000;
+
+
   }
+
+
   .dark-mode .segmented-control button.active {
+
+
     background: #636366;
+
+
     color: #fff;
+
+
   }
+
+
   .comparison-grid {
+
+
     display: grid;
+
+
     grid-template-columns: 1fr 1fr;
+
+
     gap: 12px;
+
+
     margin-bottom: 16px;
+
+
   }
+
+
   .comparison-card {
+
+
     background: rgba(255,255,255,0.5);
+
+
     border-radius: 16px;
+
+
     padding: 16px;
+
+
     display: flex;
+
+
     flex-direction: column;
+
+
     gap: 4px;
+
+
     border: 1px solid rgba(198, 209, 223, 0.45);
+
+
     box-shadow: var(--elev-1);
+
+
   }
+
+
   .dark-mode .comparison-card { background: rgba(255,255,255,0.05); }
+
+
   .comparison-card.primary { background: var(--bg-card, #fff); box-shadow: var(--elev-2); }
+
+
   .dark-mode .comparison-card.primary { background: #1c1c1e; }
+
+
   .comp-label { font-size: 0.8rem; opacity: 0.78; text-transform: uppercase; letter-spacing: 0.5px; }
+
+
   .comp-value { font-size: 1.5rem; font-weight: 700; font-family: var(--font-display); }
+
+
   .comp-sub { font-size: 0.85rem; opacity: 0.8; display: flex; align-items: center; gap: 4px; }
+
+
   .trend-up { color: #34c759; }
+
+
   .trend-down { color: #ff3b30; }
+
+
   .milestone-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card, #fff); border-radius: 12px; margin-bottom: 8px; box-shadow: var(--elev-1); }
+
+
   .milestone-icon { font-size: 1.5rem; background: rgba(0,0,0,0.05); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+
   .milestone-content { flex: 1; }
+
+
   .milestone-date { font-size: 0.8rem; opacity: 0.7; }
+
+
   .milestone-title { font-weight: 600; }
+
+
   .custom-settings { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; margin-bottom: 16px; box-shadow: var(--elev-1); }
+
+
   .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+
+
   .toggle-row:last-child { border-bottom: none; }
+
+
   .chart-type-selector { display: flex; gap: 8px; margin-top: 8px; }
 
+
+
+
+
   button {
+
+
     margin: 2px;
+
+
   }
+
+
+
+
 
   .preset-amounts {
+
+
     padding: 4px;
+
+
     border-radius: 14px;
+
+
     background: rgba(255,255,255,0.6);
+
+
     box-shadow: var(--elev-1);
+
+
   }
+
+
   .dark-mode .preset-amounts {
+
+
     background: rgba(30,30,30,0.6);
+
+
     box-shadow: var(--elev-1);
+
+
   }
+
+
   .preset-btn {
+
+
     box-shadow: var(--elev-1);
+
+
   }
+
+
+
+
 
   @media (max-width: 600px) {
+
+
     #modal-sleep .sheet {
+
+
       margin: 12px;
+
+
     }
+
+
     #modal-sleep .sheet .stack {
+
+
       gap: 12px;
+
+
     }
+
+
   }
+
+
+
+
 
   /* --- Mobile UX Optimizations --- */
+
+
   :root {
+
+
     --gap-stack: 12px;
+
+
     --container-padding: 16px;
+
+
     --safe-top: env(safe-area-inset-top, 20px);
+
+
   }
+
+
+
+
 
   body {
+
+
     min-height: 100vh;
+
+
     min-height: 100dvh;
+
+
     /* Prevent bounce on iOS if content fits */
+
+
     overscroll-behavior-y: none; 
+
+
   }
+
+
+
+
 
   #app-container {
+
+
     /* Use safe area for top padding, plus a bit of breathing room */
+
+
     padding-top: max(var(--safe-top), 12px);
+
+
     padding-left: var(--container-padding);
+
+
     padding-right: var(--container-padding);
+
+
     padding-bottom: 80px; /* Space for potential bottom nav or just scroll clearance */
+
+
     gap: var(--gap-stack);
+
+
     width: 100%;
+
+
     max-width: 600px;
+
+
     margin: 0 auto;
+
+
     box-sizing: border-box;
+
+
   }
+
+
+
+
 
   /* Compact Header */
+
+
   .title-bar {
+
+
     margin-bottom: 0;
+
+
     padding: 4px 0;
+
+
     display: flex;
+
+
     align-items: center;
+
+
     justify-content: space-between;
+
+
   }
+
+
   .title-bar h1 {
+
+
     font-size: 1.35rem;
+
+
     letter-spacing: -0.02em;
+
+
   }
+
+
   .theme-toggle {
+
+
     transform: scale(0.9);
+
+
     transform-origin: right center;
+
+
   }
+
+
+
+
 
   /* Compact Profile Card */
+
+
   #leo-card {
+
+
     padding: 8px 12px;
+
+
     border-radius: 16px;
+
+
     min-height: auto;
+
+
     margin-bottom: 4px;
+
+
     background: rgba(255,255,255,0.7);
+
+
     backdrop-filter: blur(12px);
+
+
     box-shadow: var(--elev-1);
+
+
   }
+
+
   .dark-mode #leo-card {
+
+
     background: rgba(30,30,30,0.6);
+
+
   }
+
+
   #avatar-btn {
+
+
     width: 44px;
+
+
     height: 44px;
+
+
     font-size: 1.5rem;
+
+
   }
+
+
   .leo-name {
+
+
     font-size: 1.05rem;
+
+
     font-weight: 700;
+
+
   }
+
+
   #leo-summary-info {
+
+
     font-size: 0.8rem;
+
+
     opacity: 0.8;
+
+
   }
+
+
+
+
 
   /* Optimized Action Grid */
+
+
   .primary-actions {
+
+
     display: grid;
+
+
     grid-template-columns: repeat(2, 1fr);
+
+
     gap: 10px;
+
+
     margin-bottom: 8px;
+
+
   }
+
+
   .primary-actions .btn {
+
+
     padding: 10px 12px;
+
+
     height: auto;
+
+
     min-height: 52px;
+
+
     display: flex;
+
+
     align-items: center;
+
+
     justify-content: center;
+
+
     gap: 8px;
+
+
     font-size: 0.95rem;
+
+
     font-weight: 600;
+
+
     border-radius: 14px;
+
+
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+
+
   }
+
+
   .primary-actions .btn-icon {
+
+
     font-size: 1.25rem;
+
+
     margin: 0;
+
+
   }
+
+
+
+
 
   /* Compact Dashboard Summaries */
+
+
   .report-line {
+
+
     padding: 10px 14px;
+
+
     margin: 0;
+
+
     border-radius: 14px;
+
+
     font-size: 0.85rem;
+
+
     display: flex;
+
+
     flex-wrap: wrap;
+
+
     gap: 6px 10px;
+
+
     align-items: center;
+
+
     background: var(--bg-card, rgba(255,255,255,0.65));
+
+
     backdrop-filter: blur(10px);
+
+
     border: 1px solid rgba(255,255,255,0.2);
+
+
   }
+
+
   .dark-mode .report-line {
+
+
     background: rgba(40,40,40,0.6);
+
+
     border-color: rgba(255,255,255,0.05);
+
+
   }
+
+
   .report-line strong {
+
+
     font-size: 0.9rem;
+
+
     margin-right: auto;
+
+
     color: var(--text-main);
+
+
   }
+
+
   .report-line span, .kpi-pill {
+
+
     background: rgba(0,0,0,0.04);
+
+
     padding: 3px 8px;
+
+
     border-radius: 6px;
+
+
     font-weight: 500;
+
+
     color: var(--text-muted);
+
+
   }
+
+
   .dark-mode .report-line span, .dark-mode .kpi-pill {
+
+
     background: rgba(255,255,255,0.08);
+
+
     color: rgba(255,255,255,0.8);
+
+
   }
+
+
+
+
 
   /* History Section Tweaks */
+
+
   .section-head {
+
+
     margin-top: 8px;
+
+
     margin-bottom: 8px;
+
+
     padding: 0 2px;
+
+
   }
+
+
   .history-item {
+
+
     margin-bottom: 8px;
+
+
     border-radius: 14px;
+
+
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+
+
   }
+
+
   .history-item-foreground {
+
+
     padding: 10px 14px;
+
+
     background: var(--bg-card, rgba(255,255,255,0.65));
+
+
     backdrop-filter: blur(10px);
+
+
     border: 1px solid rgba(255,255,255,0.2);
+
+
     border-radius: 14px;
+
+
   }
+
+
   .dark-mode .history-item-foreground {
+
+
     background: rgba(40,40,40,0.6);
+
+
     border-color: rgba(255,255,255,0.05);
+
+
   }
+
+
   .item-title {
+
+
     font-size: 0.95rem;
+
+
     margin-bottom: 2px;
+
+
   }
+
+
   .item-meta {
+
+
     font-size: 0.8rem;
+
+
   }
+
+
+
+
 
   /* Focus Mode Overlay */
+
+
   .focus-overlay {
+
+
     position: fixed;
+
+
     inset: 0;
+
+
     background-color: #000;
+
+
     background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--hero-image);
+
+
     background-position: center;
+
+
     background-size: cover;
+
+
     color: #fff;
+
+
     z-index: 2000;
+
+
     display: flex;
+
+
     flex-direction: column;
+
+
     align-items: center;
+
+
     justify-content: center;
+
+
     opacity: 0;
+
+
     pointer-events: none;
+
+
     transition: opacity 0.3s ease;
+
+
     padding: 24px;
+
+
   }
+
+
   .focus-overlay.active {
+
+
     opacity: 1;
+
+
     pointer-events: auto;
+
+
   }
+
+
   .focus-minimize-btn {
+
+
     position: absolute;
+
+
     top: max(20px, env(safe-area-inset-top));
+
+
     right: 20px;
+
+
     background: rgba(255,255,255,0.2);
+
+
     border: none;
+
+
     color: #fff;
+
+
     width: 44px;
+
+
     height: 44px;
+
+
     border-radius: 50%;
+
+
     font-size: 1.5rem;
+
+
     display: flex;
+
+
     align-items: center;
+
+
     justify-content: center;
+
+
   }
+
+
   .focus-content {
+
+
     display: flex;
+
+
     flex-direction: column;
+
+
     align-items: center;
+
+
     gap: 32px;
+
+
     width: 100%;
+
+
     max-width: 400px;
+
+
   }
+
+
   .focus-icon { font-size: 4rem; }
+
+
   .focus-label { font-size: 1.5rem; font-weight: 600; opacity: 0.8; margin: 0; }
+
+
   .focus-timer { font-size: 5rem; font-weight: 200; font-variant-numeric: tabular-nums; line-height: 1; }
+
+
   .focus-meta { font-size: 1.2rem; opacity: 0.6; }
+
+
   .focus-action-btn {
+
+
     width: 100%;
+
+
     padding: 20px;
+
+
     font-size: 1.2rem;
+
+
     border-radius: 20px;
+
+
     background: #ff3b30;
+
+
     color: white;
+
+
     border: none;
+
+
     font-weight: 600;
+
+
   }
+
+
   .btn-focus-toggle {
+
+
     background: transparent;
+
+
     border: 1px solid currentColor;
+
+
     color: inherit;
+
+
     opacity: 0.6;
+
+
     width: 36px;
+
+
     height: 36px;
+
+
     border-radius: 50%;
+
+
     display: inline-flex;
+
+
     align-items: center;
+
+
     justify-content: center;
+
+
     margin-left: 8px;
+
+
     vertical-align: middle;
+
+
   }
+
+
+
+
 
   /* Bottle Panel UX Improvements */
+
+
   .bottle-time-summary {
+
+
     display: flex;
+
+
     align-items: center;
+
+
     justify-content: center;
+
+
     gap: 8px;
+
+
     padding: 10px 16px;
+
+
     background: rgba(0,0,0,0.03);
+
+
     border-radius: 12px;
+
+
     margin: 2px 0;
+
+
     font-size: 0.95rem;
+
+
     color: var(--text-main);
+
+
     cursor: pointer;
+
+
     transition: background 0.2s;
+
+
     user-select: none;
+
+
   }
+
+
   .bottle-time-summary:active { background: rgba(0,0,0,0.06); }
+
+
   .bottle-time-summary .icon-edit { opacity: 0.5; font-size: 1.1em; }
+
+
   
+
+
   .bottle-details-wrapper {
+
+
     display: grid;
+
+
     grid-template-rows: 0fr;
+
+
     transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+
     overflow: hidden;
+
+
   }
+
+
   .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
+
+
   .bottle-details-inner { min-height: 0; padding: 4px 2px; display: none; }
+
+
   .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
 
+
+
+
+
   /* Botón Guardar Biberón Destacado */
+
+
   #save-biberon {
+
+
     background-color: #ff9f0a; /* Naranja vibrante */
+
+
     font-size: 1.2rem;
+
+
     font-weight: 800;
+
+
     padding: 16px;
+
+
     margin-top: 16px;
+
+
     box-shadow: 0 4px 15px rgba(255, 159, 10, 0.4);
+
+
     border: none;
+
+
     transition: transform 0.2s, background-color 0.3s;
+
+
   }
+
+
+
+
 
   #save-biberon.save-biberon {
+
+
     animation: bounce-confirm 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+
     background-color: #34c759; /* Verde éxito */
+
+
   }
+
+
+
+
 
   @keyframes bounce-confirm {
+
+
     0% { transform: scale(1); }
+
+
     25% { transform: scale(0.9); }
+
+
     50% { transform: scale(1.1); }
+
+
     75% { transform: scale(0.95); }
+
+
     100% { transform: scale(1); }
+
+
   }
+
+
+
+
 
   /* Timeline View Enhancements */
+
+
   .list {
+
+
     position: relative;
+
+
     padding-left: 0;
+
+
   }
+
+
   
+
+
   /* Continuous vertical line */
+
+
   .list::before {
+
+
     content: '';
+
+
     position: absolute;
+
+
     top: 12px;
+
+
     bottom: 20px;
+
+
     left: 15px;
+
+
     width: 2px;
+
+
     background: rgba(0,0,0,0.08);
+
+
     z-index: 0;
+
+
   }
+
+
   .dark-mode .list::before {
+
+
     background: rgba(255,255,255,0.1);
+
+
   }
+
+
+
+
 
   .history-day-header {
+
+
     position: relative;
+
+
     z-index: 1;
+
+
     padding-left: 42px;
+
+
     margin-bottom: 12px;
+
+
   }
+
+
+
+
 
   .history-item {
+
+
     margin-left: 34px;
+
+
     position: relative;
+
+
     overflow: visible !important;
+
+
   }
+
+
+
+
 
   /* Timeline Dot */
+
+
   .history-item::after {
+
+
     content: '';
+
+
     position: absolute;
+
+
     left: -24px; /* Aligns with the line at left:15px relative to parent list */
+
+
     top: 20px;
+
+
     width: 12px;
+
+
     height: 12px;
+
+
     border-radius: 50%;
+
+
     background: var(--bg-card, #fff);
+
+
     border: 3px solid #ccc;
+
+
     z-index: 1;
+
+
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+
   }
+
+
+
+
 
   /* Type Colors for Timeline Dots */
+
+
   .history-item.type-feed::after { border-color: #0a84ff; }
+
+
   .history-item.type-elim::after { border-color: #34c759; }
+
+
   .history-item.type-med::after { border-color: #ff9f0a; }
+
+
   .history-item.type-sleep::after { border-color: #5e5ce6; }
+
+
   .history-item.type-pump::after { border-color: #af52de; }
+
+
   .history-item.type-measurement::after { border-color: #ff3b30; }
+
+
   .history-item.type-milestone::after { border-color: #ffd60a; }
 
+
+
+
+
   /* Day Header Dot */
+
+
   .history-day-header::before {
+
+
     content: '';
+
+
     position: absolute;
+
+
     left: 12px;
+
+
     top: 50%;
+
+
     transform: translateY(-50%);
+
+
     width: 8px;
+
+
     height: 8px;
+
+
     background: var(--text-muted);
+
+
     border-radius: 50%;
+
+
     opacity: 0.5;
+
+
     box-shadow: 0 0 0 4px var(--bg-body, #f7fafd); /* Mask line */
+
+
   }
+
+
   .dark-mode .history-day-header::before {
+
+
     box-shadow: 0 0 0 4px #000;
+
+
   }
+
+
+
+
 
   .pump-confirm-panel {
+
+
     box-shadow: 0 16px 48px -4px rgba(0, 0, 0, 0.25);
+
+
   }
+
+
 </style>
+
+
 </head>
+
+
 <body>
+
+
   <div id="app-background"></div>
+
+
   <input type="file" id="bg-picker" accept="image/*" style="display:none" />
+
+
   <div class="wrap stack" id="app-container">
+
+
     <div id="save-indicator" class="save-indicator" data-state="idle" aria-live="polite">
+
+
       <span class="save-icon"></span>
+
+
       <span id="save-label" class="save-label">Prêt</span>
+
+
     </div>
+
+
+
+
 
     <div class="title-bar">
+
+
       <h1>Bonjour, maman ✨</h1>
+
+
       <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+
+
         <span class="theme-toggle-track">
+
+
           <span class="theme-toggle-thumb"></span>
+
+
         </span>
+
+
         <span class="theme-toggle-label">Mode nuit</span>
+
+
         <span class="theme-toggle-gear" id="theme-toggle-gear" aria-hidden="true">
+
+
           <span class="icon-settings"></span>
+
+
         </span>
+
+
       </button>
+
+
       <button class="icon-btn icon-btn-secondary icon-only" id="settings-btn" type="button" aria-label="Réglages" style="display:none">
+
+
         <span class="icon-settings" aria-hidden="true"></span>
+
+
       </button>
+
+
     </div>
+
+
+
+
 
     <!-- Avatar Léo -->
+
+
     <div class="card row row-center" id="leo-card">
+
+
       <button class="avatar avatar-btn" id="avatar-btn" type="button">🍼</button>
+
+
       <div class="col">
+
+
         <button class="info-btn" id="info-btn" type="button">
+
+
           <div class="leo-name">Léo</div>
+
+
           <div class="muted" id="leo-summary-info">Touchez pour voir les informations</div>
+
+
         </button>
+
+
       </div>
+
+
       <button class="chevron-btn" id="info-chevron" type="button" aria-label="Infos Léo">›</button>
+
+
     </div>
 
-    <div class="bottle-next-hint" id="bottle-next-hint" aria-live="polite" data-state="wait">Calcul en cours...</div>
 
-    <!-- Actions principales -->
-    <div class="primary-actions">
-      <button class="btn btn-primary btn-heartbeat" id="btn-leche" aria-label="Enregistrer une tétée ou un biberon">
-        <span class="btn-icon">🍼</span> Lait
-      </button>
+
+
+
+        <section class="focus-panel" id="milk-focus" aria-label="Résumé lait">
+      <div class="focus-head">
+        <div class="focus-title">
+          <span class="focus-panel-icon" aria-hidden="true">🍼</span>
+          <div>
+            <div class="focus-panel-label">Lait</div>
+            <div class="focus-sub" id="milk-age">Âge: --</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-compact" id="btn-milk-details" type="button">Détails</button>
+      </div>
+
+      <div class="focus-kpis">
+        <div class="kpi-card">
+          <div class="kpi-label">Dernière prise</div>
+          <div class="kpi-value" id="milk-last-value">--</div>
+          <div class="kpi-meta" id="milk-last-meta">Aucune donnée</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total du jour</div>
+          <div class="kpi-value" id="milk-total-value">--</div>
+          <div class="kpi-meta" id="milk-total-meta">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Depuis la dernière</div>
+          <div class="kpi-value" id="milk-since-value">--</div>
+          <div class="kpi-meta" id="milk-since-meta">—</div>
+        </div>
+      </div>
+
+      <div class="focus-reco" id="milk-reco-line">Repère indicatif: —</div>
+      <div class="bottle-next-hint" id="bottle-next-hint" aria-live="polite" data-state="wait">Calcul en cours...</div>
+
+      <div class="focus-actions">
+        <button class="btn btn-primary btn-heartbeat" id="btn-breast" aria-label="Enregistrer une tétée">
+          <span class="btn-icon">🤱</span> Sein
+        </button>
+        <button class="btn btn-primary btn-heartbeat" id="btn-bottle" aria-label="Enregistrer un biberon">
+          <span class="btn-icon">🍼</span> Biberon
+        </button>
+      </div>
+    </section>
+
+    <div class="quick-actions" id="quick-actions" aria-label="Actions rapides">
       <button class="btn btn-success btn-heartbeat" id="btn-elim" aria-label="Enregistrer un changement de couche ou un vomi">
         <span class="btn-icon">🚼</span> Couche
+      </button>
+      <button class="btn btn-sleep btn-heartbeat" id="btn-sleep" type="button" aria-label="Enregistrer le sommeil">
+        <span class="btn-icon">💤</span> Sommeil
       </button>
       <button class="btn btn-warning btn-heartbeat" id="btn-med" aria-label="Enregistrer un médicament">
         <span class="btn-icon">💊</span> Médicaments
@@ -556,786 +1680,2325 @@
       <button class="btn btn-info btn-heartbeat" id="btn-mesures" aria-label="Enregistrer la température, le poids ou la taille">
         <span class="btn-icon">🌡️</span> Mesures
       </button>
-      <button class="btn btn-sleep btn-heartbeat" id="btn-sleep" type="button" aria-label="Enregistrer le sommeil">
-        <span class="btn-icon">💤</span> Sommeil
-      </button>
       <button class="btn btn-primary btn-heartbeat" id="btn-pump" type="button" aria-label="Tirer le lait">
-        <span class="btn-icon">🍼</span> Tirer le lait
+        <span class="btn-icon">🥛</span> Tirer le lait
       </button>
     </div>
-
-    <div class="report-line" id="dashboard-elim"></div>
-    <div class="report-line" id="summary-feed"></div>
-    <div class="report-line" id="summary-sleep"></div>
 
     <!-- Historial -->
+
+
     <div class="stack">
+
+
       <div class="section-head">
+
+
         <div class="view-switcher">
+
+
           <button class="icon-btn" id="history-range-btn" type="button" aria-haspopup="true"  aria-label="Changer la période du rapport">
+
+
             <span class="icon-calendar" aria-hidden="true"></span>
+
+
             <span class="label" id="history-range-label">Aujourd'hui</span>
-            <span class="caret" aria-hidden="true">▾</span>
+
+
+            <span class="caret" aria-hidden="true">â–¾</span>
+
+
           </button>
+
+
           <span class="pill" id="count-pill">0</span>
+
+
           <button class="icon-btn icon-btn-secondary icon-only" id="export-pdf" type="button" aria-label="Exporter le rapport en PDF" style="margin-left: auto;">
+
+
             <span class="icon-export" aria-hidden="true"></span>
+
+
             <span class="spinner" aria-hidden="true"></span>
+
+
           </button>
+
+
           <button class="icon-btn icon-btn-secondary icon-only" id="export-csv" type="button" aria-label="Exporter en CSV" style="margin-left: 4px;">
+
+
             <span style="font-size: 0.7rem; font-weight: 800; letter-spacing: -0.5px;">CSV</span>
+
+
           </button>
+
+
           <div class="range-menu" id="history-range-menu" role="menu" aria-labelledby="history-range-btn">
+
+
             <button class="range-option active" type="button" data-range="day" role="menuitemradio" aria-checked="true">
+
+
               <span class="icon-calendar" aria-hidden="true"></span>
+
+
               <span>Jour actuel</span>
+
+
             </button>
+
+
             <button class="range-option" type="button" data-range="week" role="menuitemradio" aria-checked="false">
+
+
               <span class="icon-calendar" aria-hidden="true"></span>
+
+
               <span>7 derniers jours</span>
+
+
             </button>
+
+
             <button class="range-option" type="button" data-range="month" role="menuitemradio" aria-checked="false">
+
+
               <span class="icon-calendar" aria-hidden="true"></span>
+
+
               <span>30 derniers jours</span>
+
+
             </button>
+
+
             <div class="range-option range-option-custom" data-range="custom" role="menuitemradio" aria-checked="false" tabindex="-1">
+
+
               <button class="range-option-custom-trigger" type="button">
+
+
                 <span class="icon-calendar" aria-hidden="true"></span>
+
+
                 <span>Choisir une date</span>
+
+
               </button>
+
+
               <input class="range-date-input" id="history-range-date" type="date" aria-label="Sélectionner une date spécifique" />
+
+
             </div>
+
+
           </div>
+
+
         </div>
+
+
         <div class="history-actions">
+
+
           <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuellement</button>
+
+
           <button class="btn btn-ghost btn-compact btn-stats" id="btn-stats" type="button"><span class="btn-icon">📈</span> Statistiques</button>
+
+
           <button class="btn btn-ghost btn-compact" id="btn-milestones" type="button"><span class="btn-icon">🏆</span> Étapes</button>
+
+
         </div>
+
+
         <div class="selection-actions is-hidden" id="selection-actions">
+
+
           <button class="btn btn-ghost" id="cancel-select-btn" type="button">Annuler</button>
+
+
           <button class="btn btn-danger" id="delete-selected-btn" type="button" disabled>
+
+
             <span class="btn-icon">🗑️</span> Supprimer la sélection (0)
+
+
           </button>
+
+
         </div>
+
+
       </div>
+
+
       <div class="list" id="history"></div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Focus Overlay -->
+
+
   <div id="focus-overlay" class="focus-overlay" aria-hidden="true">
+
+
     <button class="focus-minimize-btn" id="focus-minimize-btn" aria-label="Réduire">✕</button>
+
+
     <div class="focus-content">
+
+
       <div class="focus-icon" id="focus-icon">⏱️</div>
+
+
       <h2 class="focus-label" id="focus-label">Activité</h2>
+
+
       <div class="focus-timer" id="focus-timer">00:00</div>
+
+
       <div class="focus-meta" id="focus-meta"></div>
+
+
       <button class="focus-action-btn" id="focus-action-btn">Arrêter</button>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
     <div class="modal" id="modal-pump" aria-hidden="true">
+
+
       <div class="sheet stack">
+
+
         <div class="modal-header">
+
+
           <h2>Tirer mon lait</h2>
+
+
           <button class="modal-close" id="close-pump" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
         </div>
+
+
         <section class="pump-card" id="pump-card" aria-labelledby="pump-card-title">
+
+
   <div class="pump-card-head">
+
+
     <div>
+
+
       <p class="pump-label" id="pump-card-title">Tirer mon lait</p>
+
+
     </div>
+
+
     <span class="pump-icon" id="pump-icon" aria-hidden="true">Léo</span>
+
+
   </div>
 
+
+
+
+
   <div class="pump-display" aria-live="polite">
+
+
     <span class="pump-timer" id="pump-timer">00:00</span>
+
+
   </div>
+
+
+
+
 
   <button class="btn btn-pump btn-heartbeat" id="pump-control" type="button">Démarrer</button>
 
+
+
+
+
   <div class="pump-confirm-panel" id="pump-confirm-panel" aria-live="polite">
+
+
     <div class="pump-confirm-row">
+
+
       <span class="pump-confirm-label">Durée</span>
+
+
       <span class="pump-confirm-value" id="pump-confirm-duration">00:00</span>
+
+
     </div>
+
+
     <div class="pump-confirm-row">
+
+
       <span class="pump-confirm-label">Lait</span>
+
+
       <div class="pump-stepper" role="group" aria-label="Quantité en ml">
+
+
         <button type="button" class="pump-step-btn" id="pump-amount-down" aria-label="Moins">-</button>
+
+
         <span class="pump-amount-value" id="pump-amount-value">160 ml</span>
+
+
         <button type="button" class="pump-step-btn" id="pump-amount-up" aria-label="Plus">+</button>
+
+
       </div>
+
+
     </div>
+
+
     <div class="pump-confirm-actions">
+
+
       <button class="btn btn-primary pump-save" id="pump-save-intent" type="button">Enregistrer</button>
+
+
       <button class="btn btn-ghost pump-cancel" id="pump-cancel-intent" type="button">Annuler</button>
+
+
     </div>
-  </div>
-</section>
-    </div>
+
+
   </div>
 
-    <div class="micro-modal" id="pump-confirm-modal" aria-hidden="true">
-      <div class="micro-modal-sheet">
-        <p class="micro-modal-title" id="pump-confirm-title">Enregistrer ?</p>
-        <p class="micro-modal-line" id="pump-confirm-amount">Lait : 160 ml</p>
-        <p class="micro-modal-line" id="pump-confirm-time">Durée : 00:00</p>
-        <div class="micro-modal-actions">
-          <button class="btn btn-primary" id="pump-confirm-yes" type="button">Oui, enregistrer</button>
-          <button class="btn btn-ghost" id="pump-confirm-adjust" type="button">Ajuster</button>
-        </div>
-      </div>
+
+</section>
+
+
     </div>
+
+
+  </div>
+
+
+
+
+
+    <div class="micro-modal" id="pump-confirm-modal" aria-hidden="true">
+
+
+      <div class="micro-modal-sheet">
+
+
+        <p class="micro-modal-title" id="pump-confirm-title">Enregistrer ?</p>
+
+
+        <p class="micro-modal-line" id="pump-confirm-amount">Lait : 160 ml</p>
+
+
+        <p class="micro-modal-line" id="pump-confirm-time">Durée : 00:00</p>
+
+
+        <div class="micro-modal-actions">
+
+
+          <button class="btn btn-primary" id="pump-confirm-yes" type="button">Oui, enregistrer</button>
+
+
+          <button class="btn btn-ghost" id="pump-confirm-adjust" type="button">Ajuster</button>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+
+
+
 
 
 
   <!-- Modal LAIT -->
+
+
   <div class="modal" id="modal-leche" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Lait</h2>
+
+
         <button class="modal-close" id="close-leche" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
 
+
+
+
+
       <div class="seg">
+
+
         <button id="seg-pecho" class="active">Sein</button>
+
+
         <button id="seg-biberon">Biberon</button>
+
+
       </div>\r\n\r\n      <div class="stack" id="feed-content">
+
+
         <!-- Pecho -->
+
+
         <div id="pane-pecho" class="stack pane-content">
+
+
           <div class="seg seg-sides">
+
+
             <button id="side-left" class="active">Gauche</button>
+
+
             <button id="side-right">Droite</button>
+
+
           </div>
+
+
           <div class="text-center">
-            <div class="time-row"><div class="time" id="chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="breast" aria-label="Mode focus">⛶</button></div>
+
+
+            <div class="time-row"><div class="time" id="chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="breast" aria-label="Mode focus">â›¶</button></div>
+
+
             <div id="start-time-display" class="muted"></div>
+
+
             <button class="btn btn-primary" id="startStop">Démarrer</button>
+
+
           </div>
+
+
         </div>
+
+
+
+
 
         <!-- Biberón -->
+
+
         <div id="pane-biberon" class="stack">
+
+
           <div class="text-center">
-            <div class="time-row"><div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle" aria-label="Mode focus" style="display: none;">⛶</button></div>
+
+
+            <div class="time-row"><div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle" aria-label="Mode focus" style="display: none;">â›¶</button></div>
+
+
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
+
+
           </div>
+
+
+
+
 
           <!-- Summary / Edit Toggle -->
+
+
           <div id="bottle-time-summary" class="bottle-time-summary" role="button" tabindex="0" aria-expanded="false" aria-label="Modifier l'heure">
+
+
             <span id="bottle-time-label">Aujourd'hui</span>
+
+
             <span class="icon-edit">✏️</span>
+
+
           </div>
 
+
+
+
+
           <div id="bottle-details-wrapper" class="bottle-details-wrapper">
+
+
             <div class="bottle-details-inner">
+
+
               <div class="form-grid">
+
+
                 <div class="field"><label for="bottle-start">Début</label><input id="bottle-start" class="input" type="datetime-local" /></div>
+
+
                 <div class="field"><label for="bottle-end">Fin</label><input id="bottle-end" class="input" type="datetime-local" /></div>
+
+
               </div>
+
+
               <div class="bottle-edit-actions">
+
+
                 <button type="button" class="btn btn-ghost btn-compact" id="cancel-bottle-time">Annuler</button>
+
+
                 <button type="button" class="btn btn-ghost btn-compact btn-primary" id="confirm-bottle-time">Valider</button>
+
+
               </div>
+
+
             </div>
+
+
           </div>
+
+
           <div id="bottle-form" class="stack">
+
+
             <div class="field field-padded" id="bottle-amount-field">
+
+
               <label for="ml">Quantité (ml)</label>
+
+
               <div class="bottle-amount-control">
+
+
                 <button type="button" class="circle-btn volume-step" id="bottle-decrease" aria-label="Retirer 10 ml">-10</button>
+
+
                 <div class="bottle-amount-input">
+
+
                   <input id="ml" class="input" type="number" inputmode="decimal" step="10" min="0" placeholder="ex. 130" />
+
+
                   <div id="bottle-amount-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez</div>
+
+
                 </div>
+
+
                 <button type="button" class="circle-btn volume-step" id="bottle-increase" aria-label="Ajouter 10 ml">+10</button>
+
+
               </div>
+
+
               <div class="preset-amounts" id="bottle-preset-buttons" role="group" aria-label="Quantités suggérées">
+
+
                 <button type="button" class="preset-btn" data-value="100">100 ml</button>
+
+
                 <button type="button" class="preset-btn" data-value="130">130 ml</button>
+
+
                 <button type="button" class="preset-btn" data-value="150">150 ml</button>
+
+
                 <button type="button" class="preset-btn" data-value="180">180 ml</button>
+
+
               </div>
+
+
             </div>
+
+
             <button class="btn btn-primary" id="save-biberon">Enregistrer</button>
+
+
           </div>
+
+
         </div>
+
+
+
+
+
+
 
 
         <div class="stack" id="feed-history-section">
+
+
           <strong>Aujourd'hui</strong>
+
+
           <div class="list" id="feed-history"></div>
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal SOMMEIL -->
+
+
   <div class="modal" id="modal-sleep" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Sommeil</h2>
+
+
         <button class="modal-close" id="close-sleep" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
       <div class="stack">
+
+
         <div class="text-center">
-          <div class="time-row"><div class="time" id="sleep-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="sleep" aria-label="Mode focus">⛶</button></div>
+
+
+          <div class="time-row"><div class="time" id="sleep-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="sleep" aria-label="Mode focus">â›¶</button></div>
+
+
           <div class="muted" id="sleep-start-time-display"></div>
+
+
           <button class="btn btn-primary" id="startStopSleep" type="button">Démarrer</button>
+
+
         </div>
+
+
         <div class="form-grid">
+
+
           <div class="field">
+
+
             <label for="sleep-start">Début</label>
+
+
             <input id="sleep-start" class="input" type="datetime-local" />
+
+
           </div>
+
+
           <div class="field">
+
+
             <label for="sleep-end">Fin</label>
+
+
             <input id="sleep-end" class="input" type="datetime-local" />
+
+
           </div>
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="sleep-notes">Notes</label>
+
+
           <textarea id="sleep-notes" class="input textarea" rows="2" placeholder="Sieste, nuit complète, etc."></textarea>
+
+
         </div>
+
+
         <div class="footer">
+
+
           <button class="btn btn-ghost btn-danger" id="cancel-sleep" type="button">Annuler</button>
+
+
           <button class="btn btn-primary" id="save-sleep" type="button">Enregistrer</button>
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
+
   </div>
 
+
+
+
+
   <!-- Modal Éliminations -->
+
+
   <div class="modal" id="modal-elim" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Pipi / Caca / Vomi</h2>
+
+
         <button class="modal-close" id="close-elim" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
 
+
+
+
+
       <div class="stack">
+
+
         <div class="field">
+
+
           <label>Pipi</label>
+
+
           <div class="scale" data-scale="pee"></div>
+
+
         </div>
+
+
         <div class="field">
+
+
           <label>Caca</label>
+
+
           <div class="scale" data-scale="poop"></div>
+
+
         </div>
+
+
         <div class="field">
+
+
           <label>Vomi</label>
+
+
           <div class="scale" data-scale="vomit"></div>
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="report-line" id="summary-elim"></div>
 
+
+
+
+
       <div class="footer">
+
+
         <button class="btn btn-ghost btn-danger" id="cancel-elim">Annuler</button>
+
+
         <button class="btn btn-primary" id="save-elim">Enregistrer</button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal MEDICAMENTS -->
+
+
   <div class="modal" id="modal-med" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Medicaments</h2>
+
+
         <button class="modal-close" id="close-med" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
+
+
 
       <div class="stack">
+
+
         <div class="field">
+
+
           <label for="medication-select">Choisir un medicament</label>
+
+
           <select id="medication-select" class="input">
+
+
             <option value="ibufrone">Ibufrone</option>
+
+
             <option value="dalfalgan">Dalfalgan</option>
+
+
             <option value="other">Autres...</option>
+
+
           </select>
+
+
         </div>
+
+
         <div class="field is-hidden" id="medication-other-field">
+
+
           <label for="medication-other">Nom du medicament</label>
+
+
           <input id="medication-other" class="input" type="text" placeholder="Nom du medicament" />
+
+
         </div>
+
+
         <div class="report-line" id="summary-med"></div>
+
+
       </div>
 
+
+
+
+
       <div class="footer">
+
+
         <button class="btn btn-ghost btn-danger" id="cancel-med" type="button">Annuler</button>
+
+
         <button class="btn btn-primary" id="save-med" type="button">Enregistrer</button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal MESURES -->
+
+
   <div class="modal" id="modal-mesures" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Mesures</h2>
+
+
         <button class="modal-close" id="close-mesures" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid">
+
+
         <div class="field">
+
+
           <label for="mesure-temp">Température (°C)</label>
+
+
           <input id="mesure-temp" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 37.5" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="mesure-poids">Poids (kg)</label>
+
+
           <input id="mesure-poids" class="input" type="text" inputmode="decimal" step="0.01" placeholder="ex. 4.25" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="mesure-taille">Taille (cm)</label>
+
+
           <input id="mesure-taille" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 55.5" />
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="stat-card" style="padding:16px; gap:12px">
+
+
         <div class="stat-card-head">
+
+
           <span class="stat-pill">Croissance</span>
+
+
           <span class="stat-pill stat-pill-muted">Historique</span>
+
+
         </div>
-        <div class="muted" id="mesures-growth-summary">Ajoutez un poids / une taille pour voir l’évolution.</div>
+
+
+        <div class="muted" id="mesures-growth-summary">Ajoutez un poids / une taille pour voir l'évolution.</div>
+
+
         <div class="growth-history" id="mesures-growth-history"></div>
+
+
       </div>
 
+
+
+
+
       <div class="footer">
+
+
         <button class="btn btn-ghost btn-danger" id="cancel-mesures" type="button">Annuler</button>
+
+
         <button class="btn btn-primary" id="save-mesures" type="button">Enregistrer</button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal MANUAL -->
+
+
   <div class="modal" id="modal-manual" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="row modal-header">
+
+
         <h2>Nouvel enregistrement</h2>
+
+
         <button class="modal-close" id="close-manual" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
+
+
 
       <div class="seg" id="manual-type">
+
+
         <button data-type="feed" class="active" type="button"><span class="btn-icon">🍼</span> Lait</button>
+
+
         <button data-type="elim" type="button"><span class="btn-icon">🚼</span> Couche</button>
+
+
         <button data-type="med" type="button"><span class="btn-icon">💊</span> Médicaments</button>
+
+
         <button data-type="measurement" type="button"><span class="btn-icon">🌡️</span> Mesures</button>
+
+
         <button data-type="pump" type="button"><span class="btn-icon">🌀</span> Tire-lait</button>
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid" id="manual-feed-fields">
+
+
         <div class="field span-2">
+
+
           <label for="manual-source">Source</label>
+
+
           <select id="manual-source" class="input">
+
+
             <option value="breast">Sein</option>
+
+
             <option value="bottle">Biberon</option>
+
+
           </select>
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-breast">Côté</label>
+
+
           <select id="manual-breast" class="input">
+
+
             <option value="Gauche">Gauche</option>
+
+
             <option value="Droite">Droite</option>
+
+
             <option value="Les deux">Les deux</option>
+
+
           </select>
+
+
         </div>
+
+
         <div class="field" id="manual-duration-field">
+
+
           <label for="manual-duration">Durée (minutes)</label>
+
+
           <input id="manual-duration" class="input" type="text" inputmode="numeric" min="0" step="1" placeholder="ex. 12" />
+
+
         </div>
+
+
         <div class="field is-hidden" id="manual-amount-field">
+
+
           <label for="manual-amount">Quantité (ml)</label>
+
+
           <div class="bottle-amount-control">
+
+
             <button type="button" class="circle-btn volume-step" id="manual-bottle-decrease" aria-label="Retirer 10 ml">-10</button>
+
+
             <div class="bottle-amount-input">
+
+
               <input id="manual-amount" class="input" type="number" inputmode="decimal" min="0" step="10" placeholder="ex. 120" />
+
+
               <div id="manual-bottle-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez</div>
+
+
             </div>
+
+
             <button type="button" class="circle-btn volume-step" id="manual-bottle-increase" aria-label="Ajouter 10 ml">+10</button>
+
+
           </div>
+
+
           <div class="preset-amounts" id="manual-bottle-preset-buttons" role="group" aria-label="Quantités suggérées">
+
+
             <button type="button" class="preset-btn" data-value="90">90 ml</button>
+
+
             <button type="button" class="preset-btn" data-value="120">120 ml</button>
+
+
             <button type="button" class="preset-btn" data-value="130">130 ml</button>
+
+
             <button type="button" class="preset-btn" data-value="140">140 ml</button>
+
+
             <button type="button" class="preset-btn" data-value="150">150 ml</button>
+
+
           </div>
+
+
         </div>
+
+
                 <div class="field is-hidden" id="manual-bottle-start-field">
+
+
           <label for="manual-bottle-start">Début</label>
+
+
           <input id="manual-bottle-start" class="input" type="datetime-local" />
+
+
         </div>
+
+
         <div class="field is-hidden" id="manual-bottle-end-field">
+
+
           <label for="manual-bottle-end">Fin</label>
+
+
           <input id="manual-bottle-end" class="input" type="datetime-local" />
+
+
         </div><div class="field span-2">
+
+
           <label for="manual-notes">Notes</label>
+
+
           <textarea id="manual-notes" class="input textarea" rows="2" placeholder="Observations rapides..."></textarea>
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid is-hidden" id="manual-elim-fields">
+
+
         <div class="field">
+
+
           <label for="manual-pee">Pipi</label>
+
+
           <input id="manual-pee" class="input" type="text" inputmode="numeric" min="0" max="3" step="1" value="0" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-poop">Caca</label>
+
+
           <input id="manual-poop" class="input" type="text" inputmode="numeric" min="0" max="3" step="1" value="0" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-vomit">Vomi</label>
+
+
           <input id="manual-vomit" class="input" type="text" inputmode="numeric" min="0" max="3" step="1" value="0" />
+
+
         </div>
+
+
         <div class="field span-2">
+
+
           <label for="manual-elim-notes">Notes</label>
+
+
           <textarea id="manual-elim-notes" class="input textarea" rows="2" placeholder="Textures, couleurs, etc."></textarea>
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid is-hidden" id="manual-med-fields">
+
+
         <div class="field">
+
+
           <label for="manual-med-select">Médicament</label>
+
+
           <select id="manual-med-select" class="input">
+
+
             <option value="ibufrone">Ibufrone</option>
+
+
             <option value="dalfalgan">Dalfalgan</option>
+
+
             <option value="other">Autres...</option>
+
+
           </select>
+
+
         </div>
+
+
         <div class="field is-hidden" id="manual-med-other-field">
+
+
           <label for="manual-med-other">Nom</label>
+
+
           <input id="manual-med-other" class="input" type="text" placeholder="Nom du medicament" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-med-dose">Dose</label>
+
+
           <input id="manual-med-dose" class="input" type="text" placeholder="ex. 5 ml" />
+
+
         </div>
+
+
         <div class="field span-2">
+
+
           <label for="manual-med-notes">Notes</label>
+
+
           <textarea id="manual-med-notes" class="input textarea" rows="2" placeholder="Réactions, rappel..."></textarea>
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid is-hidden" id="manual-mesures-fields">
+
+
         <div class="field">
+
+
           <label for="manual-mesure-temp">Température (°C)</label>
+
+
           <input id="manual-mesure-temp" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 37.5" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-mesure-poids">Poids (kg)</label>
+
+
           <input id="manual-mesure-poids" class="input" type="text" inputmode="decimal" step="0.01" placeholder="ex. 4.25" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-mesure-taille">Taille (cm)</label>
+
+
           <input id="manual-mesure-taille" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 55.5" />
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid is-hidden" id="manual-pump-fields">
+
+
         <div class="field">
+
+
           <label for="manual-pump-duration">Durée (minutes)</label>
+
+
           <input id="manual-pump-duration" class="input" type="text" inputmode="numeric" min="0" step="1" placeholder="ex. 15" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label for="manual-pump-amount">Quantité (ml)</label>
+
+
           <input id="manual-pump-amount" class="input" type="number" inputmode="decimal" min="0" step="10" placeholder="ex. 120" />
+
+
         </div>
+
+
         <div class="field span-2">
+
+
           <label for="manual-pump-notes">Notes</label>
+
+
           <textarea id="manual-pump-notes" class="input textarea" rows="2" placeholder="Observations..."></textarea>
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="field">
+
+
         <label for="manual-datetime">Date &amp; heure</label>
+
+
         <input id="manual-datetime" class="input" type="datetime-local" />
+
+
       </div>
 
+
+
+
+
       <div class="footer">
+
+
         <button class="btn btn-ghost btn-danger" id="cancel-manual" type="button">Annuler</button>
+
+
         <button class="btn btn-primary" id="save-manual" type="button">Enregistrer</button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal STATS -->
+
+
   <div class="modal" id="modal-stats" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="row modal-header">
+
+
         <h2>Statistiques</h2>
+
+
         <button class="modal-close" id="close-stats" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
+
+
 
       <!-- New Stats UX -->
+
+
       <div class="segmented-control" id="stats-view-selector">
+
+
         <button type="button" data-view="today" class="active">Aujourd'hui</button>
+
+
         <button type="button" data-view="yesterday">Hier</button>
+
+
         <button type="button" data-view="week">Semaine</button>
+
+
         <button type="button" data-view="custom">Perso</button>
+
+
       </div>
+
+
+
+
 
       <div id="stats-custom-settings" class="custom-settings is-hidden">
+
+
         <div class="form-grid">
+
+
           <div class="field">
+
+
             <label>Du</label>
+
+
             <input type="date" id="stats-custom-start" class="input">
+
+
           </div>
+
+
           <div class="field">
+
+
             <label>Au</label>
+
+
             <input type="date" id="stats-custom-end" class="input">
+
+
           </div>
+
+
         </div>
+
+
         <div class="toggle-row">
+
+
           <span>Afficher graphiques</span>
+
+
           <input type="checkbox" id="stats-toggle-charts" checked>
+
+
         </div>
+
+
       </div>
+
+
+
+
 
       <div class="stack stats-content">
+
+
         <div id="stats-dynamic-content"></div>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal SETTINGS (Local only) -->
+
+
   <div class="modal" id="modal-settings" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="row modal-header">
+
+
         <h2>Réglages</h2>
+
+
         <button class="modal-close" id="close-settings" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
       <div class="settings-card">
+
+
         <div class="settings-card-head">
+
+
           <div class="stack" style="gap:4px">
+
+
             <h3>Actions visibles</h3>
-            <div class="muted">Désactivez une action pour la retirer de l’écran d’accueil. (Sauvé sur cet appareil.)</div>
+
+
+            <div class="muted">Désactivez une action pour la retirer de l'écran d'accueil. (Sauvé sur cet appareil.)</div>
+
+
           </div>
+
+
           <button class="btn btn-ghost btn-compact" id="settings-reset-actions" type="button">Tout afficher</button>
+
+
         </div>
+
+
+
+
 
         <div class="settings-list" id="action-visibility-settings">
+
+
           <div class="settings-item">
+
+
             <div class="settings-item-main">
+
+
               <div class="settings-item-icon">🍼</div>
+
+
               <div class="settings-item-text">
+
+
                 <div class="settings-item-title">Lait</div>
+
+
                 <div class="settings-item-sub">Biberon / sein</div>
+
+
               </div>
+
+
             </div>
+
+
             <label class="switch" aria-label="Afficher Lait">
+
+
               <input type="checkbox" data-action="milk" checked>
+
+
               <span class="switch-track"></span>
+
+
             </label>
+
+
           </div>
 
+
+
+
+
           <div class="settings-item">
+
+
             <div class="settings-item-main">
+
+
               <div class="settings-item-icon">🧷</div>
+
+
               <div class="settings-item-text">
+
+
                 <div class="settings-item-title">Couche</div>
+
+
                 <div class="settings-item-sub">Pipi / caca / vomi</div>
+
+
               </div>
+
+
             </div>
+
+
             <label class="switch" aria-label="Afficher Couche">
+
+
               <input type="checkbox" data-action="diaper" checked>
+
+
               <span class="switch-track"></span>
+
+
             </label>
+
+
           </div>
 
+
+
+
+
           <div class="settings-item">
+
+
             <div class="settings-item-main">
+
+
               <div class="settings-item-icon">💊</div>
+
+
               <div class="settings-item-text">
+
+
                 <div class="settings-item-title">Médication</div>
+
+
                 <div class="settings-item-sub">Traitements / doses</div>
+
+
               </div>
+
+
             </div>
+
+
             <label class="switch" aria-label="Afficher Médication">
+
+
               <input type="checkbox" data-action="medication" checked>
+
+
               <span class="switch-track"></span>
+
+
             </label>
+
+
           </div>
 
+
+
+
+
           <div class="settings-item">
+
+
             <div class="settings-item-main">
+
+
               <div class="settings-item-icon">📏</div>
+
+
               <div class="settings-item-text">
+
+
                 <div class="settings-item-title">Mesures</div>
+
+
                 <div class="settings-item-sub">Poids / taille / température</div>
+
+
               </div>
+
+
             </div>
+
+
             <label class="switch" aria-label="Afficher Mesures">
+
+
               <input type="checkbox" data-action="measurements" checked>
+
+
               <span class="switch-track"></span>
+
+
             </label>
+
+
           </div>
 
+
+
+
+
           <div class="settings-item">
+
+
             <div class="settings-item-main">
+
+
               <div class="settings-item-icon">😴</div>
+
+
               <div class="settings-item-text">
+
+
                 <div class="settings-item-title">Sommeil</div>
+
+
                 <div class="settings-item-sub">Siestes</div>
+
+
               </div>
+
+
             </div>
+
+
             <label class="switch" aria-label="Afficher Sommeil">
+
+
               <input type="checkbox" data-action="sleep" checked>
+
+
               <span class="switch-track"></span>
+
+
             </label>
+
+
           </div>
 
+
+
+
+
           <div class="settings-item">
+
+
             <div class="settings-item-main">
+
+
               <div class="settings-item-icon">🥛</div>
+
+
               <div class="settings-item-text">
+
+
                 <div class="settings-item-title">Tirage</div>
+
+
                 <div class="settings-item-sub">Pompage</div>
+
+
               </div>
+
+
             </div>
+
+
             <label class="switch" aria-label="Afficher Tirage">
+
+
               <input type="checkbox" data-action="pumping" checked>
+
+
               <span class="switch-track"></span>
+
+
             </label>
+
+
           </div>
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal MILK DAY DETAILS -->
+
+
   <div class="modal" id="modal-milk-details" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="row modal-header" style="align-items:flex-start">
+
+
         <div class="stack" style="gap:4px">
+
+
           <h2 style="margin:0">Détail lait</h2>
+
+
           <div class="muted" id="milk-details-subtitle">—</div>
+
+
         </div>
+
+
         <button class="modal-close" id="close-milk-details" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
       <div class="milk-details-nav">
+
+
         <button class="btn btn-ghost btn-compact" id="milk-details-prev" type="button">← Jour précédent</button>
+
+
         <button class="btn btn-ghost btn-compact" id="milk-details-next" type="button">Jour suivant →</button>
+
+
       </div>
+
+
       <div id="milk-details-content"></div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal CONFIRM DELETE -->
+
+
   <div class="modal" id="modal-confirm-delete" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Confirmer la suppression</h2>
+
+
         <button class="modal-close" id="close-confirm-delete" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
       <p id="confirm-delete-message" class="text-center">Voulez-vous vraiment supprimer cet élément ?</p>
+
+
       <div class="field">
+
+
         <label for="security-pin">Code de sécurité</label>
+
+
         <input id="security-pin" class="input" type="password" inputmode="numeric" placeholder="Entrez le code pour confirmer" />
+
+
       </div>
+
+
       <div class="footer">
+
+
         <button class="btn btn-ghost btn-danger" id="cancel-confirm-delete" type="button">Annuler</button>
+
+
         <button class="btn btn-danger" id="confirm-delete-btn" type="button">Supprimer</button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal DATE RANGE PICKER -->
+
+
   <div class="modal" id="modal-range-picker" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Choisir une période</h2>
+
+
         <button class="modal-close" id="close-range-picker" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
       <div class="list" id="range-picker-options">
+
+
         <button class="range-option-item" data-range="day">
+
+
           <span class="icon-calendar"></span>
+
+
           <span>Jour actuel</span>
+
+
         </button>
+
+
         <button class="range-option-item" data-range="week">
+
+
           <span class="icon-calendar"></span>
+
+
           <span>7 derniers jours</span>
+
+
         </button>
+
+
         <button class="range-option-item" data-range="month">
+
+
           <span class="icon-calendar"></span>
+
+
           <span>30 derniers jours</span>
+
+
         </button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Modal MILESTONES -->
+
+
   <div class="modal" id="modal-milestones" aria-hidden="true">
+
+
     <div class="sheet stack">
+
+
       <div class="modal-header">
+
+
         <h2>Étapes de développement</h2>
+
+
         <button class="modal-close" id="close-milestones" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+
+
       </div>
+
+
       
+
+
       <div class="list" id="milestones-list">
+
+
         <!-- Items go here -->
+
+
       </div>
+
+
+
+
 
       <div class="stack form-grid" style="margin-top: 16px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 16px;">
+
+
         <h3>Ajouter une étape</h3>
+
+
         <div class="field">
+
+
           <label>Titre</label>
+
+
           <input id="milestone-title" class="input" type="text" placeholder="ex. Premier sourire" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label>Date</label>
+
+
           <input id="milestone-date" class="input" type="date" />
+
+
         </div>
+
+
         <div class="field">
+
+
           <label>Icône</label>
+
+
           <select id="milestone-icon" class="input">
+
+
             <option value="🏆">🏆 Trophée</option>
+
+
             <option value="😃">😃 Sourire</option>
+
+
             <option value="🗣️">🗣️ Areuh</option>
+
+
             <option value="🦷">🦷 Dent</option>
+
+
             <option value="👣">👣 Pas</option>
+
+
             <option value="🧸">🧸 Jouet</option>
+
+
             <option value="🌟">🌟 Autre</option>
+
+
           </select>
+
+
         </div>
+
+
         <button class="btn btn-primary" id="save-milestone" type="button">Ajouter</button>
+
+
       </div>
+
+
     </div>
+
+
   </div>
+
+
+
+
 
   <!-- Template para los elementos del historial -->
+
+
   <template id="history-item-template">
+
+
     <div class="history-item" role="listitem">
+
+
       <div class="history-item-background">
+
+
         <button class="swipe-delete-btn" type="button" aria-label="Supprimer">
+
+
           <span>🗑️</span>
+
+
         </button>
+
+
       </div>
+
+
       <div class="history-item-foreground">
+
+
         <input type="checkbox" class="history-item-checkbox" aria-label="Sélectionner cet élément">
+
+
         <div class="item-content">
+
+
           <strong class="item-title"></strong>
+
+
           <div class="item-meta"></div>
+
+
         </div>
+
+
         <div class="item-actions">
+
+
           <button class="item-action item-edit" type="button" aria-label="Modifier l'élément"><span>✏️</span></button>
+
+
           <button class="item-action item-delete" type="button" aria-label="Supprimer l'élément"><span>🗑️</span></button>
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
+
   </template>
 
+
+
+
+
   <!-- Toast pour annuler -->
+
+
   <div id="undo-toast" class="undo-toast" role="status" aria-live="polite">
+
+
     <span id="undo-message">Élément supprimé</span>
+
+
     <button id="undo-btn" type="button" class="btn btn-ghost">Annuler</button>
+
+
   </div>
 
+
+
+
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+
   <script type="module" src="js/app.js?v=20250308"></script>
+
+
 </body>
+
+
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
