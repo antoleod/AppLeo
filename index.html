@@ -7,1507 +7,1639 @@
 <head>
 
 
-<meta charset="utf-8" />
+  <meta charset="utf-8" />
 
 
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<title>App bebé — Léo</title>
+  <title>App — Léo</title>
 
 
-<link rel="stylesheet" href="css/styles.css?v=20260206" />
+  <link rel="stylesheet" href="css/styles.css?v=20260206" />
 
 
 
 
 
-<!-- Configuración PWA y tema -->
+  <!-- Configuración PWA y tema -->
 
 
-<link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json">
 
 
-<meta name="theme-color" content="#0a84ff">
+  <meta name="theme-color" content="#0a84ff">
 
 
-<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
 
 
-<meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
 
 
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 
-<meta name="apple-mobile-web-app-title" content="App Léo">
+  <meta name="apple-mobile-web-app-title" content="App Léo">
 
 
 
 
 
-<!-- Íconos de la aplicación -->
+  <!-- Íconos de la aplicación -->
 
 
-<link rel="icon" href="img/icon/icon-square-180.png" type="image/png"> <!-- Ícono principal -->
+  <link rel="icon" href="img/icon/icon-square-180.png" type="image/png"> <!-- Ícono principal -->
 
 
-<link rel="apple-touch-icon" href="img/icon/icon-square-180.png"> <!-- Ícono para iOS -->
+  <link rel="apple-touch-icon" href="img/icon/icon-square-180.png"> <!-- Ícono para iOS -->
 
 
 
 
 
-<style>
+  <style>
+    #app-background {
 
 
-  #app-background {
+      position: fixed;
 
 
-    position: fixed;
+      top: 0;
 
 
-    top: 0;
+      left: 0;
 
 
-    left: 0;
+      width: 100%;
 
 
-    width: 100%;
+      height: 100%;
 
 
-    height: 100%;
+      z-index: -1;
 
 
-    z-index: -1;
+      background-image: var(--hero-image);
 
 
-    background-image: var(--hero-image);
+      background-position: center center;
 
 
-    background-position: center center;
+      background-size: cover;
 
 
-    background-size: cover;
+      background-repeat: no-repeat;
 
 
-    background-repeat: no-repeat;
+      transform-origin: center center;
 
 
-    transform-origin: center center;
+      animation: ken-burns 30s ease-in-out infinite alternate;
 
 
-    animation: ken-burns 30s ease-in-out infinite alternate;
-
-
-    transition: background-image 1.2s ease-in-out;
-
-
-  }
-
-
-  @keyframes ken-burns {
-
-
-    0% { transform: scale(1); }
-
-
-    100% { transform: scale(1.12); }
-
-
-  }
-
-
-
-
-
-  /* Stats & Milestones Styles */
-
-
-  .segmented-control {
-
-
-    display: flex;
-
-
-    background: rgba(118, 118, 128, 0.12);
-
-
-    padding: 2px;
-
-
-    border-radius: 8px;
-
-
-    margin-bottom: 16px;
-
-
-    border: 1px solid rgba(198, 209, 223, 0.45);
-
-
-    box-shadow: var(--elev-1);
-
-
-  }
-
-
-  .segmented-control button {
-
-
-    flex: 1;
-
-
-    border: none;
-
-
-    background: transparent;
-
-
-    padding: 8px 4px;
-
-
-    font-size: 0.9rem;
-
-
-    font-weight: 500;
-
-
-    border-radius: 6px;
-
-
-    color: inherit;
-
-
-    transition: background 0.2s, box-shadow 0.2s;
-
-
-    margin: 0;
-
-
-    min-height: var(--btn-height-sm);
-
-
-  }
-
-
-  .segmented-control button.active {
-
-
-    background: #fff;
-
-
-    box-shadow: var(--elev-1);
-
-
-    color: #000;
-
-
-  }
-
-
-  .dark-mode .segmented-control button.active {
-
-
-    background: #636366;
-
-
-    color: #fff;
-
-
-  }
-
-
-  .comparison-grid {
-
-
-    display: grid;
-
-
-    grid-template-columns: 1fr 1fr;
-
-
-    gap: 12px;
-
-
-    margin-bottom: 16px;
-
-
-  }
-
-
-  .comparison-card {
-
-
-    background: rgba(255,255,255,0.5);
-
-
-    border-radius: 16px;
-
-
-    padding: 16px;
-
-
-    display: flex;
-
-
-    flex-direction: column;
-
-
-    gap: 4px;
-
-
-    border: 1px solid rgba(198, 209, 223, 0.45);
-
-
-    box-shadow: var(--elev-1);
-
-
-  }
-
-
-  .dark-mode .comparison-card { background: rgba(255,255,255,0.05); }
-
-
-  .comparison-card.primary { background: var(--bg-card, #fff); box-shadow: var(--elev-2); }
-
-
-  .dark-mode .comparison-card.primary { background: #1c1c1e; }
-
-
-  .comp-label { font-size: 0.8rem; opacity: 0.78; text-transform: uppercase; letter-spacing: 0.5px; }
-
-
-  .comp-value { font-size: 1.5rem; font-weight: 700; font-family: var(--font-display); }
-
-
-  .comp-sub { font-size: 0.85rem; opacity: 0.8; display: flex; align-items: center; gap: 4px; }
-
-
-  .trend-up { color: #34c759; }
-
-
-  .trend-down { color: #ff3b30; }
-
-
-  .milestone-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card, #fff); border-radius: 12px; margin-bottom: 8px; box-shadow: var(--elev-1); }
-
-
-  .milestone-icon { font-size: 1.5rem; background: rgba(0,0,0,0.05); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-
-
-  .milestone-content { flex: 1; }
-
-
-  .milestone-date { font-size: 0.8rem; opacity: 0.7; }
-
-
-  .milestone-title { font-weight: 600; }
-
-
-  .custom-settings { background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; margin-bottom: 16px; box-shadow: var(--elev-1); }
-
-
-  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-
-
-  .toggle-row:last-child { border-bottom: none; }
-
-
-  .chart-type-selector { display: flex; gap: 8px; margin-top: 8px; }
-
-
-
-
-
-  button {
-
-
-    margin: 2px;
-
-
-  }
-
-
-
-
-
-  .preset-amounts {
-
-
-    padding: 4px;
-
-
-    border-radius: 14px;
-
-
-    background: rgba(255,255,255,0.6);
-
-
-    box-shadow: var(--elev-1);
-
-
-  }
-
-
-  .dark-mode .preset-amounts {
-
-
-    background: rgba(30,30,30,0.6);
-
-
-    box-shadow: var(--elev-1);
-
-
-  }
-
-
-  .preset-btn {
-
-
-    box-shadow: var(--elev-1);
-
-
-  }
-
-
-
-
-
-  @media (max-width: 600px) {
-
-
-    #modal-sleep .sheet {
-
-
-      margin: 12px;
+      transition: background-image 1.2s ease-in-out;
 
 
     }
 
 
-    #modal-sleep .sheet .stack {
+    @keyframes ken-burns {
+
+
+      0% {
+        transform: scale(1);
+      }
+
+
+      100% {
+        transform: scale(1.12);
+      }
+
+
+    }
+
+
+
+
+
+    /* Stats & Milestones Styles */
+
+
+    .segmented-control {
+
+
+      display: flex;
+
+
+      background: rgba(118, 118, 128, 0.12);
+
+
+      padding: 2px;
+
+
+      border-radius: 8px;
+
+
+      margin-bottom: 16px;
+
+
+      border: 1px solid rgba(198, 209, 223, 0.45);
+
+
+      box-shadow: var(--elev-1);
+
+
+    }
+
+
+    .segmented-control button {
+
+
+      flex: 1;
+
+
+      border: none;
+
+
+      background: transparent;
+
+
+      padding: 8px 4px;
+
+
+      font-size: 0.9rem;
+
+
+      font-weight: 500;
+
+
+      border-radius: 6px;
+
+
+      color: inherit;
+
+
+      transition: background 0.2s, box-shadow 0.2s;
+
+
+      margin: 0;
+
+
+      min-height: var(--btn-height-sm);
+
+
+    }
+
+
+    .segmented-control button.active {
+
+
+      background: #fff;
+
+
+      box-shadow: var(--elev-1);
+
+
+      color: #000;
+
+
+    }
+
+
+    .dark-mode .segmented-control button.active {
+
+
+      background: #636366;
+
+
+      color: #fff;
+
+
+    }
+
+
+    .comparison-grid {
+
+
+      display: grid;
+
+
+      grid-template-columns: 1fr 1fr;
 
 
       gap: 12px;
 
 
+      margin-bottom: 16px;
+
+
     }
 
 
-  }
+    .comparison-card {
 
 
+      background: rgba(255, 255, 255, 0.5);
 
 
+      border-radius: 16px;
 
-  /* --- Mobile UX Optimizations --- */
 
+      padding: 16px;
 
-  :root {
 
+      display: flex;
 
-    --gap-stack: 12px;
 
+      flex-direction: column;
 
-    --container-padding: 16px;
 
+      gap: 4px;
 
-    --safe-top: env(safe-area-inset-top, 20px);
 
+      border: 1px solid rgba(198, 209, 223, 0.45);
 
-  }
 
+      box-shadow: var(--elev-1);
 
 
+    }
 
 
-  body {
+    .dark-mode .comparison-card {
+      background: rgba(255, 255, 255, 0.05);
+    }
 
 
-    min-height: 100vh;
+    .comparison-card.primary {
+      background: var(--bg-card, #fff);
+      box-shadow: var(--elev-2);
+    }
 
 
-    min-height: 100dvh;
+    .dark-mode .comparison-card.primary {
+      background: #1c1c1e;
+    }
 
 
-    /* Prevent bounce on iOS if content fits */
+    .comp-label {
+      font-size: 0.8rem;
+      opacity: 0.78;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
 
-    overscroll-behavior-y: none; 
+    .comp-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
 
 
-  }
+    .comp-sub {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
 
+    .trend-up {
+      color: #34c759;
+    }
 
 
+    .trend-down {
+      color: #ff3b30;
+    }
 
-  #app-container {
 
+    .milestone-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-card, #fff);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      box-shadow: var(--elev-1);
+    }
 
-    /* Use safe area for top padding, plus a bit of breathing room */
 
+    .milestone-icon {
+      font-size: 1.5rem;
+      background: rgba(0, 0, 0, 0.05);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
 
-    padding-top: max(var(--safe-top), 12px);
 
+    .milestone-content {
+      flex: 1;
+    }
 
-    padding-left: var(--container-padding);
 
+    .milestone-date {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
 
-    padding-right: var(--container-padding);
 
+    .milestone-title {
+      font-weight: 600;
+    }
 
-    padding-bottom: 80px; /* Space for potential bottom nav or just scroll clearance */
 
+    .custom-settings {
+      background: rgba(0, 0, 0, 0.03);
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: var(--elev-1);
+    }
 
-    gap: var(--section-gap, var(--gap-stack));
 
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
 
-    width: 100%;
 
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
 
-    max-width: 600px;
 
+    .chart-type-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
 
-    margin: 0 auto;
 
 
-    box-sizing: border-box;
 
 
-  }
+    button {
 
 
+      margin: 2px;
 
 
+    }
 
-  /* Compact Header */
 
 
-  .title-bar {
 
 
-    margin-bottom: 0;
+    .preset-amounts {
 
 
-    padding: 4px 0;
+      padding: 4px;
 
 
-    display: flex;
+      border-radius: 14px;
 
 
-    align-items: center;
+      background: rgba(255, 255, 255, 0.6);
 
 
-    justify-content: space-between;
+      box-shadow: var(--elev-1);
 
 
-  }
+    }
 
 
-  .title-bar h1 {
+    .dark-mode .preset-amounts {
 
 
-    font-size: 1.35rem;
+      background: rgba(30, 30, 30, 0.6);
 
 
-    letter-spacing: -0.02em;
+      box-shadow: var(--elev-1);
 
 
-  }
+    }
 
 
-  .theme-toggle {
+    .preset-btn {
 
 
-    transform: scale(0.9);
+      box-shadow: var(--elev-1);
 
 
-    transform-origin: right center;
+    }
 
 
-  }
 
 
 
+    @media (max-width: 600px) {
 
 
-  /* Compact Profile Card */
+      #modal-sleep .sheet {
 
 
-  #leo-card {
+        margin: 12px;
 
 
-    padding: 8px 12px;
+      }
 
 
-    border-radius: 16px;
+      #modal-sleep .sheet .stack {
 
 
-    min-height: auto;
+        gap: 12px;
 
 
-    margin-bottom: 4px;
+      }
 
 
-    background: rgba(255,255,255,0.7);
+    }
 
 
-    backdrop-filter: blur(12px);
 
 
-    box-shadow: var(--elev-1);
 
+    /* --- Mobile UX Optimizations --- */
 
-  }
 
+    :root {
 
-  .dark-mode #leo-card {
 
+      --gap-stack: 12px;
 
-    background: rgba(30,30,30,0.6);
 
+      --container-padding: 16px;
 
-  }
 
+      --safe-top: env(safe-area-inset-top, 20px);
 
-  #avatar-btn {
 
+    }
 
-    width: 44px;
 
 
-    height: 44px;
 
 
-    font-size: 1.5rem;
+    body {
 
 
-  }
+      min-height: 100vh;
 
 
-  .leo-name {
+      min-height: 100dvh;
 
 
-    font-size: 1.05rem;
+      /* Prevent bounce on iOS if content fits */
 
 
-    font-weight: 700;
+      overscroll-behavior-y: none;
 
 
-  }
+    }
 
 
-  #leo-summary-info {
 
 
-    font-size: 0.8rem;
 
+    #app-container {
 
-    opacity: 0.8;
 
+      /* Use safe area for top padding, plus a bit of breathing room */
 
-  }
 
+      padding-top: max(var(--safe-top), 12px);
 
 
+      padding-left: var(--container-padding);
 
 
-  /* Optimized Action Grid */
+      padding-right: var(--container-padding);
 
 
-  .primary-actions {
+      padding-bottom: 80px;
+      /* Space for potential bottom nav or just scroll clearance */
 
 
-    display: grid;
+      gap: var(--section-gap, var(--gap-stack));
 
 
-    grid-template-columns: repeat(2, 1fr);
+      width: 100%;
 
 
-    gap: 10px;
+      max-width: 600px;
 
 
-    margin-bottom: 8px;
+      margin: 0 auto;
 
 
-  }
+      box-sizing: border-box;
 
 
-  .primary-actions .btn {
+    }
 
 
-    padding: 10px 12px;
 
 
-    height: auto;
 
+    /* Compact Header */
 
-    min-height: 52px;
 
+    .title-bar {
 
-    display: flex;
 
+      margin-bottom: 0;
 
-    align-items: center;
 
+      padding: 4px 0;
 
-    justify-content: center;
 
+      display: flex;
 
-    gap: 8px;
 
+      align-items: center;
 
-    font-size: 0.95rem;
 
+      justify-content: space-between;
 
-    font-weight: 600;
 
+    }
 
-    border-radius: 14px;
 
+    .title-bar h1 {
 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 
+      font-size: 1.35rem;
 
-  }
 
+      letter-spacing: -0.02em;
 
-  .primary-actions .btn-icon {
 
+    }
 
-    font-size: 1.25rem;
 
+    .theme-toggle {
 
-    margin: 0;
 
+      transform: scale(0.9);
 
-  }
 
+      transform-origin: right center;
 
 
+    }
 
 
-  /* Compact Dashboard Summaries */
 
 
-  .report-line {
 
+    /* Compact Profile Card */
 
-    padding: 10px 14px;
 
+    #leo-card {
 
-    margin: 0;
 
+      padding: 8px 12px;
 
-    border-radius: 14px;
 
+      border-radius: 16px;
 
-    font-size: 0.85rem;
 
+      min-height: auto;
 
-    display: flex;
 
+      margin-bottom: 4px;
 
-    flex-wrap: wrap;
 
+      background: rgba(255, 255, 255, 0.7);
 
-    gap: 6px 10px;
 
+      backdrop-filter: blur(12px);
 
-    align-items: center;
 
+      box-shadow: var(--elev-1);
 
-    background: var(--bg-card, rgba(255,255,255,0.65));
 
+    }
 
-    backdrop-filter: blur(10px);
 
+    .dark-mode #leo-card {
 
-    border: 1px solid rgba(255,255,255,0.2);
 
+      background: rgba(30, 30, 30, 0.6);
 
-  }
 
+    }
 
-  .dark-mode .report-line {
 
+    #avatar-btn {
 
-    background: rgba(40,40,40,0.6);
 
+      width: 44px;
 
-    border-color: rgba(255,255,255,0.05);
 
+      height: 44px;
 
-  }
 
+      font-size: 1.5rem;
 
-  .report-line strong {
 
+    }
 
-    font-size: 0.9rem;
 
+    .leo-name {
 
-    margin-right: auto;
 
+      font-size: 1.05rem;
 
-    color: var(--text-main);
 
+      font-weight: 700;
 
-  }
 
+    }
 
-  .report-line span, .kpi-pill {
 
+    #leo-summary-info {
 
-    background: rgba(0,0,0,0.04);
 
+      font-size: 0.8rem;
 
-    padding: 3px 8px;
 
+      opacity: 0.8;
 
-    border-radius: 6px;
 
+    }
 
-    font-weight: 500;
 
 
-    color: var(--text-muted);
 
 
-  }
+    /* Optimized Action Grid */
 
 
-  .dark-mode .report-line span, .dark-mode .kpi-pill {
+    .primary-actions {
 
 
-    background: rgba(255,255,255,0.08);
+      display: grid;
 
 
-    color: rgba(255,255,255,0.8);
+      grid-template-columns: repeat(2, 1fr);
 
 
-  }
+      gap: 10px;
 
 
+      margin-bottom: 8px;
 
 
+    }
 
-  /* History Section Tweaks */
 
+    .primary-actions .btn {
 
-  .section-head {
 
+      padding: 10px 12px;
 
-    margin-top: 8px;
 
+      height: auto;
 
-    margin-bottom: 8px;
 
+      min-height: 52px;
 
-    padding: 0 2px;
 
+      display: flex;
 
-  }
 
+      align-items: center;
 
-  .history-item {
 
+      justify-content: center;
 
-    margin-bottom: 8px;
 
+      gap: 8px;
 
-    border-radius: 14px;
 
+      font-size: 0.95rem;
 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 
+      font-weight: 600;
 
-  }
 
+      border-radius: 14px;
 
-  .history-item-foreground {
 
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 
-    padding: 10px 14px;
 
+    }
 
-    background: var(--bg-card, rgba(255,255,255,0.65));
 
+    .primary-actions .btn-icon {
 
-    backdrop-filter: blur(10px);
 
+      font-size: 1.25rem;
 
-    border: 1px solid rgba(255,255,255,0.2);
 
+      margin: 0;
 
-    border-radius: 14px;
 
+    }
 
-  }
 
 
-  .dark-mode .history-item-foreground {
 
 
-    background: rgba(40,40,40,0.6);
+    /* Compact Dashboard Summaries */
 
 
-    border-color: rgba(255,255,255,0.05);
+    .report-line {
 
 
-  }
+      padding: 10px 14px;
 
 
-  .item-title {
+      margin: 0;
 
 
-    font-size: 0.95rem;
+      border-radius: 14px;
 
 
-    margin-bottom: 2px;
+      font-size: 0.85rem;
 
 
-  }
+      display: flex;
 
 
-  .item-meta {
+      flex-wrap: wrap;
 
 
-    font-size: 0.8rem;
+      gap: 6px 10px;
 
 
-  }
+      align-items: center;
 
 
+      background: var(--bg-card, rgba(255, 255, 255, 0.65));
 
 
+      backdrop-filter: blur(10px);
 
-  /* Focus Mode Overlay */
 
+      border: 1px solid rgba(255, 255, 255, 0.2);
 
-  .focus-overlay {
 
+    }
 
-    position: fixed;
 
+    .dark-mode .report-line {
 
-    inset: 0;
 
+      background: rgba(40, 40, 40, 0.6);
 
-    background-color: #000;
 
+      border-color: rgba(255, 255, 255, 0.05);
 
-    background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--hero-image);
 
+    }
 
-    background-position: center;
 
+    .report-line strong {
 
-    background-size: cover;
 
+      font-size: 0.9rem;
 
-    color: #fff;
 
+      margin-right: auto;
 
-    z-index: 2000;
 
+      color: var(--text-main);
 
-    display: flex;
 
+    }
 
-    flex-direction: column;
 
+    .report-line span,
+    .kpi-pill {
 
-    align-items: center;
 
+      background: rgba(0, 0, 0, 0.04);
 
-    justify-content: center;
 
+      padding: 3px 8px;
 
-    opacity: 0;
 
+      border-radius: 6px;
 
-    pointer-events: none;
 
+      font-weight: 500;
 
-    transition: opacity 0.3s ease;
 
+      color: var(--text-muted);
 
-    padding: 24px;
 
+    }
 
-  }
 
+    .dark-mode .report-line span,
+    .dark-mode .kpi-pill {
 
-  .focus-overlay.active {
 
+      background: rgba(255, 255, 255, 0.08);
 
-    opacity: 1;
 
+      color: rgba(255, 255, 255, 0.8);
 
-    pointer-events: auto;
 
+    }
 
-  }
 
 
-  .focus-minimize-btn {
 
 
-    position: absolute;
+    /* History Section Tweaks */
 
 
-    top: max(20px, env(safe-area-inset-top));
+    .section-head {
 
 
-    right: 20px;
+      margin-top: 8px;
 
 
-    background: rgba(255,255,255,0.2);
+      margin-bottom: 8px;
 
 
-    border: none;
+      padding: 0 2px;
 
 
-    color: #fff;
+    }
 
 
-    width: 44px;
+    .history-item {
 
 
-    height: 44px;
+      margin-bottom: 8px;
 
 
-    border-radius: 50%;
+      border-radius: 14px;
 
 
-    font-size: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
 
-    display: flex;
+    }
 
 
-    align-items: center;
+    .history-item-foreground {
 
 
-    justify-content: center;
+      padding: 10px 14px;
 
 
-  }
+      background: var(--bg-card, rgba(255, 255, 255, 0.65));
 
 
-  .focus-content {
+      backdrop-filter: blur(10px);
 
 
-    display: flex;
+      border: 1px solid rgba(255, 255, 255, 0.2);
 
 
-    flex-direction: column;
+      border-radius: 14px;
 
 
-    align-items: center;
+    }
 
 
-    gap: 32px;
+    .dark-mode .history-item-foreground {
 
 
-    width: 100%;
+      background: rgba(40, 40, 40, 0.6);
 
 
-    max-width: 400px;
+      border-color: rgba(255, 255, 255, 0.05);
 
 
-  }
+    }
 
 
-  .focus-icon { font-size: 4rem; }
+    .item-title {
 
 
-  .focus-label { font-size: 1.5rem; font-weight: 600; opacity: 0.8; margin: 0; }
+      font-size: 0.95rem;
 
 
-  .focus-timer { font-size: 5rem; font-weight: 200; font-variant-numeric: tabular-nums; line-height: 1; }
+      margin-bottom: 2px;
 
 
-  .focus-meta { font-size: 1.2rem; opacity: 0.6; }
+    }
 
 
-  .focus-action-btn {
+    .item-meta {
 
 
-    width: 100%;
+      font-size: 0.8rem;
 
 
-    padding: 20px;
+    }
 
 
-    font-size: 1.2rem;
 
 
-    border-radius: 20px;
 
+    /* Focus Mode Overlay */
 
-    background: #ff3b30;
 
+    .focus-overlay {
 
-    color: white;
 
+      position: fixed;
 
-    border: none;
 
+      inset: 0;
 
-    font-weight: 600;
 
+      background-color: #000;
 
-  }
 
+      background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--hero-image);
 
-  .btn-focus-toggle {
 
+      background-position: center;
 
-    background: transparent;
 
+      background-size: cover;
 
-    border: 1px solid currentColor;
 
+      color: #fff;
 
-    color: inherit;
 
+      z-index: 2000;
 
-    opacity: 0.6;
 
+      display: flex;
 
-    width: 36px;
 
+      flex-direction: column;
 
-    height: 36px;
 
+      align-items: center;
 
-    border-radius: 50%;
 
+      justify-content: center;
 
-    display: inline-flex;
 
+      opacity: 0;
 
-    align-items: center;
 
+      pointer-events: none;
 
-    justify-content: center;
 
+      transition: opacity 0.3s ease;
 
-    margin-left: 8px;
 
+      padding: 24px;
 
-    vertical-align: middle;
 
+    }
 
-  }
 
+    .focus-overlay.active {
 
 
+      opacity: 1;
 
 
-  /* Bottle Panel UX Improvements */
+      pointer-events: auto;
 
 
-  .bottle-time-summary {
+    }
 
 
-    display: flex;
+    .focus-minimize-btn {
 
 
-    align-items: center;
+      position: absolute;
 
 
-    justify-content: center;
+      top: max(20px, env(safe-area-inset-top));
 
 
-    gap: 8px;
+      right: 20px;
 
 
-    padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.2);
 
 
-    background: rgba(0,0,0,0.03);
+      border: none;
 
 
-    border-radius: 12px;
+      color: #fff;
 
 
-    margin: 2px 0;
+      width: 44px;
 
 
-    font-size: 0.95rem;
+      height: 44px;
 
 
-    color: var(--text-main);
+      border-radius: 50%;
 
 
-    cursor: pointer;
+      font-size: 1.5rem;
 
 
-    transition: background 0.2s;
+      display: flex;
 
 
-    user-select: none;
+      align-items: center;
 
 
-  }
+      justify-content: center;
 
 
-  .bottle-time-summary:active { background: rgba(0,0,0,0.06); }
+    }
 
 
-  .bottle-time-summary .icon-edit { opacity: 0.5; font-size: 1.1em; }
+    .focus-content {
 
 
-  
+      display: flex;
 
 
-  .bottle-details-wrapper {
+      flex-direction: column;
 
 
-    display: grid;
+      align-items: center;
 
 
-    grid-template-rows: 0fr;
+      gap: 32px;
 
 
-    transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
 
 
-    overflow: hidden;
+      max-width: 400px;
 
 
-  }
+    }
 
 
-  .bottle-details-wrapper.is-open { grid-template-rows: 1fr; margin-bottom: 16px; }
+    .focus-icon {
+      font-size: 4rem;
+    }
 
 
-  .bottle-details-inner { min-height: 0; padding: 4px 2px; display: none; }
+    .focus-label {
+      font-size: 1.5rem;
+      font-weight: 600;
+      opacity: 0.8;
+      margin: 0;
+    }
 
 
-  .bottle-edit-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 12px; }
+    .focus-timer {
+      font-size: 5rem;
+      font-weight: 200;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
 
 
+    .focus-meta {
+      font-size: 1.2rem;
+      opacity: 0.6;
+    }
 
 
+    .focus-action-btn {
 
-  /* Botón Guardar Biberón Destacado */
 
+      width: 100%;
 
-  #save-biberon {
 
+      padding: 20px;
 
-    background-color: #ff9f0a; /* Naranja vibrante */
 
+      font-size: 1.2rem;
 
-    font-size: 1.2rem;
 
+      border-radius: 20px;
 
-    font-weight: 800;
 
+      background: #ff3b30;
 
-    padding: 16px;
 
+      color: white;
 
-    margin-top: 16px;
 
+      border: none;
 
-    box-shadow: 0 4px 15px rgba(255, 159, 10, 0.4);
 
+      font-weight: 600;
 
-    border: none;
 
+    }
 
-    transition: transform 0.2s, background-color 0.3s;
 
+    .btn-focus-toggle {
 
-  }
 
+      background: transparent;
 
 
+      border: 1px solid currentColor;
 
 
-  #save-biberon.save-biberon {
+      color: inherit;
 
 
-    animation: bounce-confirm 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      opacity: 0.6;
 
 
-    background-color: #34c759; /* Verde éxito */
+      width: 36px;
 
 
-  }
+      height: 36px;
 
 
+      border-radius: 50%;
 
 
+      display: inline-flex;
 
-  @keyframes bounce-confirm {
 
+      align-items: center;
 
-    0% { transform: scale(1); }
 
+      justify-content: center;
 
-    25% { transform: scale(0.9); }
 
+      margin-left: 8px;
 
-    50% { transform: scale(1.1); }
 
+      vertical-align: middle;
 
-    75% { transform: scale(0.95); }
 
+    }
 
-    100% { transform: scale(1); }
 
 
-  }
 
 
+    /* Bottle Panel UX Improvements */
 
 
+    .bottle-time-summary {
 
-  /* Timeline View Enhancements */
 
+      display: flex;
 
-  .list {
 
+      align-items: center;
 
-    position: relative;
 
+      justify-content: center;
 
-    padding-left: 0;
 
+      gap: 8px;
 
-  }
 
+      padding: 10px 16px;
 
-  
 
+      background: rgba(0, 0, 0, 0.03);
 
-  /* Continuous vertical line */
 
+      border-radius: 12px;
 
-  .list::before {
 
+      margin: 2px 0;
 
-    content: '';
 
+      font-size: 0.95rem;
 
-    position: absolute;
 
+      color: var(--text-main);
 
-    top: 12px;
 
+      cursor: pointer;
 
-    bottom: 20px;
 
+      transition: background 0.2s;
 
-    left: 15px;
 
+      user-select: none;
 
-    width: 2px;
 
+    }
 
-    background: rgba(0,0,0,0.08);
 
+    .bottle-time-summary:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
 
-    z-index: 0;
 
+    .bottle-time-summary .icon-edit {
+      opacity: 0.5;
+      font-size: 1.1em;
+    }
 
-  }
 
 
-  .dark-mode .list::before {
 
 
-    background: rgba(255,255,255,0.1);
+    .bottle-details-wrapper {
 
 
-  }
+      display: grid;
 
 
+      grid-template-rows: 0fr;
 
 
+      transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  .history-day-header {
 
+      overflow: hidden;
 
-    position: relative;
 
+    }
 
-    z-index: 1;
 
+    .bottle-details-wrapper.is-open {
+      grid-template-rows: 1fr;
+      margin-bottom: 16px;
+    }
 
-    padding-left: 42px;
 
+    .bottle-details-inner {
+      min-height: 0;
+      padding: 4px 2px;
+      display: none;
+    }
 
-    margin-bottom: 12px;
 
+    .bottle-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 12px;
+    }
 
-  }
 
 
 
 
+    /* Botón Guardar Biberón Destacado */
 
-  .history-item {
 
+    #save-biberon {
 
-    margin-left: 34px;
 
+      background-color: #ff9f0a;
+      /* Naranja vibrante */
 
-    position: relative;
 
+      font-size: 1.2rem;
 
-    overflow: visible !important;
 
+      font-weight: 800;
 
-  }
 
+      padding: 16px;
 
 
+      margin-top: 16px;
 
 
-  /* Timeline Dot */
+      box-shadow: 0 4px 15px rgba(255, 159, 10, 0.4);
 
 
-  .history-item::after {
+      border: none;
 
 
-    content: '';
+      transition: transform 0.2s, background-color 0.3s;
 
 
-    position: absolute;
+    }
 
 
-    left: -24px; /* Aligns with the line at left:15px relative to parent list */
 
 
-    top: 20px;
 
+    #save-biberon.save-biberon {
 
-    width: 12px;
 
+      animation: bounce-confirm 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-    height: 12px;
 
+      background-color: #34c759;
+      /* Verde éxito */
 
-    border-radius: 50%;
 
+    }
 
-    background: var(--bg-card, #fff);
 
 
-    border: 3px solid #ccc;
 
 
-    z-index: 1;
+    @keyframes bounce-confirm {
 
 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      0% {
+        transform: scale(1);
+      }
 
 
-  }
+      25% {
+        transform: scale(0.9);
+      }
 
 
+      50% {
+        transform: scale(1.1);
+      }
 
 
+      75% {
+        transform: scale(0.95);
+      }
 
-  /* Type Colors for Timeline Dots */
 
+      100% {
+        transform: scale(1);
+      }
 
-  .history-item.type-feed::after { border-color: #0a84ff; }
 
+    }
 
-  .history-item.type-elim::after { border-color: #34c759; }
 
 
-  .history-item.type-med::after { border-color: #ff9f0a; }
 
 
-  .history-item.type-sleep::after { border-color: #5e5ce6; }
+    /* Timeline View Enhancements */
 
 
-  .history-item.type-pump::after { border-color: #af52de; }
+    .list {
 
 
-  .history-item.type-measurement::after { border-color: #ff3b30; }
+      position: relative;
 
 
-  .history-item.type-milestone::after { border-color: #ffd60a; }
+      padding-left: 0;
 
 
+    }
 
 
 
-  /* Day Header Dot */
 
 
-  .history-day-header::before {
+    /* Continuous vertical line */
 
 
-    content: '';
+    .list::before {
 
 
-    position: absolute;
+      content: '';
 
 
-    left: 12px;
+      position: absolute;
 
 
-    top: 50%;
+      top: 12px;
 
 
-    transform: translateY(-50%);
+      bottom: 20px;
 
 
-    width: 8px;
+      left: 15px;
 
 
-    height: 8px;
+      width: 2px;
 
 
-    background: var(--text-muted);
+      background: rgba(0, 0, 0, 0.08);
 
 
-    border-radius: 50%;
+      z-index: 0;
 
 
-    opacity: 0.5;
+    }
 
 
-    box-shadow: 0 0 0 4px var(--bg-body, #f7fafd); /* Mask line */
+    .dark-mode .list::before {
 
 
-  }
+      background: rgba(255, 255, 255, 0.1);
 
 
-  .dark-mode .history-day-header::before {
+    }
 
 
-    box-shadow: 0 0 0 4px #000;
 
 
-  }
 
+    .history-day-header {
 
 
+      position: relative;
 
 
-  .pump-confirm-panel {
+      z-index: 1;
 
 
-    box-shadow: 0 16px 48px -4px rgba(0, 0, 0, 0.25);
+      padding-left: 42px;
 
 
-  }
+      margin-bottom: 12px;
 
 
-</style>
+    }
+
+
+
+
+
+    .history-item {
+
+
+      margin-left: 34px;
+
+
+      position: relative;
+
+
+      overflow: visible !important;
+
+
+    }
+
+
+
+
+
+    /* Timeline Dot */
+
+
+    .history-item::after {
+
+
+      content: '';
+
+
+      position: absolute;
+
+
+      left: -24px;
+      /* Aligns with the line at left:15px relative to parent list */
+
+
+      top: 20px;
+
+
+      width: 12px;
+
+
+      height: 12px;
+
+
+      border-radius: 50%;
+
+
+      background: var(--bg-card, #fff);
+
+
+      border: 3px solid #ccc;
+
+
+      z-index: 1;
+
+
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+
+    }
+
+
+
+
+
+    /* Type Colors for Timeline Dots */
+
+
+    .history-item.type-feed::after {
+      border-color: #0a84ff;
+    }
+
+
+    .history-item.type-elim::after {
+      border-color: #34c759;
+    }
+
+
+    .history-item.type-med::after {
+      border-color: #ff9f0a;
+    }
+
+
+    .history-item.type-sleep::after {
+      border-color: #5e5ce6;
+    }
+
+
+    .history-item.type-pump::after {
+      border-color: #af52de;
+    }
+
+
+    .history-item.type-measurement::after {
+      border-color: #ff3b30;
+    }
+
+
+    .history-item.type-milestone::after {
+      border-color: #ffd60a;
+    }
+
+
+
+
+
+    /* Day Header Dot */
+
+
+    .history-day-header::before {
+
+
+      content: '';
+
+
+      position: absolute;
+
+
+      left: 12px;
+
+
+      top: 50%;
+
+
+      transform: translateY(-50%);
+
+
+      width: 8px;
+
+
+      height: 8px;
+
+
+      background: var(--text-muted);
+
+
+      border-radius: 50%;
+
+
+      opacity: 0.5;
+
+
+      box-shadow: 0 0 0 4px var(--bg-body, #f7fafd);
+      /* Mask line */
+
+
+    }
+
+
+    .dark-mode .history-day-header::before {
+
+
+      box-shadow: 0 0 0 4px #000;
+
+
+    }
+
+
+
+
+
+    .pump-confirm-panel {
+
+
+      box-shadow: 0 16px 48px -4px rgba(0, 0, 0, 0.25);
+
+
+    }
+  </style>
 
 
 </head>
@@ -1516,18 +1648,79 @@
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0" aria-hidden="true">
     <defs>
-      <symbol id="icon-breast" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4c-1.5 0-2.5 1.2-2.5 2.8 0 1.2.6 2.2 1.5 2.8v9.4h2V9.6c.9-.6 1.5-1.6 1.5-2.8C14.5 5.2 13.5 4 12 4z"/><circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.6"/></symbol>
-      <symbol id="icon-bottle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v3h6V2H9zM8 6h8v2l2 10H6L8 6z"/><path d="M7 8v11h10V8" stroke-width="1.2"/><path d="M10 11h4M10 14h4M10 17h2" stroke-width="1"/></symbol>
-      <symbol id="icon-med" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5h7.5a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8.5a2 2 0 0 1 2-2z"/><path d="M8 6h5.5a1 1 0 0 1 1 1v1.5H7V7a1 1 0 0 1 1-1z"/><path d="M9.8 13h2M10.8 12v2"/><path d="M16.8 7.8l2.6 2.6"/><path d="M18.1 6.5a1.9 1.9 0 1 1 2.7 2.7L18.1 12a1.9 1.9 0 0 1-2.7-2.7l2.7-2.8z"/></symbol>
-      <symbol id="icon-diaper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7.5h15a1.5 1.5 0 0 1 1.5 1.5v3.2A8.9 8.9 0 0 1 12 21a8.9 8.9 0 0 1-9-8.8V9a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M8.2 11.2a3.8 3.8 0 0 0 7.6 0"/><path d="M3 9.5h2.2l1.2 2.6-2.1 1.5H3"/><path d="M21 9.5h-2.2l-1.2 2.6 2.1 1.5H21"/></symbol>
-      <symbol id="icon-measures" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19.5V8.2A2.2 2.2 0 0 1 8.2 6h1.3A2.2 2.2 0 0 1 11.7 8.2v11.3A2.2 2.2 0 0 1 9.5 21H8.2A2.2 2.2 0 0 1 6 19.5z"/><path d="M7.7 10.2h2.2M7.7 12.8h2.2M7.7 15.4h2.2"/><path d="M14 7.2h6M14 10.4h4.5M14 13.6h6M14 16.8h4.5"/><path d="M14 19.8h6"/></symbol>
-      <symbol id="icon-pump" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 6h4.8a2 2 0 0 1 2 2v1.8h2.4a2.3 2.3 0 0 1 2.3 2.3V18a2 2 0 0 1-2 2h-3.6"/><path d="M7.5 6V4h2v2"/><path d="M7.3 20H6a2 2 0 0 1-2-2v-5.8a2.3 2.3 0 0 1 2.3-2.3h2.4V8a2 2 0 0 1 2-2h1.6"/><path d="M9.2 13.2h4.5v6.8H9.2z"/><path d="M17.3 13.1v4.2"/></symbol>
-      <symbol id="icon-stats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17v-6h4v6H3zM10 17V9h4v8h-4zM17 17v-3h4v3h-4z"/></symbol>
-      <symbol id="icon-milestone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2 6 6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1 2-6z"/></symbol>
-      <symbol id="icon-delete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M10 11v6M14 11v6"/></symbol>
-      <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
-      <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .1-1l2-1.1-2-3.5-2.3.6a7.6 7.6 0 0 0-1.6-1l-.3-2.4H10.7l-.3 2.4a7.6 7.6 0 0 0-1.6 1l-2.3-.6-2 3.5 2 1.1a7.9 7.9 0 0 0 .1 1 7.9 7.9 0 0 0-.1 1l-2 1.1 2 3.5 2.3-.6c.5.4 1 .8 1.6 1l.3 2.4h4.6l.3-2.4c.6-.2 1.1-.6 1.6-1l2.3.6 2-3.5-2-1.1a7.9 7.9 0 0 0-.1-1Z"/></symbol>
-      <symbol id="icon-sleep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+      <symbol id="icon-breast" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path
+          d="M12 4c-1.5 0-2.5 1.2-2.5 2.8 0 1.2.6 2.2 1.5 2.8v9.4h2V9.6c.9-.6 1.5-1.6 1.5-2.8C14.5 5.2 13.5 4 12 4z" />
+        <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.6" />
+      </symbol>
+      <symbol id="icon-bottle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 2v3h6V2H9zM8 6h8v2l2 10H6L8 6z" />
+        <path d="M7 8v11h10V8" stroke-width="1.2" />
+        <path d="M10 11h4M10 14h4M10 17h2" stroke-width="1" />
+      </symbol>
+      <symbol id="icon-med" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 8.5h7.5a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8.5a2 2 0 0 1 2-2z" />
+        <path d="M8 6h5.5a1 1 0 0 1 1 1v1.5H7V7a1 1 0 0 1 1-1z" />
+        <path d="M9.8 13h2M10.8 12v2" />
+        <path d="M16.8 7.8l2.6 2.6" />
+        <path d="M18.1 6.5a1.9 1.9 0 1 1 2.7 2.7L18.1 12a1.9 1.9 0 0 1-2.7-2.7l2.7-2.8z" />
+      </symbol>
+      <symbol id="icon-diaper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path
+          d="M4.5 7.5h15a1.5 1.5 0 0 1 1.5 1.5v3.2A8.9 8.9 0 0 1 12 21a8.9 8.9 0 0 1-9-8.8V9a1.5 1.5 0 0 1 1.5-1.5z" />
+        <path d="M8.2 11.2a3.8 3.8 0 0 0 7.6 0" />
+        <path d="M3 9.5h2.2l1.2 2.6-2.1 1.5H3" />
+        <path d="M21 9.5h-2.2l-1.2 2.6 2.1 1.5H21" />
+      </symbol>
+      <symbol id="icon-measures" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path
+          d="M6 19.5V8.2A2.2 2.2 0 0 1 8.2 6h1.3A2.2 2.2 0 0 1 11.7 8.2v11.3A2.2 2.2 0 0 1 9.5 21H8.2A2.2 2.2 0 0 1 6 19.5z" />
+        <path d="M7.7 10.2h2.2M7.7 12.8h2.2M7.7 15.4h2.2" />
+        <path d="M14 7.2h6M14 10.4h4.5M14 13.6h6M14 16.8h4.5" />
+        <path d="M14 19.8h6" />
+      </symbol>
+      <symbol id="icon-pump" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7.5 6h4.8a2 2 0 0 1 2 2v1.8h2.4a2.3 2.3 0 0 1 2.3 2.3V18a2 2 0 0 1-2 2h-3.6" />
+        <path d="M7.5 6V4h2v2" />
+        <path d="M7.3 20H6a2 2 0 0 1-2-2v-5.8a2.3 2.3 0 0 1 2.3-2.3h2.4V8a2 2 0 0 1 2-2h1.6" />
+        <path d="M9.2 13.2h4.5v6.8H9.2z" />
+        <path d="M17.3 13.1v4.2" />
+      </symbol>
+      <symbol id="icon-stats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 17v-6h4v6H3zM10 17V9h4v8h-4zM17 17v-3h4v3h-4z" />
+      </symbol>
+      <symbol id="icon-milestone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l2 6 6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1 2-6z" />
+      </symbol>
+      <symbol id="icon-delete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" />
+        <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+        <path d="M10 11v6M14 11v6" />
+      </symbol>
+      <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.7 1.7 0 0 0 .1-1l2-1.1-2-3.5-2.3.6a7.6 7.6 0 0 0-1.6-1l-.3-2.4H10.7l-.3 2.4a7.6 7.6 0 0 0-1.6 1l-2.3-.6-2 3.5 2 1.1a7.9 7.9 0 0 0 .1 1 7.9 7.9 0 0 0-.1 1l-2 1.1 2 3.5 2.3-.6c.5.4 1 .8 1.6 1l.3 2.4h4.6l.3-2.4c.6-.2 1.1-.6 1.6-1l2.3.6 2-3.5-2-1.1a7.9 7.9 0 0 0-.1-1Z" />
+      </symbol>
+      <symbol id="icon-sleep" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </symbol>
     </defs>
   </svg>
   <div id="app-background"></div>
@@ -1576,15 +1769,20 @@
 
 
         <span class="theme-toggle-gear" id="theme-toggle-gear" aria-hidden="true">
-          <svg class="icon-svg icon-settings-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"/></svg>
+          <svg class="icon-svg icon-settings-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#icon-settings" />
+          </svg>
         </span>
 
 
       </button>
 
 
-      <button class="icon-btn icon-btn-secondary icon-only" id="settings-btn" type="button" aria-label="Réglages" style="display:none">
-        <svg class="icon-svg icon-settings-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"/></svg>
+      <button class="icon-btn icon-btn-secondary icon-only" id="settings-btn" type="button" aria-label="Réglages"
+        style="display:none">
+        <svg class="icon-svg icon-settings-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <use href="#icon-settings" />
+        </svg>
       </button>
 
 
@@ -1600,7 +1798,10 @@
     <div class="card row row-center" id="leo-card">
 
 
-      <button class="avatar avatar-btn" id="avatar-btn" type="button" aria-label="Léo"><svg class="icon-svg icon-avatar" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bottle"/></svg></button>
+      <button class="avatar avatar-btn" id="avatar-btn" type="button" aria-label="Léo"><svg class="icon-svg icon-avatar"
+          viewBox="0 0 24 24" aria-hidden="true">
+          <use href="#icon-bottle" />
+        </svg></button>
 
 
       <div class="col">
@@ -1625,10 +1826,13 @@
 
 
     </div>
-        <section class="focus-panel" id="milk-focus" aria-label="Résumé lait">
+    <section class="focus-panel" id="milk-focus" aria-label="Résumé lait">
       <div class="focus-head">
         <div class="focus-title">
-          <span class="focus-panel-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bottle"/></svg></span>
+          <span class="focus-panel-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24"
+              aria-hidden="true">
+              <use href="#icon-bottle" />
+            </svg></span>
           <div>
             <div class="focus-panel-label">Lait</div>
             <div class="focus-sub" id="milk-age">Âge: --</div>
@@ -1637,7 +1841,8 @@
         <button class="btn btn-ghost btn-compact" id="btn-milk-details" type="button">Détails</button>
       </div>
 
-      <div class="status-visual status-visual-min" id="milk-status" style="--progress: 0.6;" aria-live="polite" data-state="in">
+      <div class="status-visual status-visual-min" id="milk-status" style="--progress: 0.6;" aria-live="polite"
+        data-state="in">
         <div class="status-visual-head">
           <div class="status-visual-text">
             <div class="status-visual-label">Etat du jour</div>
@@ -1649,7 +1854,8 @@
             <span class="status-visual-note">Objectif quotidien</span>
           </div>
         </div>
-        <div class="status-visual-bar" id="milk-status-bar" role="progressbar" aria-label="Etat du jour" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="status-visual-bar" id="milk-status-bar" role="progressbar" aria-label="Etat du jour"
+          aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
           <span class="status-visual-fill" id="milk-status-fill"></span>
         </div>
       </div>
@@ -1672,30 +1878,43 @@
         </div>
       </div>
 
-     
+
 
       <div class="focus-actions">
         <button class="btn btn-primary btn-heartbeat" id="btn-breast" aria-label="Enregistrer une tétée">
-          <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-breast"/></svg></span> Sein
+          <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-breast" />
+            </svg></span> Sein
         </button>
         <button class="btn btn-primary btn-heartbeat" id="btn-bottle" aria-label="Enregistrer un biberon">
-          <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bottle"/></svg></span> Biberon
+          <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-bottle" />
+            </svg></span> Biberon
         </button>
       </div>
     </section>
 
     <div class="quick-actions" id="quick-actions" aria-label="Actions rapides">
       <button class="btn btn-warning btn-heartbeat" id="btn-med" aria-label="Enregistrer un médicament">
-        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-med"/></svg></span> Médicaments
+        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#icon-med" />
+          </svg></span> Médicaments
       </button>
       <button class="btn btn-success btn-heartbeat" id="btn-elim" aria-label="Enregistrer une couche">
-        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-diaper"/></svg></span> Couche
+        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#icon-diaper" />
+          </svg></span> Couche
       </button>
-      <button class="btn btn-info btn-heartbeat" id="btn-mesures" aria-label="Enregistrer la température, le poids ou la taille">
-        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-measures"/></svg></span> Mesures
+      <button class="btn btn-info btn-heartbeat" id="btn-mesures"
+        aria-label="Enregistrer la température, le poids ou la taille">
+        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#icon-measures" />
+          </svg></span> Mesures
       </button>
       <button class="btn btn-primary btn-heartbeat" id="btn-pump" type="button" aria-label="Tirer le lait">
-        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-pump"/></svg></span> Tirer le lait
+        <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#icon-pump" />
+          </svg></span> Tirer le lait
       </button>
     </div>
 
@@ -1711,7 +1930,8 @@
         <div class="view-switcher">
 
 
-          <button class="icon-btn" id="history-range-btn" type="button" aria-haspopup="true"  aria-label="Changer la période du rapport">
+          <button class="icon-btn" id="history-range-btn" type="button" aria-haspopup="true"
+            aria-label="Changer la période du rapport">
 
 
             <span class="icon-calendar" aria-hidden="true"></span>
@@ -1729,7 +1949,8 @@
           <span class="pill" id="count-pill">0</span>
 
 
-          <button class="icon-btn icon-btn-secondary icon-only" id="export-pdf" type="button" aria-label="Exporter le rapport en PDF" style="margin-left: auto;">
+          <button class="icon-btn icon-btn-secondary icon-only" id="export-pdf" type="button"
+            aria-label="Exporter le rapport en PDF" style="margin-left: auto;">
 
 
             <span class="icon-export" aria-hidden="true"></span>
@@ -1741,7 +1962,8 @@
           </button>
 
 
-          <button class="icon-btn icon-btn-secondary icon-only" id="export-csv" type="button" aria-label="Exporter en CSV" style="margin-left: 4px;">
+          <button class="icon-btn icon-btn-secondary icon-only" id="export-csv" type="button"
+            aria-label="Exporter en CSV" style="margin-left: 4px;">
 
 
             <span style="font-size: 0.7rem; font-weight: 800; letter-spacing: -0.5px;">CSV</span>
@@ -1789,7 +2011,8 @@
             </button>
 
 
-            <div class="range-option range-option-custom" data-range="custom" role="menuitemradio" aria-checked="false" tabindex="-1">
+            <div class="range-option range-option-custom" data-range="custom" role="menuitemradio" aria-checked="false"
+              tabindex="-1">
 
 
               <button class="range-option-custom-trigger" type="button">
@@ -1804,7 +2027,8 @@
               </button>
 
 
-              <input class="range-date-input" id="history-range-date" type="date" aria-label="Sélectionner une date spécifique" />
+              <input class="range-date-input" id="history-range-date" type="date"
+                aria-label="Sélectionner une date spécifique" />
 
 
             </div>
@@ -1822,10 +2046,16 @@
           <button class="btn btn-ghost btn-compact" id="add-manual" type="button">Ajouter manuellement</button>
 
 
-          <button class="btn btn-ghost btn-compact btn-stats" id="btn-stats" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-stats"/></svg></span> Statistiques</button>
+          <button class="btn btn-ghost btn-compact btn-stats" id="btn-stats" type="button"><span class="btn-icon"
+              aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <use href="#icon-stats" />
+              </svg></span> Statistiques</button>
 
 
-          <button class="btn btn-ghost btn-compact" id="btn-milestones" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-milestone"/></svg></span> Étapes</button>
+          <button class="btn btn-ghost btn-compact" id="btn-milestones" type="button"><span class="btn-icon"
+              aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <use href="#icon-milestone" />
+              </svg></span> Étapes</button>
 
 
         </div>
@@ -1840,7 +2070,9 @@
           <button class="btn btn-danger" id="delete-selected-btn" type="button" disabled>
 
 
-            <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-delete"/></svg></span> Supprimer la sélection (0)
+            <span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                <use href="#icon-delete" />
+              </svg></span> Supprimer la sélection (0)
 
 
           </button>
@@ -1900,40 +2132,125 @@
 
 
 
-    <div class="modal" id="modal-pump" aria-hidden="true">
+  <div class="modal" id="modal-pump" aria-hidden="true">
 
 
-      <div class="sheet stack">
+    <div class="sheet stack">
 
 
-        <div class="modal-header">
+      <div class="modal-header">
 
 
-          <h2>Tirer mon lait</h2>
+        <h2>Tirer mon lait</h2>
 
 
-          <button class="modal-close" id="close-pump" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-pump" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
+
+
+      </div>
+
+
+      <section class="pump-card" id="pump-card" aria-labelledby="pump-card-title">
+
+
+        <div class="pump-card-head">
+
+
+          <div>
+
+
+            <p class="pump-label" id="pump-card-title">Tirer mon lait</p>
+
+
+          </div>
+
+
+          <span class="pump-icon" id="pump-icon" aria-hidden="true">Léo</span>
 
 
         </div>
 
 
-        <section class="pump-card" id="pump-card" aria-labelledby="pump-card-title">
 
 
-  <div class="pump-card-head">
+
+        <div class="pump-display" aria-live="polite">
 
 
-    <div>
+          <span class="pump-timer" id="pump-timer">00:00</span>
 
 
-      <p class="pump-label" id="pump-card-title">Tirer mon lait</p>
+        </div>
+
+
+
+
+
+        <button class="btn btn-pump btn-heartbeat" id="pump-control" type="button">Démarrer</button>
+
+
+
+
+
+        <div class="pump-confirm-panel" id="pump-confirm-panel" aria-live="polite">
+
+
+          <div class="pump-confirm-row">
+
+
+            <span class="pump-confirm-label">Durée</span>
+
+
+            <span class="pump-confirm-value" id="pump-confirm-duration">00:00</span>
+
+
+          </div>
+
+
+          <div class="pump-confirm-row">
+
+
+            <span class="pump-confirm-label">Lait</span>
+
+
+            <div class="pump-stepper" role="group" aria-label="Quantité en ml">
+
+
+              <button type="button" class="pump-step-btn" id="pump-amount-down" aria-label="Moins">-</button>
+
+
+              <span class="pump-amount-value" id="pump-amount-value">160 ml</span>
+
+
+              <button type="button" class="pump-step-btn" id="pump-amount-up" aria-label="Plus">+</button>
+
+
+            </div>
+
+
+          </div>
+
+
+          <div class="pump-confirm-actions">
+
+
+            <button class="btn btn-primary pump-save" id="pump-save-intent" type="button">Enregistrer</button>
+
+
+            <button class="btn btn-ghost pump-cancel" id="pump-cancel-intent" type="button">Annuler</button>
+
+
+          </div>
+
+
+        </div>
+
+
+      </section>
 
 
     </div>
-
-
-    <span class="pump-icon" id="pump-icon" aria-hidden="true">Léo</span>
 
 
   </div>
@@ -1942,55 +2259,28 @@
 
 
 
-  <div class="pump-display" aria-live="polite">
+  <div class="micro-modal" id="pump-confirm-modal" aria-hidden="true">
 
 
-    <span class="pump-timer" id="pump-timer">00:00</span>
+    <div class="micro-modal-sheet">
 
 
-  </div>
+      <p class="micro-modal-title" id="pump-confirm-title">Enregistrer ?</p>
 
 
+      <p class="micro-modal-line" id="pump-confirm-amount">Lait : 160 ml</p>
 
 
-
-  <button class="btn btn-pump btn-heartbeat" id="pump-control" type="button">Démarrer</button>
-
+      <p class="micro-modal-line" id="pump-confirm-time">Durée : 00:00</p>
 
 
+      <div class="micro-modal-actions">
 
 
-  <div class="pump-confirm-panel" id="pump-confirm-panel" aria-live="polite">
+        <button class="btn btn-primary" id="pump-confirm-yes" type="button">Oui, enregistrer</button>
 
 
-    <div class="pump-confirm-row">
-
-
-      <span class="pump-confirm-label">Durée</span>
-
-
-      <span class="pump-confirm-value" id="pump-confirm-duration">00:00</span>
-
-
-    </div>
-
-
-    <div class="pump-confirm-row">
-
-
-      <span class="pump-confirm-label">Lait</span>
-
-
-      <div class="pump-stepper" role="group" aria-label="Quantité en ml">
-
-
-        <button type="button" class="pump-step-btn" id="pump-amount-down" aria-label="Moins">-</button>
-
-
-        <span class="pump-amount-value" id="pump-amount-value">160 ml</span>
-
-
-        <button type="button" class="pump-step-btn" id="pump-amount-up" aria-label="Plus">+</button>
+        <button class="btn btn-ghost" id="pump-confirm-adjust" type="button">Ajuster</button>
 
 
       </div>
@@ -1999,64 +2289,7 @@
     </div>
 
 
-    <div class="pump-confirm-actions">
-
-
-      <button class="btn btn-primary pump-save" id="pump-save-intent" type="button">Enregistrer</button>
-
-
-      <button class="btn btn-ghost pump-cancel" id="pump-cancel-intent" type="button">Annuler</button>
-
-
-    </div>
-
-
   </div>
-
-
-</section>
-
-
-    </div>
-
-
-  </div>
-
-
-
-
-
-    <div class="micro-modal" id="pump-confirm-modal" aria-hidden="true">
-
-
-      <div class="micro-modal-sheet">
-
-
-        <p class="micro-modal-title" id="pump-confirm-title">Enregistrer ?</p>
-
-
-        <p class="micro-modal-line" id="pump-confirm-amount">Lait : 160 ml</p>
-
-
-        <p class="micro-modal-line" id="pump-confirm-time">Durée : 00:00</p>
-
-
-        <div class="micro-modal-actions">
-
-
-          <button class="btn btn-primary" id="pump-confirm-yes" type="button">Oui, enregistrer</button>
-
-
-          <button class="btn btn-ghost" id="pump-confirm-adjust" type="button">Ajuster</button>
-
-
-        </div>
-
-
-      </div>
-
-
-    </div>
 
 
 
@@ -2083,7 +2316,8 @@
         <h2>Lait</h2>
 
 
-        <button class="modal-close" id="close-leche" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-leche" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -2101,7 +2335,7 @@
         <button id="seg-biberon">Biberon</button>
 
 
-      </div>\r\n\r\n      <div class="stack" id="feed-content">
+      </div>\r\n\r\n <div class="stack" id="feed-content">
 
 
         <!-- Pecho -->
@@ -2125,7 +2359,10 @@
           <div class="text-center">
 
 
-            <div class="time-row"><div class="time" id="chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="breast" aria-label="Mode focus">â›¶</button></div>
+            <div class="time-row">
+              <div class="time" id="chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="breast"
+                aria-label="Mode focus">â›¶</button>
+            </div>
 
 
             <div id="start-time-display" class="muted"></div>
@@ -2152,7 +2389,10 @@
           <div class="text-center">
 
 
-            <div class="time-row"><div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle" aria-label="Mode focus" style="display: none;">â›¶</button></div>
+            <div class="time-row">
+              <div class="time" id="bottle-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="bottle"
+                aria-label="Mode focus" style="display: none;">â›¶</button>
+            </div>
 
 
             <button class="btn btn-primary" id="startStopBottle">Démarrer</button>
@@ -2167,7 +2407,8 @@
           <!-- Summary / Edit Toggle -->
 
 
-          <div id="bottle-time-summary" class="bottle-time-summary" role="button" tabindex="0" aria-expanded="false" aria-label="Modifier l'heure">
+          <div id="bottle-time-summary" class="bottle-time-summary" role="button" tabindex="0" aria-expanded="false"
+            aria-label="Modifier l'heure">
 
 
             <span id="bottle-time-label">Aujourd'hui</span>
@@ -2191,10 +2432,12 @@
               <div class="form-grid">
 
 
-                <div class="field"><label for="bottle-start">Début</label><input id="bottle-start" class="input" type="datetime-local" /></div>
+                <div class="field"><label for="bottle-start">Début</label><input id="bottle-start" class="input"
+                    type="datetime-local" /></div>
 
 
-                <div class="field"><label for="bottle-end">Fin</label><input id="bottle-end" class="input" type="datetime-local" /></div>
+                <div class="field"><label for="bottle-end">Fin</label><input id="bottle-end" class="input"
+                    type="datetime-local" /></div>
 
 
               </div>
@@ -2206,7 +2449,8 @@
                 <button type="button" class="btn btn-ghost btn-compact" id="cancel-bottle-time">Annuler</button>
 
 
-                <button type="button" class="btn btn-ghost btn-compact btn-primary" id="confirm-bottle-time">Valider</button>
+                <button type="button" class="btn btn-ghost btn-compact btn-primary"
+                  id="confirm-bottle-time">Valider</button>
 
 
               </div>
@@ -2230,22 +2474,26 @@
               <div class="bottle-amount-control">
 
 
-                <button type="button" class="circle-btn volume-step" id="bottle-decrease" aria-label="Retirer 10 ml">-10</button>
+                <button type="button" class="circle-btn volume-step" id="bottle-decrease"
+                  aria-label="Retirer 10 ml">-10</button>
 
 
                 <div class="bottle-amount-input">
 
 
-                  <input id="ml" class="input" type="number" inputmode="decimal" step="10" min="0" placeholder="ex. 130" />
+                  <input id="ml" class="input" type="number" inputmode="decimal" step="10" min="0"
+                    placeholder="ex. 130" />
 
 
-                  <div id="bottle-amount-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez</div>
+                  <div id="bottle-amount-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez
+                  </div>
 
 
                 </div>
 
 
-                <button type="button" class="circle-btn volume-step" id="bottle-increase" aria-label="Ajouter 10 ml">+10</button>
+                <button type="button" class="circle-btn volume-step" id="bottle-increase"
+                  aria-label="Ajouter 10 ml">+10</button>
 
 
               </div>
@@ -2326,7 +2574,8 @@
         <h2>Sommeil</h2>
 
 
-        <button class="modal-close" id="close-sleep" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-sleep" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -2338,7 +2587,10 @@
         <div class="text-center">
 
 
-          <div class="time-row"><div class="time" id="sleep-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="sleep" aria-label="Mode focus">â›¶</button></div>
+          <div class="time-row">
+            <div class="time" id="sleep-chrono">00:00:00</div><button class="btn-focus-toggle" data-focus="sleep"
+              aria-label="Mode focus">â›¶</button>
+          </div>
 
 
           <div class="muted" id="sleep-start-time-display"></div>
@@ -2386,7 +2638,8 @@
           <label for="sleep-notes">Notes</label>
 
 
-          <textarea id="sleep-notes" class="input textarea" rows="2" placeholder="Sieste, nuit complète, etc."></textarea>
+          <textarea id="sleep-notes" class="input textarea" rows="2"
+            placeholder="Sieste, nuit complète, etc."></textarea>
 
 
         </div>
@@ -2431,7 +2684,8 @@
         <h2>Pipi / Caca / Vomi</h2>
 
 
-        <button class="modal-close" id="close-elim" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-elim" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -2527,7 +2781,8 @@
         <h2>Medicaments</h2>
 
 
-        <button class="modal-close" id="close-med" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-med" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -2620,7 +2875,8 @@
         <h2>Mesures</h2>
 
 
-        <button class="modal-close" id="close-mesures" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-mesures" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -2738,7 +2994,8 @@
           <div class="modal-subtitle" id="manual-subtitle"></div>
         </div>
 
-        <button class="modal-close" id="close-manual" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-manual" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
       </div>
 
@@ -2749,19 +3006,34 @@
       <div class="seg" id="manual-type">
 
 
-        <button data-type="feed" class="active" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bottle"/></svg></span> Lait</button>
+        <button data-type="feed" class="active" type="button"><span class="btn-icon" aria-hidden="true"><svg
+              class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-bottle" />
+            </svg></span> Lait</button>
 
 
-        <button data-type="elim" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-diaper"/></svg></span> Couche</button>
+        <button data-type="elim" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg"
+              viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-diaper" />
+            </svg></span> Couche</button>
 
 
-        <button data-type="med" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-med"/></svg></span> Médicaments</button>
+        <button data-type="med" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg"
+              viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-med" />
+            </svg></span> Médicaments</button>
 
 
-        <button data-type="measurement" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-measures"/></svg></span> Mesures</button>
+        <button data-type="measurement" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg"
+              viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-measures" />
+            </svg></span> Mesures</button>
 
 
-        <button data-type="pump" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-pump"/></svg></span> Tire-lait</button>
+        <button data-type="pump" type="button"><span class="btn-icon" aria-hidden="true"><svg class="icon-svg"
+              viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-pump" />
+            </svg></span> Tire-lait</button>
 
 
       </div>
@@ -2781,7 +3053,7 @@
 
 
 
-      
+
       <div class="stack form-grid" id="manual-feed-fields">
 
         <div class="field span-2">
@@ -2836,7 +3108,8 @@
 
           <label for="manual-duration">Durée (minutes)</label>
 
-          <input id="manual-duration" class="input" type="text" inputmode="numeric" min="0" step="1" placeholder="ex. 12" />
+          <input id="manual-duration" class="input" type="text" inputmode="numeric" min="0" step="1"
+            placeholder="ex. 12" />
 
         </div>
 
@@ -2846,17 +3119,20 @@
 
           <div class="bottle-amount-control">
 
-            <button type="button" class="circle-btn volume-step" id="manual-bottle-decrease" aria-label="Retirer 10 ml">-10</button>
+            <button type="button" class="circle-btn volume-step" id="manual-bottle-decrease"
+              aria-label="Retirer 10 ml">-10</button>
 
             <div class="bottle-amount-input">
 
-              <input id="manual-amount" class="input" type="number" inputmode="decimal" min="0" step="10" placeholder="ex. 120" />
+              <input id="manual-amount" class="input" type="number" inputmode="decimal" min="0" step="10"
+                placeholder="ex. 120" />
 
               <div id="manual-bottle-feedback" class="amount-feedback" aria-live="polite">Choisissez ou ajustez</div>
 
             </div>
 
-            <button type="button" class="circle-btn volume-step" id="manual-bottle-increase" aria-label="Ajouter 10 ml">+10</button>
+            <button type="button" class="circle-btn volume-step" id="manual-bottle-increase"
+              aria-label="Ajouter 10 ml">+10</button>
 
           </div>
 
@@ -2878,7 +3154,8 @@
 
         <div class="options-accordion span-2" id="manual-options">
 
-          <button class="options-toggle" id="manual-options-toggle" type="button" aria-expanded="false" aria-controls="manual-options-content">Options</button>
+          <button class="options-toggle" id="manual-options-toggle" type="button" aria-expanded="false"
+            aria-controls="manual-options-content">Options</button>
 
           <div class="options-content is-collapsed" id="manual-options-content">
 
@@ -2916,7 +3193,8 @@
 
               <label for="manual-notes">Notes</label>
 
-              <textarea id="manual-notes" class="input textarea" rows="2" placeholder="Ajouter une note (facultatif)"></textarea>
+              <textarea id="manual-notes" class="input textarea" rows="2"
+                placeholder="Ajouter une note (facultatif)"></textarea>
 
             </div>
 
@@ -2976,7 +3254,8 @@
           <label for="manual-elim-notes">Notes</label>
 
 
-          <textarea id="manual-elim-notes" class="input textarea" rows="2" placeholder="Ajouter une note (facultatif)"></textarea>
+          <textarea id="manual-elim-notes" class="input textarea" rows="2"
+            placeholder="Ajouter une note (facultatif)"></textarea>
 
 
         </div>
@@ -3066,7 +3345,8 @@
           <label for="manual-mesure-temp">Température (°C)</label>
 
 
-          <input id="manual-mesure-temp" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 37.5" />
+          <input id="manual-mesure-temp" class="input" type="text" inputmode="decimal" step="0.1"
+            placeholder="ex. 37.5" />
 
 
         </div>
@@ -3078,7 +3358,8 @@
           <label for="manual-mesure-poids">Poids (kg)</label>
 
 
-          <input id="manual-mesure-poids" class="input" type="text" inputmode="decimal" step="0.01" placeholder="ex. 4.25" />
+          <input id="manual-mesure-poids" class="input" type="text" inputmode="decimal" step="0.01"
+            placeholder="ex. 4.25" />
 
 
         </div>
@@ -3090,7 +3371,8 @@
           <label for="manual-mesure-taille">Taille (cm)</label>
 
 
-          <input id="manual-mesure-taille" class="input" type="text" inputmode="decimal" step="0.1" placeholder="ex. 55.5" />
+          <input id="manual-mesure-taille" class="input" type="text" inputmode="decimal" step="0.1"
+            placeholder="ex. 55.5" />
 
 
         </div>
@@ -3111,7 +3393,8 @@
           <label for="manual-pump-duration">Durée (minutes)</label>
 
 
-          <input id="manual-pump-duration" class="input" type="text" inputmode="numeric" min="0" step="1" placeholder="ex. 15" />
+          <input id="manual-pump-duration" class="input" type="text" inputmode="numeric" min="0" step="1"
+            placeholder="ex. 15" />
 
 
         </div>
@@ -3123,7 +3406,8 @@
           <label for="manual-pump-amount">Quantité (ml)</label>
 
 
-          <input id="manual-pump-amount" class="input" type="number" inputmode="decimal" min="0" step="10" placeholder="ex. 120" />
+          <input id="manual-pump-amount" class="input" type="number" inputmode="decimal" min="0" step="10"
+            placeholder="ex. 120" />
 
 
         </div>
@@ -3182,7 +3466,8 @@
         <h2>Statistiques</h2>
 
 
-        <button class="modal-close" id="close-stats" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-stats" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -3299,7 +3584,8 @@
         <h2>Réglages</h2>
 
 
-        <button class="modal-close" id="close-settings" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-settings" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -3317,7 +3603,8 @@
             <h3>Actions visibles</h3>
 
 
-            <div class="muted">Désactivez une action pour la retirer de l'écran d'accueil. (Sauvé sur cet appareil.)</div>
+            <div class="muted">Désactivez une action pour la retirer de l'écran d'accueil. (Sauvé sur cet appareil.)
+            </div>
 
 
           </div>
@@ -3341,7 +3628,9 @@
             <div class="settings-item-main">
 
 
-              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bottle"/></svg></div>
+              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                  <use href="#icon-bottle" />
+                </svg></div>
 
 
               <div class="settings-item-text">
@@ -3383,7 +3672,9 @@
             <div class="settings-item-main">
 
 
-              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-diaper"/></svg></div>
+              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                  <use href="#icon-diaper" />
+                </svg></div>
 
 
               <div class="settings-item-text">
@@ -3425,7 +3716,9 @@
             <div class="settings-item-main">
 
 
-              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-med"/></svg></div>
+              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                  <use href="#icon-med" />
+                </svg></div>
 
 
               <div class="settings-item-text">
@@ -3467,7 +3760,9 @@
             <div class="settings-item-main">
 
 
-              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-measures"/></svg></div>
+              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                  <use href="#icon-measures" />
+                </svg></div>
 
 
               <div class="settings-item-text">
@@ -3509,7 +3804,9 @@
             <div class="settings-item-main">
 
 
-              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-sleep"/></svg></div>
+              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                  <use href="#icon-sleep" />
+                </svg></div>
 
 
               <div class="settings-item-text">
@@ -3551,7 +3848,9 @@
             <div class="settings-item-main">
 
 
-              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-pump"/></svg></div>
+              <div class="settings-item-icon"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+                  <use href="#icon-pump" />
+                </svg></div>
 
 
               <div class="settings-item-text">
@@ -3623,7 +3922,8 @@
         </div>
 
 
-        <button class="modal-close" id="close-milk-details" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-milk-details" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -3668,7 +3968,8 @@
         <h2>Confirmer la suppression</h2>
 
 
-        <button class="modal-close" id="close-confirm-delete" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-confirm-delete" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -3683,7 +3984,8 @@
         <label for="security-pin">Code de sécurité</label>
 
 
-        <input id="security-pin" class="input" type="password" inputmode="numeric" placeholder="Entrez le code pour confirmer" />
+        <input id="security-pin" class="input" type="password" inputmode="numeric"
+          placeholder="Entrez le code pour confirmer" />
 
 
       </div>
@@ -3725,7 +4027,8 @@
         <h2>Choisir une période</h2>
 
 
-        <button class="modal-close" id="close-range-picker" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-range-picker" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
@@ -3797,13 +4100,14 @@
         <h2>Étapes de développement</h2>
 
 
-        <button class="modal-close" id="close-milestones" type="button" aria-label="Fermer" title="Fermer" data-close-label="Fermer"><span>×</span></button>
+        <button class="modal-close" id="close-milestones" type="button" aria-label="Fermer" title="Fermer"
+          data-close-label="Fermer"><span>×</span></button>
 
 
       </div>
 
 
-      
+
 
 
       <div class="list" id="milestones-list">
@@ -3912,7 +4216,9 @@
 
 
         <button class="swipe-delete-btn" type="button" aria-label="Supprimer">
-          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-delete"/></svg>
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <use href="#icon-delete" />
+          </svg>
         </button>
 
 
@@ -3940,10 +4246,16 @@
         <div class="item-actions">
 
 
-          <button class="item-action item-edit" type="button" aria-label="Modifier l'élément"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-edit"/></svg></button>
+          <button class="item-action item-edit" type="button" aria-label="Modifier l'élément"><svg class="icon-svg"
+              viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-edit" />
+            </svg></button>
 
 
-          <button class="item-action item-delete" type="button" aria-label="Supprimer l'élément"><svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-delete"/></svg></button>
+          <button class="item-action item-delete" type="button" aria-label="Supprimer l'élément"><svg class="icon-svg"
+              viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#icon-delete" />
+            </svg></button>
 
 
         </div>
@@ -3987,21 +4299,4 @@
 
 </body>
 
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
