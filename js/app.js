@@ -2214,6 +2214,7 @@ let lastSyncedTime = null;
 
 
 let saveIndicatorResetTimer = null;
+let syncSavingDelayTimer = null;
 
 
 const summaryMedEl = $('#summary-med');
@@ -12497,7 +12498,7 @@ function updateBottleAmountFeedback(value){
   }
 
 
-  bottleAmountFeedback.textContent = `${formatNumber(value)} ml sAclectionnAcs`;
+  bottleAmountFeedback.textContent = `${formatNumber(value)} ml sélectionné`;
 
 
   bottleAmountFeedback.classList.add('is-strong');
@@ -14691,7 +14692,9 @@ saveBottleBtn?.addEventListener('click', async () => {
     };
 
 
-
+    // Stop timer and clear remote state BEFORE saveFeed so sync does not restore the timer
+    stopBottleTimerWithoutSaving({ resetDisplay: true, persist: true });
+    if (activeFocusMode === 'bottle') exitFocusMode();
 
 
     await saveFeed(entry);
@@ -14716,9 +14719,6 @@ saveBottleBtn?.addEventListener('click', async () => {
 
 
     applyBottleDefaultAmount();
-
-
-    stopBottleTimerWithoutSaving();
 
 
   });
@@ -18257,14 +18257,25 @@ async function initFirebaseSync() {
 
 
       } else if (event === 'sync-status') {
-
-
-        setSaveIndicator(payload.status, payload.message);
-
-
+        const status = payload.status;
+        const message = payload.message;
+        if (syncSavingDelayTimer) {
+          clearTimeout(syncSavingDelayTimer);
+          syncSavingDelayTimer = null;
+        }
+        if (status === 'saving') {
+          syncSavingDelayTimer = setTimeout(() => {
+            syncSavingDelayTimer = null;
+            setSaveIndicator('saving', message);
+          }, 500);
+        } else {
+          setSaveIndicator(status, message);
+        }
       } else if (event === 'server-update') {
-
-
+        if (syncSavingDelayTimer) {
+          clearTimeout(syncSavingDelayTimer);
+          syncSavingDelayTimer = null;
+        }
         setSaveIndicator('synced', 'Données à jour');
 
 

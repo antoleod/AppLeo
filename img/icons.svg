@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <defs>
+    <!-- Breast / Sein -->
+    <symbol id="icon-breast" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 4c-1.5 0-2.5 1.2-2.5 2.8 0 1.2.6 2.2 1.5 2.8v9.4h2V9.6c.9-.6 1.5-1.6 1.5-2.8C14.5 5.2 13.5 4 12 4z"/>
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.6"/>
+    </symbol>
+    <!-- Bottle / Biberon -->
+    <symbol id="icon-bottle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2v3h6V2H9zM8 6h8v2l2 10H6L8 6z"/>
+      <path d="M7 8v11h10V8" stroke-width="1.2"/>
+      <path d="M10 11h4M10 14h4M10 17h2" stroke-width="1"/>
+    </symbol>
+    <!-- Meds / Médicaments -->
+    <symbol id="icon-med" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 12h8M12 8v8"/>
+      <rect x="4" y="6" width="16" height="12" rx="2"/>
+    </symbol>
+    <!-- Diaper / Couche -->
+    <symbol id="icon-diaper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/>
+      <path d="M12 5v14M5 12h14"/>
+      <circle cx="9" cy="9" r="1.2" fill="currentColor"/>
+      <circle cx="15" cy="15" r="1.2" fill="currentColor"/>
+    </symbol>
+    <!-- Mesures (thermometer) -->
+    <symbol id="icon-measures" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 4v16a2 2 0 0 1-4 0V4a2 2 0 0 1 4 0z"/>
+      <path d="M14 8h-4M14 12h-4M14 16h-4"/>
+      <circle cx="12" cy="20" r="1.5" fill="currentColor"/>
+    </symbol>
+    <!-- Pump / Tirer le lait -->
+    <symbol id="icon-pump" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v4M12 17v4M5 12h4M15 12h4"/>
+      <path d="M7.34 7.34l2.83 2.83M13.83 13.83l2.83 2.83M7.34 16.66l2.83-2.83M13.83 10.17l2.83-2.83"/>
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 8v2a2 2 0 0 1 0 4v2" stroke-width="1.2"/>
+    </symbol>
+    <!-- Stats / Statistiques -->
+    <symbol id="icon-stats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 17v-6h4v6H3zM10 17V9h4v8h-4zM17 17v-3h4v3h-4z"/>
+    </symbol>
+    <!-- Milestones / Étapes -->
+    <symbol id="icon-milestone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l2 6 6 1-4 4 1 6-5-3-5 3 1-6-4-4 6-1 2-6z"/>
+    </symbol>
+    <!-- Delete / Supprimer -->
+    <symbol id="icon-delete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 6h16v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"/>
+      <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
+      <path d="M10 11v6M14 11v6"/>
+    </symbol>
+    <!-- Manual: Lait (bottle), Couche (diaper), Médicaments (med), Mesures (measures), Tire-lait (pump) - reuse same symbols -->
+  </defs>
+</svg>

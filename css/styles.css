@@ -1695,20 +1695,19 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 
 
 .btn .btn-icon{
-
-
   display:inline-flex;
-
-
+  align-items:center;
+  justify-content:center;
   margin-right:10px;
-
-
   font-size:1.15em;
-
-
   transition:transform .3s ease;
-
-
+}
+.btn .btn-icon .icon-svg{
+  width:1.25em;
+  height:1.25em;
+  flex-shrink:0;
+  color:inherit;
+  fill:currentColor;
 }
 
 
@@ -2917,7 +2916,9 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 .item-action:active{transform:scale(.94)}
 
 
-.item-action span{font-size:16px;line-height:1}
+.item-action span,.item-action .icon-svg{font-size:16px;line-height:1}
+.item-action .icon-svg{width:1rem;height:1rem;display:block}
+.swipe-delete-btn .icon-svg{width:1.5rem;height:1.5rem;display:block;color:inherit}
 
 
 :root.dark-mode .history-item, :root.dark-mode .item{
@@ -8133,6 +8134,11 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   font-size:1.3rem;
   flex:0 0 auto;
 }
+.focus-panel .focus-panel-icon .icon-svg{
+  width:1.4rem;
+  height:1.4rem;
+  color:var(--primary);
+}
 .focus-panel .focus-panel-label{
   font-size:0.85rem;
   font-weight:800;
@@ -8376,6 +8382,11 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
   border:1px solid rgba(10,132,255,.2);
   font-size:1.3rem;
   flex:0 0 auto;
+}
+.focus-panel .focus-panel-icon .icon-svg{
+  width:1.4rem;
+  height:1.4rem;
+  color:var(--primary);
 }
 .focus-panel .focus-panel-label{
   font-size:0.85rem;
