@@ -2215,6 +2215,7 @@ let lastSyncedTime = null;
 
 let saveIndicatorResetTimer = null;
 let syncSavingDelayTimer = null;
+let saveIndicatorInfoTimer = null;
 
 
 const summaryMedEl = $('#summary-med');
@@ -2407,6 +2408,7 @@ const BOTTLE_MIN_ML = 0;
 
 
 const BOTTLE_INTERVAL_MS = 3 * 60 * 60 * 1000;
+const BOTTLE_REMOTE_SUPPRESS_MS = 45000;
 
 
 let manualType = 'feed';
@@ -2452,6 +2454,9 @@ let lastStoppedBottleStart = null;
 
 
 let lastBottleStopRequestedAt = null;
+let lastBottleTimerClearAttemptAt = 0;
+let suppressRemoteBottleTimerUntil = 0;
+let bottleSaveInFlight = false;
 
 
 let bottleType = store.get(BOTTLE_TYPE_PREF_KEY, 'maternal') || 'maternal';
@@ -7978,6 +7983,14 @@ function setSaveIndicator(status = 'idle', message){
 
 
   if(!saveIndicatorEl || !saveLabelEl) return;
+  const nextStatus = status || 'idle';
+  const nextMessage = message || SAVE_MESSAGES[nextStatus] || SAVE_MESSAGES.idle;
+  if(saveIndicatorEl.dataset.state === nextStatus && saveLabelEl.textContent === nextMessage){
+    return;
+  }
+  if(nextStatus === 'saving' && lastSyncedTime && (Date.now() - lastSyncedTime) < 1800){
+    return;
+  }
 
 
   if(saveIndicatorResetTimer){
@@ -7992,13 +8005,13 @@ function setSaveIndicator(status = 'idle', message){
   }
 
 
-  saveIndicatorEl.dataset.state = status || 'idle';
+  saveIndicatorEl.dataset.state = nextStatus;
 
 
-  saveLabelEl.textContent = message || SAVE_MESSAGES[status] || SAVE_MESSAGES.idle;
+  saveLabelEl.textContent = nextMessage;
 
 
-  if(status === 'synced'){
+  if(nextStatus === 'synced'){
 
 
     lastSyncedTime = Date.now();
@@ -8048,6 +8061,40 @@ function setSaveIndicator(status = 'idle', message){
 
 
 
+
+function showConnectionStatusInline(){
+  const fbStatus = firebaseInitialized ? 'Firebase OK' : 'Firebase non initialise';
+  const netStatus = isOnline() ? 'Reseau en ligne' : 'Reseau hors ligne';
+  const docStatus = firebaseDocId ? `Doc: ${firebaseDocId}` : 'Doc manquant';
+  const infoMessage = `${fbStatus} · ${netStatus} · ${docStatus}`;
+  setSaveIndicator('idle', infoMessage);
+  if(saveIndicatorInfoTimer){
+    clearTimeout(saveIndicatorInfoTimer);
+    saveIndicatorInfoTimer = null;
+  }
+  saveIndicatorInfoTimer = setTimeout(() => {
+    saveIndicatorInfoTimer = null;
+    if(!saveIndicatorEl || !saveLabelEl) return;
+    if(saveIndicatorEl.dataset.state === 'idle'){
+      setSaveIndicator('idle', isOnline() ? SAVE_MESSAGES.idle : SAVE_MESSAGES.offline);
+    }
+  }, 3200);
+}
+
+async function requestRemoteBottleTimerClear(reason = 'Stop bottle timer'){
+  const now = Date.now();
+  lastBottleStopRequestedAt = now;
+  suppressRemoteBottleTimerUntil = Math.max(suppressRemoteBottleTimerUntil, now + BOTTLE_REMOTE_SUPPRESS_MS);
+  if(now - lastBottleTimerClearAttemptAt < 1200) return;
+  lastBottleTimerClearAttemptAt = now;
+  const api = getPersistenceApi();
+  if(!api?.saveTimer) return;
+  try{
+    await api.saveTimer('bottle', null, reason);
+  }catch(err){
+    console.warn('Failed to clear remote bottle timer:', err);
+  }
+}
 
 function exportReports(){
 
@@ -9708,19 +9755,19 @@ function updatePumpUI(){
     if(isPaused){
 
 
-      if(pumpIcon.textContent !== 'Leo'){
+      if(pumpIcon.textContent !== 'Léo'){
 
 
         pumpIcon.dataset.og = pumpIcon.textContent;
 
 
-        pumpIcon.textContent = 'Leo';
+        pumpIcon.textContent = 'Léo';
 
 
       }
 
 
-    } else if(pumpIcon.dataset.og && pumpIcon.textContent === 'Leo'){
+    } else if(pumpIcon.dataset.og && pumpIcon.textContent === 'Léo'){
 
 
       pumpIcon.textContent = pumpIcon.dataset.og;
@@ -11779,6 +11826,8 @@ function beginBottleTimer(startTimestamp = Date.now(), persist = true){
 
 
   showBottlePrompt();
+  suppressRemoteBottleTimerUntil = 0;
+  lastBottleStopRequestedAt = null;
 
 
   bottleTimerStart = startTimestamp;
@@ -11877,7 +11926,7 @@ function stopBottleTimerWithoutSaving({ resetDisplay = true, persist = true } = 
   if(persist){
 
 
-    getPersistenceApi()?.saveTimer('bottle', null);
+    void requestRemoteBottleTimerClear('Stop bottle timer');
 
 
   }
@@ -11982,16 +12031,17 @@ function syncLocalTimersWithRemote(activeTimers) {
   if (bottle && bottle.start) {
 
 
-    if(bottlePendingDuration > 0 || bottlePendingAmount != null){
+    const suppressRemoteTimer = suppressRemoteBottleTimerUntil && Date.now() < suppressRemoteBottleTimerUntil;
+    if(bottleSaveInFlight || suppressRemoteTimer || bottlePendingDuration > 0 || bottlePendingAmount != null){
 
 
-      getPersistenceApi()?.saveTimer('bottle', null);
+      void requestRemoteBottleTimerClear('Ignore stale remote bottle timer');
 
 
-    } else if(lastBottleStopRequestedAt && Date.now() - lastBottleStopRequestedAt < 10000){
+    } else if(lastBottleStopRequestedAt && Date.now() - lastBottleStopRequestedAt < BOTTLE_REMOTE_SUPPRESS_MS){
 
 
-      getPersistenceApi()?.saveTimer('bottle', null);
+      void requestRemoteBottleTimerClear('Retry clear stale bottle timer');
 
 
     } else {
@@ -12031,6 +12081,7 @@ function syncLocalTimersWithRemote(activeTimers) {
 
 
     lastBottleStopRequestedAt = null;
+    suppressRemoteBottleTimerUntil = 0;
 
 
   }
@@ -13700,12 +13751,14 @@ btnBreast?.addEventListener('click', ()=> {
   pendingBreastAutoStart = true;
 });
 btnBottle?.addEventListener('click', ()=> {
+  if(bottleSaveInFlight) return;
   setFeedMode('bottle');
   openModal('#modal-leche');
   updateBottleIntervalHint();
   if(!bottleTimerInterval){
-    beginBottleTimer(Date.now(), true);
-    getPersistenceApi()?.saveTimer('bottle', { start: Date.now(), bottleType });
+    const startTs = Date.now();
+    beginBottleTimer(startTs, true);
+    getPersistenceApi()?.saveTimer('bottle', { start: startTs, bottleType });
     enterFocusMode('bottle');
   }
 });
@@ -14321,6 +14374,7 @@ cancelBottleTimeBtn?.addEventListener('click', () => {
 
 
 startStopBottleBtn?.addEventListener('click', async () => {
+  if(bottleSaveInFlight) return;
 
 
   if(!bottleTimerInterval){
@@ -14488,7 +14542,9 @@ startStopBottleBtn?.addEventListener('click', async () => {
     setFeedMode('bottle');
 
 
-    beginBottleTimer(Date.now(), true);
+    const startTs = Date.now();
+    beginBottleTimer(startTs, true);
+    getPersistenceApi()?.saveTimer('bottle', { start: startTs, bottleType });
 
 
     updateBottleTimeSummary();
@@ -14510,6 +14566,9 @@ saveBottleBtn?.addEventListener('click', async () => {
 
 
   await safeAction(saveBottleBtn, async () => {
+    if(bottleSaveInFlight) return;
+    bottleSaveInFlight = true;
+    try{
 
 
     triggerVibration();
@@ -14692,8 +14751,9 @@ saveBottleBtn?.addEventListener('click', async () => {
     };
 
 
-    // Stop timer and clear remote state BEFORE saveFeed so sync does not restore the timer
-    stopBottleTimerWithoutSaving({ resetDisplay: true, persist: true });
+    // Stop local timer first, then clear remote timer to avoid stale snapshot restarts.
+    stopBottleTimerWithoutSaving({ resetDisplay: true, persist: false });
+    await requestRemoteBottleTimerClear('Stop bottle timer after save');
     if (activeFocusMode === 'bottle') exitFocusMode();
 
 
@@ -14719,6 +14779,9 @@ saveBottleBtn?.addEventListener('click', async () => {
 
 
     applyBottleDefaultAmount();
+    } finally {
+      bottleSaveInFlight = false;
+    }
 
 
   });
@@ -18267,7 +18330,7 @@ async function initFirebaseSync() {
           syncSavingDelayTimer = setTimeout(() => {
             syncSavingDelayTimer = null;
             setSaveIndicator('saving', message);
-          }, 500);
+          }, 1200);
         } else {
           setSaveIndicator(status, message);
         }
@@ -18351,22 +18414,11 @@ async function bootstrap() {
       saveIndicatorEl.style.cursor = 'pointer';
 
 
-      saveIndicatorEl.title = "Vérifier la connexion";
+      saveIndicatorEl.title = "Voir l'etat de synchronisation";
 
 
       saveIndicatorEl.addEventListener('click', () => {
-
-
-        const fbStatus = firebaseInitialized ? '✅ Initialisé' : '❌ Non initialisé';
-
-
-        const netStatus = isOnline() ? '✅ En ligne' : '⚠️ Hors ligne';
-
-
-        const docStatus = firebaseDocId ? `📄 ${firebaseDocId}` : '❌ Manquant';
-
-
-        alert(`État de la connexion :\n\nFirebase : ${fbStatus}\nRéseau : ${netStatus}\nDocument : ${docStatus}`);
+        showConnectionStatusInline();
 
 
       });

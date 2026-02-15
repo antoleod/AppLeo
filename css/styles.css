@@ -557,15 +557,15 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 }
 
 
-.theme-toggle-gear .icon-settings{
-
-
+.theme-toggle-gear .icon-svg{
   width:14px;
-
-
   height:14px;
-
-
+  color:inherit;
+}
+.icon-settings-svg{
+  width:18px;
+  height:18px;
+  color:inherit;
 }
 
 
@@ -738,6 +738,7 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 
 
 .avatar{width:72px;height:72px;border-radius:24px;background:linear-gradient(135deg,#f2f6fc,#e3ecfa);display:grid;place-items:center;font-size:32px;box-shadow:inset 0 2px 10px rgba(255,255,255,.9);border:0;cursor:pointer;transition:transform .2s ease, box-shadow .2s ease}
+.avatar .icon-svg,.avatar-btn .icon-svg{width:1.75rem;height:1.75rem;color:var(--primary);display:block}
 
 
 .avatar-btn:focus-visible{outline:3px solid rgba(10,132,255,.35);outline-offset:3px}
@@ -1203,29 +1204,17 @@ h1{font-size:var(--title-size);font-weight:800;margin:8px 0 22px;letter-spacing:
 
 
 .settings-item-icon{
-
-
   width:38px;height:38px;border-radius:14px;
-
-
   display:grid;place-items:center;
-
-
   background:rgba(10,132,255,.12);
-
-
   border:1px solid rgba(10,132,255,.22);
-
-
   font-size:18px;
-
-
   flex:0 0 auto;
-
-
 }
-
-
+.settings-item-icon .icon-svg{
+  width:1.2rem;height:1.2rem;
+  color:var(--primary);
+}
 :root.dark-mode .settings-item-icon{background:rgba(120,182,255,.12);border-color:rgba(120,182,255,.22)}
 
 
@@ -5736,21 +5725,12 @@ select.input{appearance:none;background:rgba(255,255,255,.92) url('data:image/sv
 
 
 #leo-card .avatar {
-
-
-  width: 48px; /* Adjusted for better proportion */
-
-
-  height: 48px; /* Adjusted for better proportion */
-
-
+  width: 48px;
+  height: 48px;
   font-size: 22px;
-
-
-  border-radius: 12px; /* 50% of 24px */
-
-
+  border-radius: 12px;
 }
+#leo-card .avatar .icon-svg{width:1.4rem;height:1.4rem}
 
 
 
@@ -9368,5 +9348,267 @@ body::after{
   }
   #modal-manual.is-editing .options-content .field.span-2{
     grid-column: span 2;
+  }
+}
+
+/* --- Quick actions UX tune for modern phones (iPhone 14 Pro / S24 Ultra) --- */
+#quick-actions{
+  gap: 12px;
+}
+#quick-actions .btn{
+  min-height: 56px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#quick-actions .btn .btn-icon{
+  margin-right: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.28);
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+}
+#quick-actions .btn .btn-icon .icon-svg{
+  width: 1.24rem;
+  height: 1.24rem;
+  fill: none;
+  stroke: currentColor;
+}
+#quick-actions .btn:focus-visible{
+  outline: 2px solid rgba(10, 132, 255, 0.92);
+  outline-offset: 2px;
+}
+#quick-actions .btn:active{
+  transform: scale(0.985);
+}
+
+:root.dark-mode #quick-actions .btn .btn-icon{
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+/* Unique icon accents per quick action */
+#quick-actions #btn-med .btn-icon{
+  color: #b45309;
+  background: linear-gradient(160deg, rgba(255, 244, 214, 0.96), rgba(255, 224, 149, 0.8));
+  border-color: rgba(180, 83, 9, 0.28);
+}
+#quick-actions #btn-elim .btn-icon{
+  color: #0f766e;
+  background: linear-gradient(160deg, rgba(219, 255, 246, 0.95), rgba(153, 246, 228, 0.78));
+  border-color: rgba(15, 118, 110, 0.28);
+}
+#quick-actions #btn-mesures .btn-icon{
+  color: #1d4ed8;
+  background: linear-gradient(160deg, rgba(223, 238, 255, 0.96), rgba(165, 205, 255, 0.8));
+  border-color: rgba(29, 78, 216, 0.28);
+}
+#quick-actions #btn-pump .btn-icon{
+  color: #be185d;
+  background: linear-gradient(160deg, rgba(255, 230, 243, 0.96), rgba(255, 188, 220, 0.8));
+  border-color: rgba(190, 24, 93, 0.28);
+}
+
+:root.dark-mode #quick-actions #btn-med .btn-icon{
+  color: #fbbf24;
+  background: linear-gradient(160deg, rgba(120, 62, 0, 0.32), rgba(120, 62, 0, 0.18));
+}
+:root.dark-mode #quick-actions #btn-elim .btn-icon{
+  color: #2dd4bf;
+  background: linear-gradient(160deg, rgba(0, 95, 84, 0.32), rgba(0, 95, 84, 0.18));
+}
+:root.dark-mode #quick-actions #btn-mesures .btn-icon{
+  color: #60a5fa;
+  background: linear-gradient(160deg, rgba(18, 74, 180, 0.32), rgba(18, 74, 180, 0.18));
+}
+:root.dark-mode #quick-actions #btn-pump .btn-icon{
+  color: #f472b6;
+  background: linear-gradient(160deg, rgba(139, 19, 75, 0.32), rgba(139, 19, 75, 0.18));
+}
+
+@media (max-width: 520px){
+  #quick-actions{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  #quick-actions .btn{
+    min-height: 58px;
+    padding: 12px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (min-width: 390px) and (max-width: 440px){
+  #app-container{
+    padding-bottom: max(96px, calc(env(safe-area-inset-bottom, 0px) + 80px));
+  }
+  #quick-actions{
+    gap: 12px;
+  }
+  #quick-actions .btn{
+    min-height: 62px;
+    padding: 14px 15px;
+    border-radius: 18px;
+    font-size: 0.98rem;
+  }
+  #quick-actions .btn .btn-icon{
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 13px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (min-width: 410px) and (max-width: 440px) and (min-height: 900px){
+  #quick-actions{
+    gap: 14px;
+  }
+  #quick-actions .btn{
+    min-height: 64px;
+    font-size: 1rem;
+  }
+}
+
+/* --- Milk focus compact mode (-20% density) --- */
+#milk-focus{
+  padding: clamp(10px, 1.6vw, 13px);
+  gap: 10px;
+  border-radius: 16px;
+}
+#milk-focus .focus-head{
+  gap: 9px;
+}
+#milk-focus .focus-title{
+  gap: 10px;
+}
+#milk-focus .focus-panel-icon{
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+#milk-focus .focus-panel-icon .icon-svg{
+  width: 1.1rem;
+  height: 1.1rem;
+}
+#milk-focus .focus-panel-label{
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+#milk-focus .focus-sub{
+  font-size: 0.74rem;
+}
+#milk-focus #btn-milk-details{
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+#milk-focus .status-visual.status-visual-min{
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+#milk-focus .status-visual-label{
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+}
+#milk-focus .status-visual-min .status-visual-msg{
+  font-size: 0.88rem;
+}
+#milk-focus .status-visual-min .status-visual-emote{
+  font-size: 0.64rem;
+}
+#milk-focus .status-visual-num{
+  font-size: 0.74rem;
+}
+#milk-focus .status-visual-note{
+  font-size: 0.62rem;
+}
+#milk-focus .status-visual-min .status-visual-bar{
+  height: 6px;
+  margin-top: 7px;
+}
+#milk-focus .next-bottle-card{
+  padding: 11px 12px;
+  border-radius: 14px;
+  gap: 4px;
+}
+#milk-focus .next-bottle-label{
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+}
+#milk-focus .next-bottle-value{
+  font-size: 1.22rem;
+}
+#milk-focus .next-bottle-meta{
+  font-size: 0.74rem;
+}
+#milk-focus .focus-kpis{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+#milk-focus .focus-kpis .kpi-card:last-child{
+  grid-column: auto;
+}
+#milk-focus .focus-kpis .kpi-card{
+  min-height: 54px;
+  border-radius: 12px;
+  padding: 7px 9px;
+  gap: 2px;
+}
+#milk-focus .focus-kpis .kpi-label{
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+}
+#milk-focus .focus-kpis .kpi-value{
+  font-size: 0.9rem;
+}
+#milk-focus .focus-kpis .kpi-meta{
+  font-size: 0.66rem;
+}
+#milk-focus .focus-actions{
+  gap: 8px;
+}
+#milk-focus .focus-actions .btn{
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 0.84rem;
+  padding: 8px 10px;
+}
+#milk-focus .focus-actions .btn .btn-icon{
+  margin-right: 8px;
+  font-size: 1.05em;
+}
+
+@media (max-width: 520px){
+  #milk-focus{
+    padding: 10px;
+    gap: 9px;
+  }
+  #milk-focus .focus-panel-icon{
+    width: 32px;
+    height: 32px;
+  }
+  #milk-focus .next-bottle-value{
+    font-size: 1.14rem;
+  }
+  #milk-focus .focus-kpis{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #milk-focus .focus-kpis .kpi-card:last-child{
+    grid-column: auto;
+  }
+  #milk-focus .focus-actions .btn{
+    min-height: 42px;
+    font-size: 0.82rem;
   }
 }
