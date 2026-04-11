@@ -8063,10 +8063,10 @@ function setSaveIndicator(status = 'idle', message){
 
 
 function showConnectionStatusInline(){
-  const fbStatus = firebaseInitialized ? 'Firebase OK' : 'Firebase non initialise';
-  const netStatus = isOnline() ? 'Reseau en ligne' : 'Reseau hors ligne';
-  const docStatus = firebaseDocId ? `Doc: ${firebaseDocId}` : 'Doc manquant';
-  const infoMessage = `${fbStatus} · ${netStatus} · ${docStatus}`;
+  const fbStatus = firebaseInitialized ? 'Sincronización activa' : 'Esperando conexión';
+  const netStatus = isOnline() ? 'En línea' : 'Modo local';
+  const docStatus = firebaseDocId ? `ID: ...${firebaseDocId.slice(-4)}` : '';
+  const infoMessage = `${fbStatus} ✨ ${netStatus} ${docStatus}`;
   setSaveIndicator('idle', infoMessage);
   if(saveIndicatorInfoTimer){
     clearTimeout(saveIndicatorInfoTimer);
@@ -20963,6 +20963,3 @@ initMilkDetailsModal();
 
 
 bootstrap();
-
-
-

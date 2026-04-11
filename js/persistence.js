@@ -33,11 +33,11 @@ const clone = (value) => {
 };
 
 const SAVE_MESSAGES = {
-  idle: 'Prêt',
-  saving: 'Synchronisation…',
-  offline: 'Enregistré localement',
-  error: 'Erreur de synchronisation',
-  synced: 'Sauvegardé dans le cloud'
+  idle: 'Prêt ✨',
+  saving: 'Mise en sécurité...',
+  offline: 'Sauvé localement 🏠',
+  error: 'Souci de connexion ⚠️',
+  synced: 'Tout est à l\'abri ✨'
 };
 
 function baseSnapshot() {
